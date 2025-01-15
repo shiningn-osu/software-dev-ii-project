@@ -8,7 +8,7 @@ Aiden McCoy, Engineer in charge of UI design / Frontend Engineer
 Daniel Molina, Backend Engineer
 Nicholas Shininger, Tester / Backend UI Engineer
 
-## Team Members and Roles
+## Project Relevant Artifacts
 GitHub Project Link: https://github.com/shiningn-osu/software-dev-ii-project
 
 ## Communication Channels / Policies
