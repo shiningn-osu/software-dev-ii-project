@@ -9,7 +9,8 @@ Daniel Molina, Backend Engineer
 Nicholas Shininger, Tester / Backend UI Engineer
 
 ## Project Relevant Artifacts
-GitHub Project Link: https://github.com/shiningn-osu/software-dev-ii-project
+GitHub Repository Link: https://github.com/shiningn-osu/software-dev-ii-project
+GitHub Task Management Project Link: https://github.com/users/shiningn-osu/projects/1/views/1
 
 ## Communication Channels / Policies
 
