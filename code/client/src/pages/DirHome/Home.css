@@ -1,0 +1,65 @@
+/* Name: CENTER PIE -- centers the pie chart, which had the outermost div class name of recharts-wrapper */
+.recharts-wrapper {
+  margin: 0 auto;
+}
+
+/* TABLE ELEMENT SECTION */
+
+/* Name: TABLE STYLE -- adjust relevant styles for creating table position 
+on the page, and for applying curved corners */
+table {
+  /* Full page width */
+  width: 100%;
+  /* Collapse borders for cleaner look */
+  border-collapse: collapse;
+  /* Add margin around the table */
+  margin: 20px 0;
+
+  /* Round the corners of the table */
+  border-radius: 8px;
+  /* Prevent rounded corners from being cut off */
+  overflow: hidden;
+}
+
+/* Name: TABLE HEAD STYLE -- adjust colors of table headers, and adjust font and font weight*/
+th {
+  /* adjust important colors for headers */
+  background-color: #3b883d;
+  color: white;
+
+  /* Use a different font for headers */
+  font-family: 'Arial', sans-serif;
+  font-weight: bold;
+}
+
+/* Name: CELL GENERAL STYLES -- Modify cell position relative to the table. 
+Also, add borders and increase font size of cells */
+th,
+td {
+  /* Add padding for space between text and borders */
+  padding: 12px 15px;
+  /* Align text to the left (default) */
+  text-align: left;
+  /* Increase line height for readability */
+  line-height: 1.5;
+
+  /* Add borders for each cell */
+  border: 1px solid #ddd;
+
+  /* Set a comfortable font size */
+  font-size: 14px;
+}
+
+/* Name: ROW HOVER -- make row a heavier color on hover */
+tr:hover {
+  /* Change background color on hover */
+  background-color: #ddd;
+}
+
+/* Name: EVEN ROW COLOR -- make even rows a slightly different color than odd rows */
+tr:nth-child(even) {
+  /* Light gray for even rows */
+  background-color: #f2f2f2;
+}
+
+/* END TABLE ELEMENT SECTION */
