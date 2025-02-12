@@ -1,0 +1,51 @@
+/* NAV SECTION */
+
+/* Name: NAV RESIZE -- Adjust the size of Nav depending on screen size */
+@media (max-width: 769px) {
+  nav ul {
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+
+    /* Aligns items to the top */
+    justify-content: flex-start;
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    text-align: center;
+  }
+}
+
+/* Name: INLINE NAV -- make nav list elements appear next to each other, instead of above/below each other. */
+nav ul {
+  /* Allows items to wrap to a new line if needed */
+  display: flex;
+  /* Keeps items centered */
+  justify-content: left;
+  /* Aligns items vertically in the navbar */
+  align-items: center;
+  /* Even spacing between items */
+  gap: 15px;
+  padding: 0 0;
+}
+
+/* Name: NAV TEXT -- adjust the font and size / remove bullet points of the Nav list elements */
+nav li {
+  font-family: "Titan one", "Arial Black", "Trebuchet MS", Verdana, sans-serif;
+  font-size: clamp(1.5rem, 1.9vw, 2.4rem);
+
+  display: inline-block;
+}
+
+a:hover {
+  text-decoration: underline;
+  color: rgb(121, 0, 0);
+}
+
+a {
+  color: black;
+  transition: color 0.4s;
+}
+
+/* END NAV SECTION */
