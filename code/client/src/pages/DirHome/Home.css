@@ -50,16 +50,16 @@ td {
   font-size: 14px;
 }
 
-/* Name: ROW HOVER -- make row a heavier color on hover */
-tr:hover {
-  /* Change background color on hover */
-  background-color: #ddd;
-}
-
 /* Name: EVEN ROW COLOR -- make even rows a slightly different color than odd rows */
 tr:nth-child(even) {
   /* Light gray for even rows */
   background-color: #f2f2f2;
+}
+
+/* Name: ROW HOVER -- make row a heavier color on hover */
+tr:hover {
+  /* Change background color on hover */
+  background-color: #ddd;
 }
 
 /* END TABLE ELEMENT SECTION */
