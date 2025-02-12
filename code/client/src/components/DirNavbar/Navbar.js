@@ -3,6 +3,20 @@ import React from "react";
 import { Link } from "react-router-dom";
 import './Navbar.css';
 
+/**
+ * Navbar component that renders the navigation bar for the Meal Match application.
+ * 
+ * This component contains links to various pages within the application (Home, Food, Grocery, Nutrition),
+ * as well as a direct link to a Help page. It provides a basic structure for navigating between different
+ * parts of the app.
+ * 
+ * @component
+ * @example
+ * // Usage:
+ * <Navbar />
+ * 
+ * @returns {JSX.Element} The rendered Navbar component.
+ */
 function Navbar() {
   return (
     <div>
