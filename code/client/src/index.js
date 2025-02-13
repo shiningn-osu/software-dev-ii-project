@@ -3,14 +3,6 @@ import ReactDOM from 'react-dom/client';
 import './index.css';
 import App from './DirApp/App';
 
-// can uncomment whichever one you want to insert, and change the tag in the React.StringMode to match your page name to display
-//    your page's content for development.
-
-// import Food from './DirFood/Food';
-// import Grocery from './DirGrocery/Grocery';
-// import Home from './DirHome/Home';
-// import Nutrition from './DirNutrition/Nutrition';
-
 import reportWebVitals from './reportWebVitals';
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
