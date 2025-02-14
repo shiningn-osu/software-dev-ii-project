@@ -5,6 +5,7 @@ import Home from "../pages/DirHome/Home";
 import Food from "../pages/DirFood/Food";
 import Grocery from "../pages/DirGrocery/Grocery";
 import Nutrition from "../pages/DirNutrition/Nutrition";
+import '@testing-library/jest-dom';
 
 /**
  * App component that serves as the main entry point for the Meal Match application.
