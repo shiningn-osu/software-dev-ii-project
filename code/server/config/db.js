@@ -1,8 +1,10 @@
 const mongoose = require('mongoose');
 
+const uri = "mongodb+srv://anatherium:<db_password>@cluster0.wpsem.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0"
+
 const connectDB = async () => {
     try {
-        await mongoose.connect('INSERT MONGODB DB IN HERE', {
+        await mongoose.connect(uri, {
             useNewUrlParser: true,
             useUnifiedTopology: true,
         });
