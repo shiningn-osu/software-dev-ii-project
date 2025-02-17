@@ -2,6 +2,7 @@
   "name": "server",
   "version": "1.0.0",
   "description": "backend for Meal Match application",
+  "type": "module",
   "main": "server.js",
   "scripts": {
     "start": "node server.js"
