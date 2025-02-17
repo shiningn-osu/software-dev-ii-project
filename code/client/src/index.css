@@ -12,6 +12,7 @@ body {
   -webkit-font-smoothing: antialiased;
   /* Ensures smoother text rendering on Firefox on macOS */
   -moz-osx-font-smoothing: grayscale;
+  background-color: #FFF2D7;
 }
 
 /* Name: CODE FONTS -- Describes the code font family to be used in the general body */

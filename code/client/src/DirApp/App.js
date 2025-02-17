@@ -3,7 +3,12 @@ import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Navbar from "../components/DirNavbar/Navbar";
 import Home from "../pages/DirHome/Home";
 import Food from "../pages/DirFood/Food";
+import Diary from "../pages/DirFood/Diary"
+import MealPlan from "../pages/DirFood/MealPlan"
+import RecipeSearch from "../pages/DirFood/RecipeSearch"
 import Grocery from "../pages/DirGrocery/Grocery";
+import GroceryList from "../pages/DirGrocery/GroceryList"
+import GrocerySearch from "../pages/DirGrocery/GrocerySearch"
 import Nutrition from "../pages/DirNutrition/Nutrition";
 
 /**
@@ -28,7 +33,12 @@ function App() {
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/food" element={<Food />} />
-        <Route path="/grocery" element={<Grocery />} />
+        <Route path="/Diary" element={<Diary />} />
+        <Route path="/RecipeSearch" element={<RecipeSearch />} />
+        <Route path="/MealPlan" element={<MealPlan />} />
+        <Route path="/Grocery" element={<Grocery />} />
+        <Route path="/GroceryList" element={<GroceryList />} />
+        <Route path="/GrocerySearch" element={<GrocerySearch />} />
         <Route path="/nutrition" element={<Nutrition />} />
         <Route path="*" element={<Home />} />
       </Routes>
