@@ -1,16 +1,8 @@
-import React from "react";
-import { PieChart, Pie, Cell, Tooltip, Legend } from "recharts";
+import React, { useState, useEffect } from 'react';
+import { PieChart, Pie, Cell, Tooltip, Legend } from 'recharts';
 
-// array of objects to be used for table name and number insertion
-const data = [
-  { name: "Protein", value: 30 },
-  { name: "Carbs", value: 40 },
-  { name: "Fats", value: 20 },
-  { name: "Vitamins", value: 10 }
-];
-
-// color array, with colors corresponding to the number of data indeces.
-const COLORS = ["#0088FE", "#00C49F", "#FFBB28", "#FF8042"];
+// Use uppercase for constant values that won't be reassigned
+const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042'];
 
 /**
  * A React component that renders a pie chart using the `recharts` library.
@@ -30,6 +22,40 @@ const COLORS = ["#0088FE", "#00C49F", "#FFBB28", "#FF8042"];
  * @returns {JSX.Element} A pie chart displaying the nutritional data.
  */
 const ChartPie = () => {
+  const [data, setData] = useState([]);
+  const [error, setError] = useState('');
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchNutritionData = async () => {
+      try {
+        const response = await fetch('/api/nutrition/overview');
+        
+        if (!response.ok) {
+          throw new Error('Network response was not ok');
+        }
+        
+        const nutritionData = await response.json();
+        setData(nutritionData);
+      } catch (err) {
+        setError('Failed to fetch nutrition data');
+        console.error('Error:', err);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchNutritionData();
+  }, []);
+
+  if (isLoading) {
+    return <div>Loading...</div>;
+  }
+
+  if (error) {
+    return <div>Error: {error}</div>;
+  }
+
   return (
     <PieChart width={400} height={400}>
       <Pie
@@ -42,7 +68,10 @@ const ChartPie = () => {
         label
       >
         {data.map((entry, index) => (
-          <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+          <Cell 
+            key={`cell-${index}`} 
+            fill={COLORS[index % COLORS.length]} 
+          />
         ))}
       </Pie>
       <Tooltip />
