@@ -26,11 +26,18 @@ function Navbar() {
       <nav>
         <ul>
           {/* SHOULD BE RELATIVE PATHS TO CORRECT FILES */}
-          <li><Link to="/">Home</Link></li>
+          <li className="dropdown">
+            <span>Home</span>
+            <div className="dropdown-content">
+              <Link to="/">Summary</Link>
+              <Link to="/AccountCreation">Create Account</Link>
+              <Link to="/login">Login</Link>
+            </div>
+          </li>
 
           {/* Food link with dropdown */}
           <li className="dropdown">
-            <h4>Food</h4>
+            <span>Food</span>
             <div className="dropdown-content">
               <Link to="/Diary">Food Diary</Link>
               <Link to="/RecipeSearch">Recipe Search</Link>
@@ -40,14 +47,22 @@ function Navbar() {
 
           {/* Grocery link with dropdown */}
           <li className="dropdown">
-            <h4>Grocery</h4>
+            <span>Grocery</span>
             <div className="dropdown-content">
               <Link to="/GroceryList">Grocery List</Link>
               <Link to="/GrocerySearch">Grocery Search</Link>
             </div>
           </li>
-          
-          <li><Link to="/Nutrition">Nutrition</Link></li>
+
+          {/* SHOULD BE RELATIVE PATHS TO CORRECT FILES */}
+          <li className="dropdown">
+            <span>Nutrition</span>
+            <div className="dropdown-content">
+              <Link to="/NutritionDay">Day</Link>
+              <Link to="/NutritionHistory">History</Link>
+            </div>
+          </li>
+
           {/* Direct link to the help page in the public folder, as this 
           code will get put into the index.html eventually */}
           <li>
