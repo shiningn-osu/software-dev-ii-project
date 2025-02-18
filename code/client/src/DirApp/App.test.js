@@ -3,9 +3,23 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Home from "../pages/DirHome/Home";
 import App from './App'; // Path to your App.js component
 
+/**
+ * Test suite for validating the routing functionality in the `App` component.
+ * This suite tests the rendering of different components based on routes, 
+ * ensuring that navigation between different paths works as expected.
+ *
+ * The tests include the following scenarios:
+ *  - Rendering the `Home` component on the default `/` route.
+ *  - Navigating to the `Account Creation` page when the "Create Account" link is clicked.
+ *  - Navigating to the `Recipe search` page when the "Recipe Search" link is clicked.
+ *  - Navigating to the `Grocery list` page when the "Grocery List" link is clicked.
+ *  - Fallback to `Home` when accessing an undefined route.
+ *
+ * @group Routing Tests
+ */
 describe('App Routing', () => {
 
-  test('should render Home component on "/" path', () => {
+  test('should render Home summary component on "/" path', () => {
     render(<App />);
 
     // Check if Home component is rendered on the default route
@@ -24,7 +38,7 @@ describe('App Routing', () => {
     expect(screen.getByText(/Create An Account/i)).toBeInTheDocument();
   });
 
-  test('should navigate to Food page when clicking on Food link', async () => {
+  test('should navigate to recipe search page when clicking on recipe search link', async () => {
     render(<App />);
 
     fireEvent.click(screen.getByText(/Recipe Search/i));
@@ -35,7 +49,7 @@ describe('App Routing', () => {
   });
 
   // Similar tests for other routes
-  test('should render Grocery component on /Grocery path', async () => {
+  test('should render Grocery list component when navigate to the grocery list page', async () => {
     render(<App />);
 
     fireEvent.click(screen.getByText(/Grocery List/i));
