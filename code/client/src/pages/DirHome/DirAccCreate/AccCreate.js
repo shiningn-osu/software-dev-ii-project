@@ -45,7 +45,7 @@ function AccCreate() {
       </header>
       <div className='centered'>
         <section className='account-box'>
-          <h2 className='centered'>Create Account</h2>
+          <h2 className='centered'>Create An Account</h2>
           <form method="POST" action="/create-account" className='centered' id="accountCreateForm">
             <div className='text-input d-flex align-items-center'>
               <label htmlFor="username" className="d-flex align-items-center justify-content-center"
