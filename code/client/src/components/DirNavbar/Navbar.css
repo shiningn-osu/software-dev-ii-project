@@ -1,13 +1,17 @@
-/* NAV SECTION */
+/* ==========================================================================
+   Navigation Section
+   ========================================================================== */
 
-/* Name: NAV RESIZE -- Adjust the size of Nav depending on screen size */
+/**
+ * NAV RESIZE
+ * Adjusts the size and layout of Nav depending on screen size
+ * Mobile-first approach with flex column layout
+ */
 @media (max-width: 769px) {
   nav ul {
     text-align: center;
     display: flex;
     flex-direction: column;
-
-    /* Aligns items to the top */
     justify-content: flex-start;
     height: 100%;
     margin: 0;
@@ -16,7 +20,11 @@
   }
 }
 
-/* Name: INLINE NAV -- make nav list elements appear next to each other, instead of above/below each other. */
+/**
+ * INLINE NAV
+ * Desktop layout with horizontal alignment
+ * Uses flexbox for consistent spacing
+ */
 nav ul {
   display: flex;
   justify-content: left;

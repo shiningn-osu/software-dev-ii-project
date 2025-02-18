@@ -1,4 +1,9 @@
-// Intended for API and DB request logic 
+/**
+ * Express server configuration for Meal Match application
+ * Handles API routes and serves the React frontend in production
+ * @module Server
+ */
+
 import express from 'express';
 import path from 'path';
 import connectDB from './config/db.js';
@@ -11,8 +16,11 @@ connectDB();
 // Middleware
 app.use(express.json());
 
-// API Routes
-// Get nutritional overview data for the pie chart
+/**
+ * GET /api/nutrition/overview
+ * @description Retrieves nutritional overview data for the pie chart
+ * @returns {Object[]} Array of nutrition data objects with name and value properties
+ */
 app.get('/api/nutrition/overview', (req, res) => {
   // Temporary mock data - replace with database query later
   const nutritionData = [
@@ -24,7 +32,11 @@ app.get('/api/nutrition/overview', (req, res) => {
   res.json(nutritionData);
 });
 
-// Get daily nutrition goals
+/**
+ * GET /api/nutrition/goals
+ * @description Retrieves daily nutrition goals
+ * @returns {Object} Object containing calorie and macronutrient goals
+ */
 app.get('/api/nutrition/goals', (req, res) => {
   // Temporary mock data - replace with database query later
   const goals = {
