@@ -31,7 +31,7 @@ function Navbar() {
             <div className="dropdown-content">
               <Link to="/">Summary</Link>
               <Link to="/AccountCreation">Create Account</Link>
-              <Link to="/login">Login</Link>
+              <Link to="/Login">Login</Link>
             </div>
           </li>
 
