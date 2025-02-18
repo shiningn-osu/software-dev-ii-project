@@ -2,6 +2,13 @@ import { render, screen } from '@testing-library/react';
 import { BrowserRouter as Router } from 'react-router-dom';  // To enable routing in tests
 import Navbar from './Navbar';  // Import your Navbar component
 
+
+/**
+ * @fileoverview Unit tests for the Navbar component.
+ * 
+ * These tests verify that the Navbar component renders correctly 
+ * and that its navigation links point to the correct routes.
+ */
 describe('Navbar', () => {
   test('Home link has correct route', () => {
     render(
