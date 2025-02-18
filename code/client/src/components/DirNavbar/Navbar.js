@@ -27,8 +27,26 @@ function Navbar() {
         <ul>
           {/* SHOULD BE RELATIVE PATHS TO CORRECT FILES */}
           <li><Link to="/">Home</Link></li>
-          <li><Link to="/Food">Food</Link></li>
-          <li><Link to="/Grocery">Grocery</Link></li>
+
+          {/* Food link with dropdown */}
+          <li className="dropdown">
+            <h4>Food</h4>
+            <div className="dropdown-content">
+              <Link to="/Diary">Food Diary</Link>
+              <Link to="/RecipeSearch">Recipe Search</Link>
+              <Link to="/MealPlan">Meal Plan Creation</Link>
+            </div>
+          </li>
+
+          {/* Grocery link with dropdown */}
+          <li className="dropdown">
+            <h4>Grocery</h4>
+            <div className="dropdown-content">
+              <Link to="/GroceryList">Grocery List</Link>
+              <Link to="/GrocerySearch">Grocery Search</Link>
+            </div>
+          </li>
+          
           <li><Link to="/Nutrition">Nutrition</Link></li>
           {/* Direct link to the help page in the public folder, as this 
           code will get put into the index.html eventually */}

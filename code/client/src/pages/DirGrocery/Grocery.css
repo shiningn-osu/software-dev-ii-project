@@ -1,0 +1,65 @@
+.GroceryList {
+    padding: 20px;
+    max-width: 600px;
+    margin: 0 auto;
+    background-color: #f9f9f9;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  }
+  
+  .GroceryList-header {
+    text-align: center;
+    margin-bottom: 20px;
+  }
+  
+  .GroceryList input {
+    padding: 8px;
+    font-size: 16px;
+    margin-right: 10px;
+    width: 80%;
+    border-radius: 4px;
+    border: 1px solid #ccc;
+  }
+  
+  .GroceryList button {
+    padding: 8px 16px;
+    font-size: 16px;
+    background-color: #28a745;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+  }
+  
+  .GroceryList button:hover {
+    background-color: #218838;
+  }
+  
+  .GroceryList ul {
+    list-style-type: none;
+    padding: 0;
+  }
+  
+  .GroceryList li {
+    padding: 8px;
+    margin: 5px 0;
+    background-color: #fff;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  
+  .GroceryList li button {
+    background-color: #dc3545;
+    padding: 4px 8px;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+  }
+  
+  .GroceryList li button:hover {
+    background-color: #c82333;
+  }
