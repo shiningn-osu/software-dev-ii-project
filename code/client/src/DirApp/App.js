@@ -10,6 +10,7 @@ import Grocery from "../pages/DirGrocery/Grocery";
 import GroceryList from "../pages/DirGrocery/GroceryList"
 import GrocerySearch from "../pages/DirGrocery/GrocerySearch"
 import Nutrition from "../pages/DirNutrition/Nutrition";
+import '@testing-library/jest-dom';
 
 /**
  * App component that serves as the main entry point for the Meal Match application.
