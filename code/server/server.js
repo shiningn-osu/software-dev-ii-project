@@ -67,6 +67,22 @@ app.get('/api/nutrition/recent', (req, res) => {
   res.json(recentNutrition);
 });
 
+/**
+ * GET /api/nutrition/current
+ * @description Retrieves current nutrition values for the day
+ * @returns {Object} Object containing current calorie and macronutrient values
+ */
+app.get('/api/nutrition/current', (req, res) => {
+  // Temporary mock data - replace with database query later
+  const currentNutrition = {
+    calories: 1200,  // Example: User has consumed 1200 out of 2000 calories
+    protein: 80,     // Example: User has consumed 80 out of 150g protein
+    carbs: 120,      // Example: User has consumed 120 out of 200g carbs
+    fats: 35,        // Example: User has consumed 35 out of 65g fats
+  };
+  res.json(currentNutrition);
+});
+
 // Serve React build files in production
 if (process.env.NODE_ENV === 'production') {
   app.use(express.static(path.join(__dirname, '../client/build')));

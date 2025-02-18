@@ -6,41 +6,48 @@ import ChartPie from "../../components/DirPieChart/ChartPie";
 /**
  * DailyNutrGoals Component
  * 
- * This component renders a table displaying the daily nutrition goals. 
- * It is a static table with sample column and row data. 
- * It can be later updated to dynamically display nutritional goal data.
+ * Displays the daily nutrition goals and current values fetched from the backend API.
+ * Shows a comparison between target goals and actual consumption.
  * 
- * @returns {JSX.Element} The table displaying the daily nutrition goals.
+ * @returns {JSX.Element} The table displaying the daily nutrition goals and current values
  */
 const DailyNutrGoals = () => {
   const [goals, setGoals] = useState(null);
+  const [current, setCurrent] = useState(null);
   const [error, setError] = useState('');
 
   useEffect(() => {
-    const fetchGoals = async () => {
+    const fetchData = async () => {
       try {
-        const response = await fetch('/api/nutrition/goals');
+        // Fetch both goals and current values
+        const [goalsResponse, currentResponse] = await Promise.all([
+          fetch('/api/nutrition/goals'),
+          fetch('/api/nutrition/current')
+        ]);
         
-        if (!response.ok) {
+        if (!goalsResponse.ok || !currentResponse.ok) {
           throw new Error('Network response was not ok');
         }
         
-        const data = await response.json();
-        setGoals(data);
+        const goalsData = await goalsResponse.json();
+        const currentData = await currentResponse.json();
+        
+        setGoals(goalsData);
+        setCurrent(currentData);
       } catch (err) {
-        setError('Failed to fetch nutrition goals');
+        setError('Failed to fetch nutrition data');
         console.error('Error:', err);
       }
     };
 
-    fetchGoals();
+    fetchData();
   }, []);
 
   if (error) {
     return <div>Error: {error}</div>;
   }
 
-  if (!goals) {
+  if (!goals || !current) {
     return <div>Loading...</div>;
   }
 
@@ -49,25 +56,35 @@ const DailyNutrGoals = () => {
       <thead>
         <tr>
           <th>Nutrient</th>
-          <th>Goal</th>
+          <th>Daily Goal</th>
+          <th>Current</th>
+          <th>Remaining</th>
         </tr>
       </thead>
       <tbody>
         <tr>
           <td>Calories</td>
           <td>{goals.calories} kcal</td>
+          <td>{current.calories} kcal</td>
+          <td>{goals.calories - current.calories} kcal</td>
         </tr>
         <tr>
           <td>Protein</td>
           <td>{goals.protein}g</td>
+          <td>{current.protein}g</td>
+          <td>{goals.protein - current.protein}g</td>
         </tr>
         <tr>
           <td>Carbs</td>
           <td>{goals.carbs}g</td>
+          <td>{current.carbs}g</td>
+          <td>{goals.carbs - current.carbs}g</td>
         </tr>
         <tr>
           <td>Fats</td>
           <td>{goals.fats}g</td>
+          <td>{current.fats}g</td>
+          <td>{goals.fats - current.fats}g</td>
         </tr>
       </tbody>
     </table>
