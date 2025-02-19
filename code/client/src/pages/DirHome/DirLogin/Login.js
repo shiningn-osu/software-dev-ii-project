@@ -33,7 +33,7 @@ function PasswordInput() {
 }
 
 /**
- * Login component renders the account creation form, including a password input and a username input.
+ * Login component renders the account login form, including a password input and a username input.
  * It integrates the PasswordInput component to allow password visibility toggling.
  * 
  * @returns {JSX.Element} The rendered Login component containing a form for creating an account.
