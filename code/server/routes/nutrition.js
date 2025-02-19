@@ -1,12 +1,13 @@
 import express from 'express';
 import axios from 'axios';
 import User from '../models/userModel.js';
-
+import dotenv from 'dotenv';
+dotenv.config();
 
 const router = express.Router();
 
-const USDA_API_KEY = 'API_KEY';
 const USDA_BASE_URL = 'https://api.nal.usda.gov/fdc/v1';
+const USDA_API_KEY = process.env.USDA_API_KEY;
 
 // Helper function for USDA API calls
 const fetchUSDAData = async (endpoint, params = {}) => {

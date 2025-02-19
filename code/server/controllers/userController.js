@@ -1,20 +1,46 @@
-const User = require('../models/userModel');
+import User from '../models/userModel.js';
 
-// @desc    Register a new user
-// @route   POST /api/users
-// @access  Public
+/**
+ * Register a new user
+ * @desc    Creates a new user account
+ * @route   POST /api/users
+ * @access  Public
+ * @param   {Object} req - Express request object
+ * @param   {Object} res - Express response object
+ * @returns {Promise<void>}
+ */
 const registerUser = async (req, res) => {
   const { username, email, password } = req.body;
 
-  // Add validation and hashing (e.g., bcrypt) here
-
   try {
-    const user = new User({ username, email, password });
-    await user.save();
-    res.status(201).json({ message: 'User registered', user });
+    const userExists = await User.findOne({ email });
+    
+    if (userExists) {
+      return res.status(400).json({
+        message: 'User already exists',
+      });
+    }
+
+    const user = await User.create({
+      username,
+      email,
+      password,
+    });
+
+    return res.status(201).json({
+      message: 'User registered',
+      user: {
+        id: user._id,
+        username: user.username,
+        email: user.email,
+      },
+    });
   } catch (error) {
-    res.status(400).json({ message: 'Error registering user', error });
+    return res.status(400).json({
+      message: 'Error registering user',
+      error: error.message,
+    });
   }
 };
 
-module.exports = { registerUser };
+export { registerUser };
