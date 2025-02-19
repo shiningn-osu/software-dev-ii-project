@@ -7,6 +7,7 @@
 import express from 'express';
 import path from 'path';
 import connectDB from './config/db.js';
+import userRoutes from './routes/userRoutes.js';
 
 const app = express();
 
@@ -95,6 +96,9 @@ app.get('/api/nutrition/current', (req, res) => {
   };
   res.json(currentNutrition);
 });
+
+// Routes
+app.use('/api/users', userRoutes);
 
 // Serve React build files in production
 if (process.env.NODE_ENV === 'production') {
