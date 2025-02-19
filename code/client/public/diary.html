@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en-US">
+
+<head>
+  <meta charset="utf-8" name="viewport" content="width=device-width, initial-scale=1">
+  <title>Food Diary</title>
+  <link rel="stylesheet" href="styles/food-diary.css">
+</head>
+
+<body>
+  <h1>Meal Match</h1>
+  <h2>Food Diary</h2>
+
+  <main>
+    <!-- INGREDIENT ENTRY SECTION -->
+    <section class="mL-15">
+      <h3>Add Ingredients</h3>
+      <div class="mL-30">
+        <form id="ingredientForm">
+          <label for="ingredientName">Ingredient Name:</label>
+          <input type="text" id="ingredientName" required>
+
+          <label for="ingredientAmount">Amount:</label>
+          <input type="text" id="ingredientAmount" required>
+
+          <label for="ingredientCalories">Calories:</label>
+          <input type="number" id="ingredientCalories" required>
+
+          <button type="button" onclick="addIngredient()">Add Ingredient</button>
+        </form>
+      </div>
+
+      <!-- INGREDIENT LIST -->
+      <h3>Current Ingredients</h3>
+      <div class="mL-30">
+        <ul id="ingredientList">
+          <!-- Ingredients will be added here dynamically -->
+        </ul>
+      </div>
+
+      <!-- ADD MEAL SECTION -->
+      <h3>Create Meal</h3>
+      <div class="mL-30">
+        <form id="mealForm">
+          <label for="mealName">Meal Name:</label>
+          <input type="text" id="mealName" required>
+
+          <label for="mealDate">Date:</label>
+          <input type="date" id="mealDate" required>
+
+          <button type="button" onclick="addMeal()">Add Meal</button>
+        </form>
+      </div>
+    </section>
+
+    <!-- MEAL HISTORY -->
+    <h3>Meal History</h3>
+    <div class="mL-30">
+      <table>
+        <thead>
+          <tr>
+            <th>Date</th>
+            <th>Meal</th>
+            <th>Ingredients</th>
+            <th>Total Calories</th>
+          </tr>
+        </thead>
+        <tbody id="mealHistory">
+          <!-- Meals will be dynamically inserted here -->
+        </tbody>
+      </table>
+    </div>
+  </main>
+
+  <script>
+    let currentIngredients = []; //Stores ingredients
+
+    function addIngredient() {
+      let name = document.getElementById("ingredientName").value;
+      let amount = document.getElementById("ingredientAmount").value;
+      let calories = document.getElementById("ingredientCalories").value;
+
+      if (!name || !amount || !calories) {
+        alert("Please enter all ingredient details!");
+        return;
+      }
+
+      let ingredient = { name, amount, calories: parseInt(calories) };
+      currentIngredients.push(ingredient);
+
+      // Update the ingredient list
+      let list = document.getElementById("ingredientList");
+      let listItem = document.createElement("li");
+      listItem.textContent = `${name} - ${amount}, ${calories} calories`;
+      list.appendChild(listItem);
+
+      document.getElementById("ingredientForm").reset();
+    }
+
+    function addMeal() {
+      let mealName = document.getElementById("mealName").value;
+      let mealDate = document.getElementById("mealDate").value;
+
+      if (!mealName || !mealDate || currentIngredients.length === 0) {
+        alert("Please enter a meal name, date, and at least one ingredient!");
+        return;
+      }
+
+      let totalCalories = currentIngredients.reduce((sum, ing) => sum + ing.calories, 0);
+      let ingredientText = currentIngredients.map(ing => `${ing.name} (${ing.amount})`).join(", ");
+
+      let table = document.getElementById("mealHistory");
+      let newRow = table.insertRow();
+      newRow.innerHTML = `<td>${mealDate}</td><td>${mealName}</td><td>${ingredientText}</td><td>${totalCalories}</td>`;
+
+      // Clear everything for a new meal
+      currentIngredients = [];
+      document.getElementById("ingredientList").innerHTML = "";
+      document.getElementById("mealForm").reset();
+    }
+  </script>
+
+</body>
+</html>
