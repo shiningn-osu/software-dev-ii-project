@@ -10,27 +10,30 @@ function RecipeSearch() {
   const APP_KEY = "d938c99d056d72a1cb7267e86c60ff53";
 
   // Fetch recipes from the API when the query changes
-  const fetchRecipes = async () => {
-    if (!query) return;
+  const fetchRecipes = React.useCallback(async () => {
+    if (!query.trim()) return;
     setLoading(true);
     setError(null);
 
-    const apiUrl = `https://api.edamam.com/api/recipes/v2?type=public&q=${query}&app_id=${APP_ID}&app_key=${APP_KEY}`;
+    const apiUrl = `https://api.edamam.com/api/recipes/v2?type=public&q=${encodeURIComponent(query)}&app_id=${APP_ID}&app_key=${APP_KEY}`;
 
     try {
       const response = await fetch(apiUrl);
+      if (!response.ok) {
+        throw new Error('Failed to fetch recipes');
+      }
       const data = await response.json();
       setRecipes(data.hits || []);
     } catch (error) {
-      setError('Error fetching recipes');
+      setError('Error fetching recipes: ' + error.message);
     } finally {
       setLoading(false);
     }
-  };
+  }, [query]);
 
   useEffect(() => {
     fetchRecipes();
-  }, [query]);
+  }, [fetchRecipes]);
 
   // Handle form submission
   const handleSubmit = (e) => {

@@ -61,7 +61,20 @@ app.get('/api/nutrition/recent', (req, res) => {
         carbs: 45,
         fats: 15,
       },
-      // Add more meals as needed
+      {
+        name: 'Lunch',
+        calories: 600,
+        protein: 35,
+        carbs: 65,
+        fats: 22,
+      },
+      {
+        name: 'Dinner',
+        calories: 550,
+        protein: 30,
+        carbs: 60,
+        fats: 20,
+      }
     ],
   };
   res.json(recentNutrition);

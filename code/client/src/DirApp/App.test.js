@@ -3,8 +3,9 @@ import { render, screen } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import App from './App';
 import userEvent from '@testing-library/user-event';
+import '@testing-library/jest-dom';
 
-//describe('App Rendering', () => {
+describe('App Rendering', () => {
   test('renders learn react link', () => {
     render(<App />);
     const linkElement = screen.getByText(/learn react/i);
@@ -26,7 +27,7 @@ import userEvent from '@testing-library/user-event';
     // Expect that the Home page content appears
     expect(screen.getByText(/Caloric Overview/i)).toBeInTheDocument();
   });
-//});
+});
 
 describe('Navigation links', () => {
   test('renders home page when navigating with "/"', async () => {
