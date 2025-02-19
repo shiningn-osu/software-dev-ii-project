@@ -1,10 +1,8 @@
-import React from 'react';
-
 function MealPlan() {
   return (
-    <div className="MealPlan">
-      <header className="MealPlan-header">
-        Meal Plan Page
+    <div className="Food">
+      <header className="Food-header">
+        Meal Plan
       </header>
       <p>Hello from Meal Plan page</p>
     </div>
