@@ -95,17 +95,18 @@ function Home() {
   return (
     <div className="Home">
       <header className="Home-header">
+        <h2>Account Summary</h2>
       </header>
       <div>
-        <h2 className='centered'>Caloric Overview</h2>
+        <h3 className='centered'>Caloric Overview</h3>
         <ChartPie />
       </div>
       <div>
-        <h2>Daily Nutrition Goals</h2>
+        <h3>Daily Nutrition Goals</h3>
         <DailyNutrGoals />
       </div>
       <div>
-        <h2>Most Recent Nutrition Breakdown</h2>
+        <h3>Most Recent Nutrition Breakdown</h3>
         <RecentNutrBreak />
       </div>
     </div>
