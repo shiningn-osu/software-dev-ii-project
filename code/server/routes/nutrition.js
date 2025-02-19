@@ -5,7 +5,7 @@ import User from '../models/userModel.js';
 
 const router = express.Router();
 
-const USDA_API_KEY = 'gDnrPN4MYY1VobzStSqZvY02ol0hMW70tPEM4nhX';
+const USDA_API_KEY = 'API_KEY';
 const USDA_BASE_URL = 'https://api.nal.usda.gov/fdc/v1';
 
 // Helper function for USDA API calls
