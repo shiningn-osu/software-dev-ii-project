@@ -1,7 +1,10 @@
+import React from 'react';
 import { render, screen, fireEvent, act } from '@testing-library/react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Home from "../pages/DirHome/Home";
-import App from './App'; // Path to your App.js component
+import App from './App';
+import userEvent from '@testing-library/user-event';
+import '@testing-library/jest-dom';
 
 /**
  * Test suite for validating the routing functionality in the `App` component.
@@ -10,7 +13,7 @@ import App from './App'; // Path to your App.js component
  *
  * The tests include the following scenarios:
  *  - Rendering the `Home` component on the default `/` route.
- *  - Navigating to the `Account Creation` page when the "Create Account" link is clicked.
+ *  - Navigating to the `Food Diary` page when the "Food Diary" link is clicked.
  *  - Navigating to the `Recipe search` page when the "Recipe Search" link is clicked.
  *  - Navigating to the `Grocery list` page when the "Grocery List" link is clicked.
  *  - Fallback to `Home` when accessing an undefined route.
@@ -20,42 +23,45 @@ import App from './App'; // Path to your App.js component
 describe('App Routing', () => {
 
   test('should render Home summary component on "/" path', () => {
-    render(<App />);
-
-    // Check if Home component is rendered on the default route
-    expect(screen.getByText(/Account Summary/i)).toBeInTheDocument();
+    render(
+      <Router>
+        <App />
+      </Router>
+    );
+    expect(screen.getByText(/Caloric Overview/i)).toBeInTheDocument();
   });
 
-  test('should navigate to Account Creation page when clicking on Account Creation link', async () => {
-    render(<App />);
-
-    // Simulate navigating to the Account Creation page
-    fireEvent.click(screen.getByText(/Create Account/i));
-
-    // Wait for the Account Creation component to appear
-    await screen.findByText(/Create An Account/i);
-
-    expect(screen.getByText(/Create An Account/i)).toBeInTheDocument();
+  test('should navigate to Food Diary page when clicking on Food Diary link', async () => {
+    render(
+      <Router>
+        <App />
+      </Router>
+    );
+    fireEvent.click(screen.getByText(/Food/i));
+    fireEvent.click(screen.getByText(/Food Diary/i));
+    expect(screen.getByText(/Hello from Diary page/i)).toBeInTheDocument();
   });
 
   test('should navigate to recipe search page when clicking on recipe search link', async () => {
-    render(<App />);
-
+    render(
+      <Router>
+        <App />
+      </Router>
+    );
+    fireEvent.click(screen.getByText(/Food/i));
     fireEvent.click(screen.getByText(/Recipe Search/i));
-
-    await screen.findByText(/Search for Recipes/i);
-
     expect(screen.getByText(/Search for Recipes/i)).toBeInTheDocument();
   });
 
   // Similar tests for other routes
   test('should render Grocery list component when navigate to the grocery list page', async () => {
-    render(<App />);
-
+    render(
+      <Router>
+        <App />
+      </Router>
+    );
+    fireEvent.click(screen.getByText(/Grocery/i));
     fireEvent.click(screen.getByText(/Grocery List/i));
-
-    await screen.findByText(/Create Your Grocery List/i);
-
     expect(screen.getByText(/Create Your Grocery List/i)).toBeInTheDocument();
   });
 
@@ -71,28 +77,108 @@ describe('App Routing', () => {
       </Router>
     );
 
-    // Simulate navigating to a random invalid URL (e.g., "/dajsfnasjndao")
     act(() => {
       window.history.pushState({}, '', '/dajsfnasjndao');
     });
 
-    await screen.findByText(/Account Summary/i);
-
-    expect(screen.getByText(/Account Summary/i)).toBeInTheDocument();
+    await screen.findByText(/Caloric Overview/i);
+    expect(screen.getByText(/Caloric Overview/i)).toBeInTheDocument();
   });
 
-  // test('should render fallback to Home page for undefined routes', async () => {
-  //   render(<App />);
+  test('should render Daily Nutrition Goals section', () => {
+    render(
+      <Router>
+        <App />
+      </Router>
+    );
+    expect(screen.getByText(/Daily Nutrition Goals/i)).toBeInTheDocument();
+  });
 
-  //   // Simulate navigating to a random invalid URL (e.g., "/dajsfnasjndao")
-  //   act(() => {
-  //     window.history.pushState({}, '', '/dajsfnasjndao');
-  //   });
+  test('should render Recent Nutrition Breakdown section', () => {
+    render(
+      <Router>
+        <App />
+      </Router>
+    );
+    expect(screen.getByText(/Most Recent Nutrition Breakdown/i)).toBeInTheDocument();
+  });
+});
 
-  //   // Wait for the 'Account Summary' text to appear (this ensures the Home component is rendered)
-  //   const accountSummaryText = await screen.findByText(/Account Summary/i);
+describe('App Rendering', () => {
+  test('renders learn react link', () => {
+    render(<App />);
+    const linkElement = screen.getByText(/learn react/i);
+    expect(linkElement).toBeInTheDocument();
+  });
 
-  //   // Check if the 'Account Summary' text is in the document
-  //   expect(accountSummaryText).toBeInTheDocument();
-  // });
+  test('renders without crashing', () => {
+    const { container } = render(<App />);
+    expect(container).toBeTruthy();
+  });
+
+  test('renders the Home page with wildcard', async () => {
+    render(
+      <Router>
+        <App />
+      </Router>
+    );
+
+    // Expect that the Home page content appears
+    expect(screen.getByText(/Caloric Overview/i)).toBeInTheDocument();
+  });
+});
+
+describe('Navigation links', () => {
+  test('renders home page when navigating with "/"', async () => {
+    render(
+      <Router>
+        <App />
+      </Router>
+    );
+
+    // Find the link and click it
+    const homeLink = screen.getByRole('link', { name: /Home/i });
+    await userEvent.click(homeLink);
+
+    expect(screen.getByText(/Caloric Overview/i)).toBeInTheDocument();
+  });
+
+  test('navigates to the Food page', async () => {
+    render(
+      <Router>
+        <App />
+      </Router>
+    );
+
+    const aboutLink = screen.getByRole('link', { name: /Food/i });
+    await userEvent.click(aboutLink);
+
+    expect(screen.getByText(/Hello from food page/i)).toBeInTheDocument();
+  });
+
+  test('navigates to the Grocery page', async () => {
+    render(
+      <Router>
+        <App />
+      </Router>
+    );
+
+    const contactLink = screen.getByRole('link', { name: /Grocery/i });
+    await userEvent.click(contactLink);
+
+    expect(screen.getByText(/Hello from grocery page/i)).toBeInTheDocument();
+  });
+
+  test('navigates to the Nutrition page', async () => {
+    render(
+      <Router>
+        <App />
+      </Router>
+    );
+
+    const contactLink = screen.getByRole('link', { name: /Nutrition/i });
+    await userEvent.click(contactLink);
+
+    expect(screen.getByText(/Hello from Nutrition page/i)).toBeInTheDocument();
+  });
 });
