@@ -56,6 +56,12 @@ tr:nth-child(even) {
   background-color: #f2f2f2;
 }
 
+/* Name: ODD ROW COLOR -- make odd rows a slightly different color than even rows */
+tr:nth-child(odd) {
+  /* white for odd rows */
+  background-color: #ffffff;
+}
+
 /* Name: ROW HOVER -- make row a heavier color on hover */
 tr:hover {
   /* Change background color on hover */

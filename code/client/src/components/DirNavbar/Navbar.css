@@ -1,6 +1,6 @@
 /* NAV SECTION */
 
-/* Name: NAV RESIZE -- Adjust the size of Nav depending on screen size */
+/* Name: NAV RESIZE -- Adjust the size and position of Nav depending on screen size */
 @media (max-width: 769px) {
   nav ul {
     text-align: center;
@@ -30,42 +30,45 @@ nav li {
   font-family: "Titan one", "Arial Black", "Trebuchet MS", Verdana, sans-serif;
   font-size: clamp(1.5rem, 1.9vw, 2.4rem);
   display: inline-block;
-  position: relative; /* Position for dropdown positioning */
+  /* Position for dropdown positioning */
+  position: relative;
+}
+
+/* Name: GENERAL NAV TEXT - adjust the margin of the text block for general nav text */
+span {
+  /* Make it stay inline with other elements, but make it respect margins */
+  display: inline-block;
+  margin: 10px 0;
 }
 
 nav li a {
-  text-decoration: none; /* Default state: no underline */
-}
-
-nav {
-  background-color: #C46947;
-  
-}
-
-/* Hover effect for h4 */
-h4:hover {
-  text-decoration: underline;
-}
-
-/* Style for <h4> with <b> elements inside */
-h4 b {
+  /* Default state: no underline */
   text-decoration: none;
 }
 
-h4 b:hover {
+/* Hover effect for span */
+span:hover {
+  text-decoration: underline;
+}
+
+/* Style for <span> with <b> elements inside */
+span b {
+  text-decoration: none;
+}
+
+span b:hover {
   text-decoration: underline;
 }
 
 /* Make sure the underline stays when hovering over the parent <li> element */
-nav li:hover h4 {
+nav li:hover span {
   text-decoration: underline;
-
 }
 
-/* Keep underline for links and h4 during hover */
+/* Keep underline for links and span during hover */
 nav li:hover {
   text-decoration: underline;
-  color:white
+  color: rgb(82, 106, 82)
 }
 
 /* Dropdown Styles */
@@ -73,34 +76,36 @@ nav li:hover {
   display: block;
 }
 
+/* Name: DROPDOWN GENERAL STYLES - adjust position of the subnav dropdown, 
+            and adjust the color/dimensions */
 .dropdown-content {
   display: none;
   position: absolute;
-  top: 100%; /* Position dropdown below the parent link */
+  /* Position dropdown below the parent link */
+  top: 100%;
   left: 0;
-  background-color: #C46947;
+  background-color: #47c49f;
   min-width: 160px;
   box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.2);
   z-index: 1;
 }
 
+/* Name: DROPDOWN LINK STYLES - adjust the link colors, dimensions, and padding in the dropdown*/
 .dropdown-content a {
   color: black;
   padding: 12px 16px;
   text-decoration: none;
   display: block;
+  transition: color 0.4s;
 }
-
-/* .dropdown-content a:hover {
-  background-color: #ddd;
-} */
 
 /* Hover effect for nav items */
 a:hover {
   text-decoration: underline;
-  color: white;
+  color: rgb(43, 80, 175);
 }
 
+/* Help link default of black, with a delay of color change */
 a {
   color: black;
   transition: color 0.4s;
