@@ -23,24 +23,24 @@ Git - For version control and cloning the repository
 Download: https://git-scm.com/downloads/win
 
 Running the Software:
-Clone the repository: 
+	Clone the repository: 
 git clone https://github.com/your-repository/meal-match.git
 cd meal-match
 
-Install dependencies: 
+	Install dependencies: 
 npm install
 
-Set up MongoDB
+	Set up MongoDB
 Work in progress
 
-Start the backend server
+	Start the backend server
 cd server
 npm run server
 
-Start the frontend application
+	Start the frontend application
 npm start
 
-Once installation is complete, open a web browser and navigate to: 
+	Once installation is complete, open a web browser and navigate to: 
 http://localhost:3000
 
 How To Use the Software: 
