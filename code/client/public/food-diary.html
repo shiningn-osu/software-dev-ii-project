@@ -20,8 +20,8 @@
           <label for="ingredientName">Ingredient Name:</label>
           <input type="text" id="ingredientName" required>
 
-          <label for="ingredientAmount">Amount:</label>
-          <input type="text" id="ingredientAmount" required>
+          <label for="ingredientGrams">Amount:</label>
+          <input type="text" id="ingredientGrams" required>
 
           <label for="ingredientCalories">Calories:</label>
           <input type="number" id="ingredientCalories" required>
@@ -77,7 +77,7 @@
 
     function addIngredient() {
       let name = document.getElementById("ingredientName").value;
-      let amount = document.getElementById("ingredientAmount").value;
+      let amount = document.getElementById("ingredientGrams").value;
       let calories = document.getElementById("ingredientCalories").value;
 
       if (!name || !amount || !calories) {
