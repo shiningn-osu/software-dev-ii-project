@@ -1,0 +1,25 @@
+name: Node.js CI
+
+on:
+  push:
+    branches: [ "*" ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Use Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: '20.x'
+      - name: Install Client Dependencies
+        run: cd code/client && npm install
+      - name: Run Client Tests
+        run: cd code/client && npm test
+      - name: Install Server Dependencies
+        run: cd code/server && npm install
+      - name: Run Server Tests
+        run: cd code/server && npm test
