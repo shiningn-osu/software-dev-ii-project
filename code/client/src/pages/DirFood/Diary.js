@@ -67,7 +67,7 @@ const Diary = () => {
         />
         <input
           type="text"
-          placeholder="Amount"
+          placeholder="Servings"
           value={ingredientAmount}
           onChange={(e) => setIngredientAmount(e.target.value)}
         />
