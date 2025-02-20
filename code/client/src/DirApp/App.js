@@ -1,14 +1,23 @@
 import React from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Navbar from "../components/DirNavbar/Navbar";
+
+// HOME RELATED PAGES
 import Home from "../pages/DirHome/Home";
+import AccCreate from "../pages/DirHome/DirAccCreate/AccCreate.js"
+
+// FOOD RELATED PAGES
 import Food from "../pages/DirFood/Food";
 import Diary from "../pages/DirFood/Diary"
 import MealPlan from "../pages/DirFood/MealPlan"
 import RecipeSearch from "../pages/DirFood/RecipeSearch"
+
+// GROCERY RELATED PAGES
 import Grocery from "../pages/DirGrocery/Grocery";
 import GroceryList from "../pages/DirGrocery/GroceryList"
 import GrocerySearch from "../pages/DirGrocery/GrocerySearch"
+
+// NUTRITION RELATED PAGES
 import Nutrition from "../pages/DirNutrition/Nutrition";
 
 /**
@@ -16,8 +25,8 @@ import Nutrition from "../pages/DirNutrition/Nutrition";
  * 
  * This component sets up the routing for the application using React Router.
  * It renders the `Navbar` component on all pages and defines the routes for different
- * sections of the app: Home, Food, Grocery, and Nutrition. It also handles a fallback route
- * for any undefined paths by redirecting to the Home page.
+ * sections of the app: Home, Food, Grocery, and Nutrition subpages. It also handles a 
+ * fallback route for any undefined paths by redirecting to the Home page.
  * 
  * @component
  * @example
@@ -31,15 +40,26 @@ function App() {
     <Router>
       <Navbar />  {/* Visible on all pages */}
       <Routes>
+        {/* Home Routes */}
         <Route path="/" element={<Home />} />
-        <Route path="/food" element={<Food />} />
+        <Route path="/AccountCreation" element={<AccCreate />} />
+
+        {/* Food Routes */}
+        <Route path="/Food" element={<Food />} />
         <Route path="/Diary" element={<Diary />} />
         <Route path="/RecipeSearch" element={<RecipeSearch />} />
         <Route path="/MealPlan" element={<MealPlan />} />
+
+        {/* Grocery Routes */}
         <Route path="/Grocery" element={<Grocery />} />
         <Route path="/GroceryList" element={<GroceryList />} />
         <Route path="/GrocerySearch" element={<GrocerySearch />} />
-        <Route path="/nutrition" element={<Nutrition />} />
+
+        {/* Nutrition Routes */}
+        <Route path="/NutritionDay" element={<Nutrition />} />
+        <Route path="/NutritionHistory" element={<Nutrition />} />
+
+        {/* Catch-all Route */}
         <Route path="*" element={<Home />} />
       </Routes>
     </Router>
