@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import "../../styles/food-diary.css"; // Import CSS
+import './food-diary.css'; // Import CSS
 
 const Diary = () => {
   const [ingredients, setIngredients] = useState([]);
