@@ -1,9 +1,9 @@
 import { render, screen } from '@testing-library/react';
-import AccCreate from './AccCreate';
+import AccCreate from './Login.js'; // Assuming PasswordInput is exported from Login.js
 
 // Test AccCreate component
-describe('AccCreate', () => {
-  test('should render the AccCreate form with username input, password input, and create account button', () => {
+describe('Login', () => {
+  test('should render the Login form with username input, password input, and create account button', () => {
     render(<AccCreate />);
 
     // Check that the username input field is in the document
@@ -19,7 +19,7 @@ describe('AccCreate', () => {
     expect(showPasswordButton).toBeInTheDocument();
 
     // Check that the "Create Account" button is in the document
-    const createAccountButton = screen.getByRole('button', { name: /Create Account/i });
+    const createAccountButton = screen.getByRole('button', { name: /Login/i });
     expect(createAccountButton).toBeInTheDocument();
   });
 });
