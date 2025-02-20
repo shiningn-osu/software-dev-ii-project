@@ -45,6 +45,10 @@ h3 {
   font-size: 1.6rem;
 }
 
+label {
+  margin-right: 10px;
+}
+
 /* END GENERAL ELEMENT SECTION */
 
 /* CLASSES SECTION */
@@ -52,6 +56,27 @@ h3 {
 /* Name: GENERAL CENTER -- generally centers a Div or item that can have margins, based on it's width */
 .centered {
   text-align: center;
+}
+
+/* Name: ACCOUNT INFO BOX - adjust the position, color, and border of the account create/login box */
+.account-box {
+  /* Shrink to fit content */
+  display: inline-block;
+  /* Center the text inside */
+  text-align: center;
+  /* Center actual items themselves */
+  align-items: center;
+
+  background-color: #f9f9f9;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+
+  margin-top: 30px;
+  padding: 20px;
+  border-radius: 8px;
+}
+
+.text-input {
+  margin: 20px 0;
 }
 
 /* END CLASSES SECTION */
