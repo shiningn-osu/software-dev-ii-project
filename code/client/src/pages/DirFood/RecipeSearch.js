@@ -28,9 +28,11 @@ function RecipeSearch() {
     }
   };
 
-  useEffect(() => {
-    fetchRecipes();
-  }, [query]);
+// eslint-disable-next-line react-hooks/exhaustive-deps
+useEffect(() => {
+  fetchRecipes();
+}, [fetchRecipes]);
+
 
   // Handle form submission
   const handleSubmit = (e) => {
