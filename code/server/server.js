@@ -1,10 +1,11 @@
 import express from "express";
-import cors from "cors"; // cors for ensuring access only from our frontend
+import cors from "cors";
 
 const app = express();
 
 // Middleware
 app.use(express.json());
+// cors for ensuring access only from our frontend
 app.use(cors({
   origin: "https://meal-match-9nx72i8vk-duncan-eversons-projects.vercel.app/"
 }))
