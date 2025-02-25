@@ -1,19 +1,28 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
+import { useNavigate } from "react-router-dom";
 
 function RecipeSearch() {
   const [query, setQuery] = useState('');
   const [recipes, setRecipes] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [searched, setSearched] = useState(false);
+  const [selectedIngredients, setSelectedIngredients] = useState([]); // Track selected ingredients
+  const navigate = useNavigate(); // Hook for navigation
+
+  const handleAddToGroceryList = () => {
+    // Pass selected ingredients to the grocery list page
+    navigate("/GroceryList", { state: { ingredients: selectedIngredients } });
+  };
 
   const APP_ID = "14fa0a37";
   const APP_KEY = "d938c99d056d72a1cb7267e86c60ff53";
 
-  // Fetch recipes from the API when the query changes
   const fetchRecipes = async () => {
-    if (!query) return;
+    if (!query.trim()) return; // Prevent empty searches
     setLoading(true);
     setError(null);
+    setSearched(true); // Mark that a search has been made
 
     const apiUrl = `https://api.edamam.com/api/recipes/v2?type=public&q=${query}&app_id=${APP_ID}&app_key=${APP_KEY}`;
 
@@ -28,16 +37,18 @@ function RecipeSearch() {
     }
   };
 
-// eslint-disable-next-line react-hooks/exhaustive-deps
-useEffect(() => {
-  fetchRecipes();
-}, [fetchRecipes]);
-
-
-  // Handle form submission
   const handleSubmit = (e) => {
     e.preventDefault();
     fetchRecipes();
+  };
+
+  const handleIngredientChange = (ingredient) => {
+    // Update selected ingredients based on checkbox selection
+    setSelectedIngredients((prevSelected) =>
+      prevSelected.includes(ingredient)
+        ? prevSelected.filter((item) => item !== ingredient) // Deselect if already selected
+        : [...prevSelected, ingredient] // Select if not selected
+    );
   };
 
   return (
@@ -64,42 +75,75 @@ useEffect(() => {
       {error && <p>{error}</p>}
 
       {recipes.length > 0 ? (
-        <div className="container mt-4">
-          {/* Bootstrap grid system with g-4 for gap between cards */}
-          <div className="row">
-            {recipes.map((recipe, index) => (
-              <div className="col-md-4" key={index}> 
-                <div className="card">
-                  <img src={recipe.recipe.image} className="card-img-top" alt={recipe.recipe.source} />
-                  <div className="card-body">
-                    <h4 className="card-title">{recipe.recipe.label}</h4>
-                    <h6>
-                      <p>Serving Size: </p> {recipe.recipe.yield}
-                    </h6>
-                    <h6>
-                      <p>Total Calories: </p>{' '}
-                      {Math.round(recipe.recipe.calories)}
-                    </h6>
-                    <p className="card-text">
-                      <a href={recipe.recipe.url} className="btn btn-primary" target="_blank" rel="noopener noreferrer">
-                        View Recipe
-                      </a>
-                    </p>
+        <>
+          <div className="container mt-3">
+            <div className="row">
+              {recipes.map((recipe, index) => (
+                <div className="col-md-3" key={index}>
+                  <div className="card">
+                    <img src={recipe.recipe.image} className="card-img-top" alt={recipe.recipe.label} />
+                    <div className="card-body">
+                      <h4 className="card-title">{recipe.recipe.label}</h4>
+                      <h6>Serving Size: {recipe.recipe.yield}</h6>
+                      <h6>Total Calories: {Math.round(recipe.recipe.calories)}</h6>
+                      <h6>
+                        Single Serving Size Calories: 
+                        {recipe.recipe.yield > 0 
+                          ? Math.round(recipe.recipe.calories / recipe.recipe.yield) 
+                          : "N/A"}
+                      </h6>
+
+                      {/* Display Ingredients List with Checkboxes */}
+                      <h6>Ingredients:</h6>
+                      <ul>
+                        {recipe.recipe.ingredientLines.map((ingredient, index) => (
+                          <li key={index}>
+                            <label>
+                              <input
+                                type="checkbox"
+                                value={ingredient}
+                                onChange={() => handleIngredientChange(ingredient)}
+                              />
+                              {ingredient}
+                            </label>
+                          </li>
+                        ))}
+                      </ul>
+
+                      <p className="card-text">
+                        <a href={recipe.recipe.url} className="btn btn-primary" target="_blank" rel="noopener noreferrer">
+                          View Recipe
+                        </a>
+                      </p>
+                      <p className="card-text">
+                    {selectedIngredients.length > 0 && (
+                      <button className="btn btn-primary" onClick={handleAddToGroceryList}>
+                        Add Selected Ingredients to Grocery List
+                      </button>
+                    )}
+                  </p>
+                    </div>
                   </div>
                 </div>
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
-        </div>
-      ) : (
+
+          <p>
+            Refresh <a href="/recipeSearch">Search</a>
+          </p>
+        </>
+      ) : searched && !loading && (
         <p>No recipes found. Try searching for something else.</p>
       )}
-
-      <p>
-        Refresh <a href="/recipeSearch">Search</a>
-      </p>
     </div>
   );
 }
 
 export default RecipeSearch;
+
+
+
+
+
+
