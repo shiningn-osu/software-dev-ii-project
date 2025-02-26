@@ -83,4 +83,28 @@
     margin: 5px 0;
     border-radius: 5px;
   }
+
+  .error-message {
+    color: #dc3545;
+    background-color: #f8d7da;
+    padding: 10px;
+    border-radius: 5px;
+    margin: 10px 0;
+    border: 1px solid #f5c6cb;
+}
+
+.input-group {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 15px;
+}
+
+.input-group input {
+    flex: 1;
+    max-width: 300px;
+}
+
+.input-group button {
+    flex-shrink: 0;
+}
   

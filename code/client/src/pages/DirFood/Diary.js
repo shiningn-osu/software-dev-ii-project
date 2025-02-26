@@ -1,163 +1,188 @@
 import React, { useState } from "react";
-import './food-diary.css'; // Import CSS
+import axios from "axios";
+import './food-diary.css';
 
 const EDAMAM_APP_ID = "9271dc90";
 const EDAMAM_APP_KEY = "5b1927dab9fa37d8635b5f53bd2ceb4c";
+const EDAMAM_USER_ID = "Bkono2003";
 
 const Diary = () => {
-  const [ingredients, setIngredients] = useState([]);
-  const [mealName, setMealName] = useState("");
-  const [mealDate, setMealDate] = useState("");
-  const [mealHistory, setMealHistory] = useState([]);
+    const [ingredient, setIngredient] = useState("");
+    const [weight, setWeight] = useState("");
+    const [ingredients, setIngredients] = useState([]);
+    const [meals, setMeals] = useState([]);
+    const [mealName, setMealName] = useState("");
+    const [error, setError] = useState("");
 
-  const [ingredientName, setIngredientName] = useState("");
-  const [ingredientAmount, setIngredientAmount] = useState(""); // Weight in grams
-  const [loading, setLoading] = useState(false);
+    const fetchNutrition = async (name, weight) => {
+        try {
+            const response = await axios.get("https://api.edamam.com/api/nutrition-data", {
+                params: {
+                    app_id: EDAMAM_APP_ID,
+                    app_key: EDAMAM_APP_KEY,
+                    ingr: `${weight}g ${name}`,
+                    'nutrition-type': 'logging'
+                },
+                headers: {
+                    'Edamam-Account-User': EDAMAM_USER_ID
+                }
+            });
 
-  const fetchNutritionData = async (name, weight) => {
-    const url = `https://api.edamam.com/api/nutrition-data?app_id=${EDAMAM_APP_ID}&app_key=${EDAMAM_APP_KEY}&ingr=${encodeURIComponent(weight + "g " + name)}`;
+            if (!response.data?.calories) {
+                throw new Error('Nutrition data not found in response');
+            }
 
-    try {
-      setLoading(true);
-      const response = await fetch(url);
-      const data = await response.json();
-
-      if (data.calories) {
-        return data.calories;
-      } else {
-        alert("Could not find nutrition data. Try another ingredient.");
-        return null;
-      }
-    } catch (error) {
-      console.error("Error fetching nutrition data:", error);
-      alert("Failed to fetch data. Check console for details.");
-      return null;
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const addIngredient = async () => {
-    if (!ingredientName || !ingredientAmount) {
-      alert("Please enter both ingredient name and weight!");
-      return;
-    }
-
-    const calories = await fetchNutritionData(ingredientName, ingredientAmount);
-
-    if (calories !== null) {
-      const newIngredient = {
-        name: ingredientName,
-        amount: ingredientAmount + "g",
-        calories,
-      };
-
-      setIngredients([...ingredients, newIngredient]);
-      setIngredientName("");
-      setIngredientAmount("");
-    }
-  };
-
-  const addMeal = () => {
-    if (!mealName || !mealDate || ingredients.length === 0) {
-      alert("Please enter a meal name, date, and at least one ingredient!");
-      return;
-    }
-
-    const totalCalories = ingredients.reduce((sum, ing) => sum + ing.calories, 0);
-    const ingredientList = ingredients.map((ing) => `${ing.name} (${ing.amount})`).join(", ");
-
-    const newMeal = {
-      date: mealDate,
-      name: mealName,
-      ingredients: ingredientList,
-      totalCalories,
+            return Math.round(response.data.calories);
+        } catch (error) {
+            console.error("API Error:", error);
+            setError(`Error: ${error.response?.data?.message || error.message}`);
+            return 0;
+        }
     };
 
-    setMealHistory([...mealHistory, newMeal]);
-    setIngredients([]);
-    setMealName("");
-    setMealDate("");
-  };
+    const addIngredient = async () => {
+        if (!ingredient || !weight) {
+            setError("Please fill in both fields");
+            return;
+        }
+        setError("");
 
-  return (
-    <div className="container">
-      <h1>Meal Match</h1>
-      <h2>Food Diary</h2>
+        const calories = await fetchNutrition(ingredient, weight);
+        const newIngredient = {
+            name: ingredient.trim(),
+            weight: parseInt(weight),
+            calories
+        };
 
-      {/* INGREDIENT ENTRY SECTION */}
-      <div className="section">
-        <h3>Add Ingredients</h3>
-        <input
-          type="text"
-          placeholder="Ingredient Name"
-          value={ingredientName}
-          onChange={(e) => setIngredientName(e.target.value)}
-        />
-        <input
-          type="number"
-          placeholder="Weight (grams)"
-          value={ingredientAmount}
-          onChange={(e) => setIngredientAmount(e.target.value)}
-        />
-        <button onClick={addIngredient} disabled={loading}>
-          {loading ? "Fetching..." : "Add Ingredient"}
-        </button>
-      </div>
+        setIngredients([...ingredients, newIngredient]);
+        setIngredient("");
+        setWeight("");
+    };
 
-      {/* INGREDIENT LIST */}
-      <div className="section">
-        <h3>Current Ingredients</h3>
-        <ul>
-          {ingredients.map((ing, index) => (
-            <li key={index}>{`${ing.name} - ${ing.amount}, ${ing.calories} calories`}</li>
-          ))}
-        </ul>
-      </div>
+    const addMeal = () => {
+        if (!mealName) {
+            setError("Please enter a meal name");
+            return;
+        }
+        if (ingredients.length === 0) {
+            setError("Add ingredients first");
+            return;
+        }
+        setError("");
 
-      {/* ADD MEAL SECTION */}
-      <div className="section">
-        <h3>Create Meal</h3>
-        <input
-          type="text"
-          placeholder="Meal Name"
-          value={mealName}
-          onChange={(e) => setMealName(e.target.value)}
-        />
-        <input
-          type="date"
-          value={mealDate}
-          onChange={(e) => setMealDate(e.target.value)}
-        />
-        <button onClick={addMeal}>Add Meal</button>
-      </div>
+        const totalCalories = ingredients.reduce((sum, ing) => sum + ing.calories, 0);
+        const newMeal = {
+            name: mealName.trim(),
+            date: new Date().toLocaleString(),
+            totalCalories,
+            ingredients: [...ingredients]
+        };
 
-      {/* MEAL HISTORY */}
-      <div className="section">
-        <h3>Meal History</h3>
-        <table>
-          <thead>
-            <tr>
-              <th>Date</th>
-              <th>Meal</th>
-              <th>Ingredients</th>
-              <th>Total Calories</th>
-            </tr>
-          </thead>
-          <tbody>
-            {mealHistory.map((meal, index) => (
-              <tr key={index}>
-                <td>{meal.date}</td>
-                <td>{meal.name}</td>
-                <td>{meal.ingredients}</td>
-                <td>{meal.totalCalories}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-    </div>
-  );
+        setMeals([...meals, newMeal]);
+        setMealName("");
+        setIngredients([]);
+    };
+
+    return (
+        <div className="container">
+            <h1>Food Diary</h1>
+            
+            <div className="section">
+                <h2>Add Ingredient</h2>
+                {error && <div className="error-message">{error}</div>}
+                
+                <div className="input-group">
+                    <input
+                        type="text"
+                        value={ingredient}
+                        onChange={(e) => setIngredient(e.target.value)}
+                        placeholder="Ingredient name"
+                    />
+                    <input
+                        type="number"
+                        value={weight}
+                        onChange={(e) => setWeight(e.target.value.replace(/\D/g, ''))}
+                        placeholder="Weight (grams)"
+                        min="1"
+                    />
+                    <button onClick={addIngredient}>Add Ingredient</button>
+                </div>
+
+                <h3>Current Ingredients</h3>
+                {ingredients.length > 0 ? (
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Ingredient</th>
+                                <th>Weight</th>
+                                <th>Calories</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {ingredients.map((ing, index) => (
+                                <tr key={index}>
+                                    <td>{ing.name}</td>
+                                    <td>{ing.weight}g</td>
+                                    <td>{ing.calories}kcal</td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
+                ) : (
+                    <p>No ingredients added</p>
+                )}
+            </div>
+
+            <div className="section">
+                <h2>Create Meal</h2>
+                <div className="input-group">
+                    <input
+                        type="text"
+                        value={mealName}
+                        onChange={(e) => setMealName(e.target.value)}
+                        placeholder="Meal name"
+                    />
+                    <button onClick={addMeal}>Create Meal</button>
+                </div>
+            </div>
+
+            <div className="section">
+                <h2>Meal History</h2>
+                {meals.length > 0 ? (
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Meal</th>
+                                <th>Date</th>
+                                <th>Total Calories</th>
+                                <th>Ingredients</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {meals.map((meal, index) => (
+                                <tr key={index}>
+                                    <td>{meal.name}</td>
+                                    <td>{meal.date}</td>
+                                    <td>{meal.totalCalories}kcal</td>
+                                    <td>
+                                        <ul>
+                                            {meal.ingredients.map((ing, i) => (
+                                                <li key={i}>
+                                                    {ing.name} ({ing.weight}g) - {ing.calories}kcal
+                                                </li>
+                                            ))}
+                                        </ul>
+                                    </td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
+                ) : (
+                    <p>No meals recorded</p>
+                )}
+            </div>
+        </div>
+    );
 };
 
 export default Diary;
