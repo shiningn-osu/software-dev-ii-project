@@ -5,10 +5,10 @@
  */
 
 import express from 'express';
-import path from 'path';
 import connectDB from './config/db.js';
 import userRoutes from './routes/userRoutes.js';
 import nutritionRoutes from './routes/nutrition.js';
+import cors from 'cors';
 
 const app = express();
 
@@ -17,6 +17,11 @@ connectDB();
 
 // Middleware
 app.use(express.json());
+
+// cors for ensuring access only from our frontend
+app.use(cors({
+  origin: "https://meal-match-9nx72i8vk-duncan-eversons-projects.vercel.app/"
+}))
 
 /**
  * GET /api/nutrition/overview
