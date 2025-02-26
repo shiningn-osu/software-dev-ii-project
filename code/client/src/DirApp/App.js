@@ -4,7 +4,8 @@ import Navbar from "../components/DirNavbar/Navbar";
 
 // HOME RELATED PAGES
 import Home from "../pages/DirHome/Home";
-import AccCreate from "../pages/DirHome/DirAccCreate/AccCreate.js"
+import AccCreate from "../pages/DirHome/DirAccCreate/AccCreate";
+import Login from "../pages/DirHome/DirLogin/Login";
 
 // FOOD RELATED PAGES
 import Food from "../pages/DirFood/Food";
@@ -43,6 +44,7 @@ function App() {
         {/* Home Routes */}
         <Route path="/" element={<Home />} />
         <Route path="/AccountCreation" element={<AccCreate />} />
+        <Route path="/Login" element={<Login />} />
 
         {/* Food Routes */}
         <Route path="/Food" element={<Food />} />

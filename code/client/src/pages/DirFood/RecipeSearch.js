@@ -29,11 +29,13 @@ function RecipeSearch() {
     } finally {
       setLoading(false);
     }
-  }, [query]);
+  });
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
     fetchRecipes();
   }, [fetchRecipes]);
+
 
   // Handle form submission
   const handleSubmit = (e) => {
@@ -69,7 +71,7 @@ function RecipeSearch() {
           {/* Bootstrap grid system with g-4 for gap between cards */}
           <div className="row">
             {recipes.map((recipe, index) => (
-              <div className="col-md-4" key={index}> 
+              <div className="col-md-4" key={index}>
                 <div className="card">
                   <img src={recipe.recipe.image} className="card-img-top" alt={recipe.recipe.source} />
                   <div className="card-body">
