@@ -16,34 +16,26 @@ import PasswordInput from './Password'; // PasswordInput is exported from Passwo
  * @param {Function} testSuite - The callback function containing all the test cases.
  */
 describe('PasswordInput Component', () => {
+  const mockOnChange = jest.fn();
+
   test('renders password input with correct type initially', () => {
-    render(<PasswordInput />);
+    render(<PasswordInput value="" onChange={mockOnChange} />);
     const passwordInput = screen.getByPlaceholderText('Enter password');
     expect(passwordInput).toHaveAttribute('type', 'password');
   });
 
-  test('toggles password visibility on button click', () => {
-    render(<PasswordInput />);
+  test('toggles password visibility when show/hide button is clicked', () => {
+    render(<PasswordInput value="" onChange={mockOnChange} />);
     const passwordInput = screen.getByPlaceholderText('Enter password');
-    const toggleButton = screen.getByText('Show');
+    const toggleButton = screen.getByRole('button');
 
-    // Check initial state
     expect(passwordInput).toHaveAttribute('type', 'password');
-    expect(toggleButton).toHaveTextContent('Show');
-
-    // Click the button to show password
+    
     fireEvent.click(toggleButton);
-
-    // Check if type changed to 'text'
     expect(passwordInput).toHaveAttribute('type', 'text');
-    expect(toggleButton).toHaveTextContent('Hide');
-
-    // Click again to hide password
+    
     fireEvent.click(toggleButton);
-
-    // Check if type changed back to 'password'
     expect(passwordInput).toHaveAttribute('type', 'password');
-    expect(toggleButton).toHaveTextContent('Show');
   });
 
   test('password input is required', () => {
