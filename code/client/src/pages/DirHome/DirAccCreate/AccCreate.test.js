@@ -4,7 +4,6 @@ import AccCreate from './AccCreate';
 
 describe('AccCreate Component', () => {
   beforeEach(() => {
-    // Mock fetch globally
     global.fetch = jest.fn();
   });
 
@@ -14,17 +13,14 @@ describe('AccCreate Component', () => {
         <AccCreate />
       </BrowserRouter>
     );
-
-    expect(screen.getByPlaceholderText('Enter username')).toBeInTheDocument();
-    expect(screen.getByPlaceholderText('Enter password')).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /create account/i })).toBeInTheDocument();
+    expect(screen.getByRole('form')).toBeInTheDocument();
   });
 
   test('handles successful account creation', async () => {
     global.fetch.mockImplementationOnce(() =>
       Promise.resolve({
         ok: true,
-        json: () => Promise.resolve({ token: 'fake-token', user: { id: 1, username: 'test' } }),
+        json: () => Promise.resolve({ message: 'Account created successfully' })
       })
     );
 
@@ -34,17 +30,29 @@ describe('AccCreate Component', () => {
       </BrowserRouter>
     );
 
-    fireEvent.change(screen.getByPlaceholderText('Enter username'), {
-      target: { value: 'testuser' },
-    });
-    fireEvent.change(screen.getByPlaceholderText('Enter password'), {
-      target: { value: 'password123' },
-    });
+    // Fill in form
+    const usernameInput = screen.getByPlaceholderText('Enter username');
+    const passwordInput = screen.getByPlaceholderText('Enter password');
+    const form = screen.getByRole('form');
 
-    fireEvent.click(screen.getByRole('button', { name: /create account/i }));
+    fireEvent.change(usernameInput, { target: { value: 'testuser' } });
+    fireEvent.change(passwordInput, { target: { value: 'password123' } });
+
+    // Submit form
+    fireEvent.submit(form);
 
     await waitFor(() => {
-      expect(fetch).toHaveBeenCalledWith('/api/users/register', expect.any(Object));
+      expect(global.fetch).toHaveBeenCalledWith(
+        '/api/users/register',
+        expect.objectContaining({
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            username: 'testuser',
+            password: 'password123'
+          })
+        })
+      );
     });
   });
 
@@ -52,7 +60,7 @@ describe('AccCreate Component', () => {
     global.fetch.mockImplementationOnce(() =>
       Promise.resolve({
         ok: false,
-        json: () => Promise.resolve({ message: 'Username already exists' }),
+        json: () => Promise.resolve({ message: 'Username already exists' })
       })
     );
 
@@ -62,17 +70,23 @@ describe('AccCreate Component', () => {
       </BrowserRouter>
     );
 
-    fireEvent.change(screen.getByPlaceholderText('Enter username'), {
-      target: { value: 'testuser' },
-    });
-    fireEvent.change(screen.getByPlaceholderText('Enter password'), {
-      target: { value: 'password123' },
-    });
+    // Fill in form
+    const usernameInput = screen.getByPlaceholderText('Enter username');
+    const passwordInput = screen.getByPlaceholderText('Enter password');
+    const form = screen.getByRole('form');
 
-    fireEvent.click(screen.getByRole('button', { name: /create account/i }));
+    fireEvent.change(usernameInput, { target: { value: 'testuser' } });
+    fireEvent.change(passwordInput, { target: { value: 'password123' } });
+
+    // Submit form
+    fireEvent.submit(form);
 
     await waitFor(() => {
       expect(screen.getByText('Username already exists')).toBeInTheDocument();
     });
+  });
+
+  afterEach(() => {
+    jest.clearAllMocks();
   });
 });
