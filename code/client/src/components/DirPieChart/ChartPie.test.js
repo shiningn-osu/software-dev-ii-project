@@ -8,12 +8,15 @@
  * @group Unit Tests
  * @group Components
  */
-
 import React from 'react';
 import { render, screen } from '@testing-library/react';
 import ChartPie from './ChartPie';
+import fetchMock from 'jest-fetch-mock';
 
-// Mock recharts components to avoid rendering issues in tests
+// Enable fetch mocks
+fetchMock.enableMocks();
+
+// Mock recharts components
 jest.mock('recharts', () => ({
   PieChart: (props) => <div data-testid="piechart">{props.children}</div>,
   Pie: (props) => <div data-testid="pie">{props.children}</div>,
@@ -23,48 +26,41 @@ jest.mock('recharts', () => ({
 }));
 
 describe('ChartPie Component', () => {
-  /**
-   * Verifies that the PieChart component renders successfully
-   * @test
-   */
-  it('renders PieChart component', () => {
-    render(<ChartPie />);
-    expect(screen.getByTestId('piechart')).toBeInTheDocument();
+  beforeEach(() => {
+    fetch.resetMocks();
+    fetchMock.mockResponseOnce(
+      JSON.stringify([
+        { name: 'Protein', value: 90 },
+        { name: 'Carbs', value: 150 },
+        { name: 'Fats', value: 40 },
+        { name: 'Vitamins', value: 20 },
+      ]),
+      { status: 200 }
+    );
   });
 
-  /**
-   * Verifies that the Pie component is rendered within the PieChart
-   * @test
-   */
-  it('renders Pie component inside PieChart', () => {
+  it('renders PieChart component', async () => {
     render(<ChartPie />);
-    expect(screen.getByTestId('pie')).toBeInTheDocument();
+    expect(await screen.findByTestId('piechart')).toBeInTheDocument();
   });
 
-  /**
-   * Verifies that all four Cell components are rendered for the data entries
-   * @test
-   */
-  it('renders 4 Cell components for each data entry', () => {
+  it('renders Pie component inside PieChart', async () => {
     render(<ChartPie />);
-    expect(screen.getAllByTestId('cell')).toHaveLength(4);
+    expect(await screen.findByTestId('pie')).toBeInTheDocument();
   });
 
-  /**
-   * Verifies that the Tooltip component is rendered
-   * @test
-   */
-  it('renders Tooltip component', () => {
+  it('renders 4 Cell components for each data entry', async () => {
     render(<ChartPie />);
-    expect(screen.getByTestId('tooltip')).toBeInTheDocument();
+    expect(await screen.findAllByTestId('cell')).toHaveLength(4);
   });
 
-  /**
-   * Verifies that the Legend component is rendered
-   * @test
-   */
-  it('renders Legend component', () => {
+  it('renders Tooltip component', async () => {
     render(<ChartPie />);
-    expect(screen.getByTestId('legend')).toBeInTheDocument();
+    expect(await screen.findByTestId('tooltip')).toBeInTheDocument();
+  });
+
+  it('renders Legend component', async () => {
+    render(<ChartPie />);
+    expect(await screen.findByTestId('legend')).toBeInTheDocument();
   });
 });
