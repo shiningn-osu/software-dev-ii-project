@@ -1,6 +1,9 @@
 import React, { useState } from "react";
 import './food-diary.css'; // Import CSS
 
+const EDAMAM_APP_ID = "9271dc90";
+const EDAMAM_APP_KEY = "5b1927dab9fa37d8635b5f53bd2ceb4c";
+
 const Diary = () => {
   const [ingredients, setIngredients] = useState([]);
   const [mealName, setMealName] = useState("");
@@ -8,25 +11,51 @@ const Diary = () => {
   const [mealHistory, setMealHistory] = useState([]);
 
   const [ingredientName, setIngredientName] = useState("");
-  const [ingredientAmount, setIngredientAmount] = useState("");
-  const [ingredientCalories, setIngredientCalories] = useState("");
+  const [ingredientAmount, setIngredientAmount] = useState(""); // Weight in grams
+  const [loading, setLoading] = useState(false);
 
-  const addIngredient = () => {
-    if (!ingredientName || !ingredientAmount || !ingredientCalories) {
-      alert("Please enter all ingredient details!");
+  const fetchNutritionData = async (name, weight) => {
+    const url = `https://api.edamam.com/api/nutrition-data?app_id=${EDAMAM_APP_ID}&app_key=${EDAMAM_APP_KEY}&ingr=${encodeURIComponent(weight + "g " + name)}`;
+
+    try {
+      setLoading(true);
+      const response = await fetch(url);
+      const data = await response.json();
+
+      if (data.calories) {
+        return data.calories;
+      } else {
+        alert("Could not find nutrition data. Try another ingredient.");
+        return null;
+      }
+    } catch (error) {
+      console.error("Error fetching nutrition data:", error);
+      alert("Failed to fetch data. Check console for details.");
+      return null;
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const addIngredient = async () => {
+    if (!ingredientName || !ingredientAmount) {
+      alert("Please enter both ingredient name and weight!");
       return;
     }
 
-    const newIngredient = {
-      name: ingredientName,
-      amount: ingredientAmount,
-      calories: parseInt(ingredientCalories),
-    };
+    const calories = await fetchNutritionData(ingredientName, ingredientAmount);
 
-    setIngredients([...ingredients, newIngredient]);
-    setIngredientName("");
-    setIngredientAmount("");
-    setIngredientCalories("");
+    if (calories !== null) {
+      const newIngredient = {
+        name: ingredientName,
+        amount: ingredientAmount + "g",
+        calories,
+      };
+
+      setIngredients([...ingredients, newIngredient]);
+      setIngredientName("");
+      setIngredientAmount("");
+    }
   };
 
   const addMeal = () => {
@@ -66,18 +95,14 @@ const Diary = () => {
           onChange={(e) => setIngredientName(e.target.value)}
         />
         <input
-          type="text"
-          placeholder="Servings"
+          type="number"
+          placeholder="Weight (grams)"
           value={ingredientAmount}
           onChange={(e) => setIngredientAmount(e.target.value)}
         />
-        <input
-          type="number"
-          placeholder="Calories"
-          value={ingredientCalories}
-          onChange={(e) => setIngredientCalories(e.target.value)}
-        />
-        <button onClick={addIngredient}>Add Ingredient</button>
+        <button onClick={addIngredient} disabled={loading}>
+          {loading ? "Fetching..." : "Add Ingredient"}
+        </button>
       </div>
 
       {/* INGREDIENT LIST */}
