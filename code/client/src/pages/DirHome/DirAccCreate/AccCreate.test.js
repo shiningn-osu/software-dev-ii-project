@@ -1,25 +1,73 @@
-import { render, screen } from '@testing-library/react';
+import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { BrowserRouter } from 'react-router-dom';
 import AccCreate from './AccCreate';
 
-// Test AccCreate component
-describe('AccCreate', () => {
-  test('should render the AccCreate form with username input, password input, and create account button', () => {
-    render(<AccCreate />);
+// Mock fetch globally
+global.fetch = jest.fn();
 
-    // Check that the username input field is in the document
-    const usernameInput = screen.getByPlaceholderText('Enter text');
-    expect(usernameInput).toBeInTheDocument();
+const renderWithRouter = (component) => render(
+  <BrowserRouter>
+    {component}
+  </BrowserRouter>,
+);
 
-    // Check that the password input is rendered by checking for the 'Password' label
-    const passwordLabel = screen.getByText(/Password:/i);
-    expect(passwordLabel).toBeInTheDocument();
+describe('AccCreate Component', () => {
+  beforeEach(() => {
+    fetch.mockClear();
+  });
 
-    // Check that the PasswordInput component renders a "Show" button initially
-    const showPasswordButton = screen.getByText('Show');
-    expect(showPasswordButton).toBeInTheDocument();
+  it('renders account creation form', () => {
+    renderWithRouter(<AccCreate />);
+    
+    expect(screen.getByText('Create An Account')).toBeInTheDocument();
+    expect(screen.getByLabelText('Username:')).toBeInTheDocument();
+    expect(screen.getByLabelText('Password:')).toBeInTheDocument();
+  });
 
-    // Check that the "Create Account" button is in the document
-    const createAccountButton = screen.getByRole('button', { name: /Create Account/i });
-    expect(createAccountButton).toBeInTheDocument();
+  it('handles successful account creation', async () => {
+    fetch.mockImplementationOnce(() => Promise.resolve({
+      ok: true,
+      json: () => Promise.resolve({
+        token: 'fake-token',
+        user: { id: '123', username: 'testuser' },
+      }),
+    }));
+
+    renderWithRouter(<AccCreate />);
+
+    fireEvent.change(screen.getByLabelText('Username:'), {
+      target: { value: 'testuser' },
+    });
+    fireEvent.change(screen.getByLabelText('Password:'), {
+      target: { value: 'password123' },
+    });
+    fireEvent.submit(screen.getByRole('button'));
+
+    await waitFor(() => {
+      expect(fetch).toHaveBeenCalledWith('/api/users/register', expect.any(Object));
+    });
+  });
+
+  it('displays error message on failed registration', async () => {
+    fetch.mockImplementationOnce(() => Promise.resolve({
+      ok: false,
+      json: () => Promise.resolve({
+        message: 'Username already exists',
+      }),
+    }));
+
+    renderWithRouter(<AccCreate />);
+
+    fireEvent.change(screen.getByLabelText('Username:'), {
+      target: { value: 'existinguser' },
+    });
+    fireEvent.change(screen.getByLabelText('Password:'), {
+      target: { value: 'password123' },
+    });
+    fireEvent.submit(screen.getByRole('button'));
+
+    await waitFor(() => {
+      expect(screen.getByText('Username already exists')).toBeInTheDocument();
+    });
   });
 });

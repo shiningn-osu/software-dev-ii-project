@@ -9,6 +9,9 @@ import connectDB from './config/db.js';
 import userRoutes from './routes/userRoutes.js';
 import nutritionRoutes from './routes/nutrition.js';
 import cors from 'cors';
+import dotenv from 'dotenv';
+
+dotenv.config();
 
 const app = express();
 
@@ -18,10 +21,10 @@ connectDB();
 // Middleware
 app.use(express.json());
 
-// cors for ensuring access only from our frontend
+// Update the cors configuration to allow localhost during development
 app.use(cors({
-  origin: "https://meal-match-9nx72i8vk-duncan-eversons-projects.vercel.app/"
-}))
+  origin: ["https://meal-match-9nx72i8vk-duncan-eversons-projects.vercel.app/", "http://localhost:3000"]
+}));
 
 /**
  * GET /api/nutrition/overview
@@ -108,4 +111,8 @@ app.use('/api/users', userRoutes);
 app.use('/api/nutrition', nutritionRoutes);
 
 const PORT = process.env.PORT || 6000;
-app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+app.listen(PORT, () => {
+  console.log(`Server is running on port ${PORT}`);
+});
+
+export default app;
