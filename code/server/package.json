@@ -6,7 +6,7 @@
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
-    "test": "jest --watchAll"
+    "test": "jest"
   },
   "author": "",
   "license": "ISC",
