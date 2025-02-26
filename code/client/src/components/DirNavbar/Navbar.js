@@ -27,7 +27,7 @@ function Navbar() {
         <ul>
           {/* SHOULD BE RELATIVE PATHS TO CORRECT FILES */}
           <li className="dropdown">
-            <span>Home</span>
+            <span>Home Pages</span>
             <div className="dropdown-content">
               <Link to="/">Summary</Link>
               <Link to="/AccountCreation">Create Account</Link>
@@ -37,7 +37,7 @@ function Navbar() {
 
           {/* Food link with dropdown */}
           <li className="dropdown">
-            <span>Food</span>
+            <span>Food Pages</span>
             <div className="dropdown-content">
               <Link to="/Diary">Food Diary</Link>
               <Link to="/RecipeSearch">Recipe Search</Link>
@@ -47,7 +47,7 @@ function Navbar() {
 
           {/* Grocery link with dropdown */}
           <li className="dropdown">
-            <span>Grocery</span>
+            <span>Grocery Pages</span>
             <div className="dropdown-content">
               <Link to="/GroceryList">Grocery List</Link>
               <Link to="/GrocerySearch">Grocery Search</Link>
@@ -56,7 +56,7 @@ function Navbar() {
 
           {/* SHOULD BE RELATIVE PATHS TO CORRECT FILES */}
           <li className="dropdown">
-            <span>Nutrition</span>
+            <span>Nutrition Pages</span>
             <div className="dropdown-content">
               <Link to="/NutritionDay">Day</Link>
               <Link to="/NutritionHistory">History</Link>
