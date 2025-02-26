@@ -9,14 +9,14 @@ import Login from "../pages/DirHome/DirLogin/Login";
 
 // FOOD RELATED PAGES
 import Food from "../pages/DirFood/Food";
-import Diary from "../pages/DirFood/Diary"
-import MealPlan from "../pages/DirFood/MealPlan"
-import RecipeSearch from "../pages/DirFood/RecipeSearch"
+import Diary from "../pages/DirFood/Diary";
+import MealPlan from "../pages/DirFood/MealPlan";
+import RecipeSearch from "../pages/DirFood/RecipeSearch";
 
 // GROCERY RELATED PAGES
 import Grocery from "../pages/DirGrocery/Grocery";
-import GroceryList from "../pages/DirGrocery/GroceryList"
-import GrocerySearch from "../pages/DirGrocery/GrocerySearch"
+import GroceryList from "../pages/DirGrocery/GroceryList";
+import GrocerySearch from "../pages/DirGrocery/GrocerySearch";
 
 // NUTRITION RELATED PAGES
 import Nutrition from "../pages/DirNutrition/Nutrition";

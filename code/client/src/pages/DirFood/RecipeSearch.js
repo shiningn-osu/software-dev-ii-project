@@ -10,28 +10,31 @@ function RecipeSearch() {
   const APP_KEY = "d938c99d056d72a1cb7267e86c60ff53";
 
   // Fetch recipes from the API when the query changes
-  const fetchRecipes = async () => {
-    if (!query) return;
+  const fetchRecipes = React.useCallback(async () => {
+    if (!query.trim()) return;
     setLoading(true);
     setError(null);
 
-    const apiUrl = `https://api.edamam.com/api/recipes/v2?type=public&q=${query}&app_id=${APP_ID}&app_key=${APP_KEY}`;
+    const apiUrl = `https://api.edamam.com/api/recipes/v2?type=public&q=${encodeURIComponent(query)}&app_id=${APP_ID}&app_key=${APP_KEY}`;
 
     try {
       const response = await fetch(apiUrl);
+      if (!response.ok) {
+        throw new Error('Failed to fetch recipes');
+      }
       const data = await response.json();
       setRecipes(data.hits || []);
     } catch (error) {
-      setError('Error fetching recipes');
+      setError('Error fetching recipes: ' + error.message);
     } finally {
       setLoading(false);
     }
-  };
+  });
 
-// eslint-disable-next-line react-hooks/exhaustive-deps
-useEffect(() => {
-  fetchRecipes();
-}, [fetchRecipes]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  useEffect(() => {
+    fetchRecipes();
+  }, [fetchRecipes]);
 
 
   // Handle form submission
@@ -68,7 +71,7 @@ useEffect(() => {
           {/* Bootstrap grid system with g-4 for gap between cards */}
           <div className="row">
             {recipes.map((recipe, index) => (
-              <div className="col-md-4" key={index}> 
+              <div className="col-md-4" key={index}>
                 <div className="card">
                   <img src={recipe.recipe.image} className="card-img-top" alt={recipe.recipe.source} />
                   <div className="card-body">
