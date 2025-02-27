@@ -1,3 +1,4 @@
+import React, { useState, useEffect } from 'react';
 import './Home.css';
 
 import ChartPie from "../../components/DirPieChart/ChartPie";
@@ -5,111 +6,180 @@ import ChartPie from "../../components/DirPieChart/ChartPie";
 /**
  * DailyNutrGoals Component
  * 
- * This component renders a table displaying the daily nutrition goals. 
- * It is a static table with sample column and row data. 
- * It can be later updated to dynamically display nutritional goal data.
+ * Displays the daily nutrition goals and current values fetched from the backend API.
+ * Shows a comparison between target goals and actual consumption.
  * 
- * @returns {JSX.Element} The table displaying the daily nutrition goals.
+ * @returns {JSX.Element} The table displaying the daily nutrition goals and current values
  */
-function DailyNutrGoals() {
+const DailyNutrGoals = () => {
+  const [goals, setGoals] = useState(null);
+  const [current, setCurrent] = useState(null);
+  const [error, setError] = useState('');
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        // Fetch both goals and current values
+        const [goalsResponse, currentResponse] = await Promise.all([
+          fetch('/api/nutrition/goals'),
+          fetch('/api/nutrition/current')
+        ]);
+        
+        if (!goalsResponse.ok || !currentResponse.ok) {
+          throw new Error('Network response was not ok');
+        }
+        
+        const goalsData = await goalsResponse.json();
+        const currentData = await currentResponse.json();
+        
+        setGoals(goalsData);
+        setCurrent(currentData);
+      } catch (err) {
+        setError('Failed to fetch nutrition data');
+        console.error('Error:', err);
+      }
+    };
+
+    fetchData();
+  }, []);
+
+  if (error) {
+    return <div>Error: {error}</div>;
+  }
+
+  if (!goals || !current) {
+    return <div>Loading...</div>;
+  }
+
   return (
     <table>
       <thead>
         <tr>
-          <th>Column 1</th>
-          <th>Column 2</th>
-          <th>Column 3</th>
+          <th>Nutrient</th>
+          <th>Daily Goal</th>
+          <th>Current</th>
+          <th>Remaining</th>
         </tr>
       </thead>
       <tbody>
         <tr>
-          <td>Row 1 - Data 1</td>
-          <td>Row 1 - Data 2</td>
-          <td>Row 1 - Data 3</td>
+          <td>Calories</td>
+          <td>{goals.calories} kcal</td>
+          <td>{current.calories} kcal</td>
+          <td>{goals.calories - current.calories} kcal</td>
         </tr>
         <tr>
-          <td>Row 2 - Data 1</td>
-          <td>Row 2 - Data 2</td>
-          <td>Row 2 - Data 3</td>
+          <td>Protein</td>
+          <td>{goals.protein}g</td>
+          <td>{current.protein}g</td>
+          <td>{goals.protein - current.protein}g</td>
         </tr>
         <tr>
-          <td>Row 3 - Data 1</td>
-          <td>Row 3 - Data 2</td>
-          <td>Row 3 - Data 3</td>
+          <td>Carbs</td>
+          <td>{goals.carbs}g</td>
+          <td>{current.carbs}g</td>
+          <td>{goals.carbs - current.carbs}g</td>
+        </tr>
+        <tr>
+          <td>Fats</td>
+          <td>{goals.fats}g</td>
+          <td>{current.fats}g</td>
+          <td>{goals.fats - current.fats}g</td>
         </tr>
       </tbody>
     </table>
   );
-}
+};
 
 /**
  * RecentNutrBreak Component
  * 
- * This component renders a table displaying the most recent nutrition breakdown.
- * Similar to the DailyNutrGoals component, it is a static table with sample column and row data. 
- * It can be updated to display actual recent nutritional data.
+ * Displays the most recent nutrition breakdown fetched from the backend API.
  * 
- * @returns {JSX.Element} The table displaying the most recent nutrition breakdown.
+ * @returns {JSX.Element} The table displaying the most recent nutrition breakdown
  */
-function RecentNutrBreak() {
+const RecentNutrBreak = () => {
+  const [recentData, setRecentData] = useState(null);
+  const [error, setError] = useState('');
+
+  useEffect(() => {
+    const fetchRecent = async () => {
+      try {
+        const response = await fetch('/api/nutrition/recent');
+        
+        if (!response.ok) {
+          throw new Error('Network response was not ok');
+        }
+        
+        const data = await response.json();
+        setRecentData(data);
+      } catch (err) {
+        setError('Failed to fetch recent nutrition data');
+        console.error('Error:', err);
+      }
+    };
+
+    fetchRecent();
+  }, []);
+
+  if (error) {
+    return <div>Error: {error}</div>;
+  }
+
+  if (!recentData) {
+    return <div>Loading...</div>;
+  }
+
   return (
     <table>
       <thead>
         <tr>
-          <th>Column 1</th>
-          <th>Column 2</th>
-          <th>Column 3</th>
+          <th>Meal</th>
+          <th>Calories</th>
+          <th>Protein</th>
+          <th>Carbs</th>
+          <th>Fats</th>
         </tr>
       </thead>
       <tbody>
-        <tr>
-          <td>Row 1 - Data 1</td>
-          <td>Row 1 - Data 2</td>
-          <td>Row 1 - Data 3</td>
-        </tr>
-        <tr>
-          <td>Row 2 - Data 1</td>
-          <td>Row 2 - Data 2</td>
-          <td>Row 2 - Data 3</td>
-        </tr>
-        <tr>
-          <td>Row 3 - Data 1</td>
-          <td>Row 3 - Data 2</td>
-          <td>Row 3 - Data 3</td>
-        </tr>
+        {recentData.meals.map((meal, index) => (
+          <tr key={index}>
+            <td>{meal.name}</td>
+            <td>{meal.calories} kcal</td>
+            <td>{meal.protein}g</td>
+            <td>{meal.carbs}g</td>
+            <td>{meal.fats}g</td>
+          </tr>
+        ))}
       </tbody>
     </table>
   );
-}
+};
 
 /**
  * Home Component
  * 
- * This is the main display component for the home page. 
- * It contains an overview of the caloric intake via a pie chart, as well as tables displaying daily nutritional goals 
- * and the most recent nutrition breakdown.
+ * The main display component for the home page.
+ * Contains the caloric overview pie chart and nutrition tables.
  * 
- * @returns {JSX.Element} The complete home page, including the chart and tables.
+ * @returns {JSX.Element} The complete home page
  */
-function Home() {
-  return (
-    <div className="Home">
-      <header className="Home-header">
-      </header>
-      <div>
-        <h2 className='centered'>Caloric Overview</h2>
-        <ChartPie />
-      </div>
-      <div>
-        <h2>Daily Nutrition Goals</h2>
-        <DailyNutrGoals />
-      </div>
-      <div>
-        <h2>Most Recent Nutrition Breakdown</h2>
-        <RecentNutrBreak />
-      </div>
+const Home = () => (
+  <div className="Home">
+    <header className="Home-header" />
+    <div>
+      <h2 className="centered">Caloric Overview</h2>
+      <ChartPie />
     </div>
-  );
-}
+    <div>
+      <h2>Daily Nutrition Goals</h2>
+      <DailyNutrGoals />
+    </div>
+    <div>
+      <h2>Most Recent Nutrition Breakdown</h2>
+      <RecentNutrBreak />
+    </div>
+  </div>
+);
 
 export default Home;

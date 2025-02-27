@@ -12,7 +12,7 @@ body {
   -webkit-font-smoothing: antialiased;
   /* Ensures smoother text rendering on Firefox on macOS */
   -moz-osx-font-smoothing: grayscale;
-  background-color: #FFF2D7;
+  background-color: #fff8e9;
 }
 
 /* Name: CODE FONTS -- Describes the code font family to be used in the general body */
@@ -30,11 +30,23 @@ h1 {
 }
 
 /* NAME: H2 STYLE -- added margins to top and bottom, and adjusted font and font size */
-h2 {
+h3 {
+  margin-top: 10px;
+  margin-bottom: 15px;
+  font-family: "Arial Black", "Palatino", "Trebuchet MS", Verdana, sans-serif;
+  font-size: 2.0rem;
+}
+
+/* NAME: H3 STYLE -- added margins to top and bottom, and adjusted font and font size */
+h3 {
   margin-top: 10px;
   margin-bottom: 15px;
   font-family: "Palatino", "Trebuchet MS", Verdana, sans-serif;
   font-size: 1.6rem;
+}
+
+label {
+  margin-right: 10px;
 }
 
 /* END GENERAL ELEMENT SECTION */
@@ -44,6 +56,27 @@ h2 {
 /* Name: GENERAL CENTER -- generally centers a Div or item that can have margins, based on it's width */
 .centered {
   text-align: center;
+}
+
+/* Name: ACCOUNT INFO BOX - adjust the position, color, and border of the account create/login box */
+.account-box {
+  /* Shrink to fit content */
+  display: inline-block;
+  /* Center the text inside */
+  text-align: center;
+  /* Center actual items themselves */
+  align-items: center;
+
+  background-color: #f9f9f9;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+
+  margin-top: 30px;
+  padding: 20px;
+  border-radius: 8px;
+}
+
+.text-input {
+  margin: 20px 0;
 }
 
 /* END CLASSES SECTION */

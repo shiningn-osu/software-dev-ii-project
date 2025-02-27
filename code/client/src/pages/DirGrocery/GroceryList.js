@@ -1,49 +1,57 @@
 import React, { useState, useEffect } from 'react';
+import { useLocation } from 'react-router-dom';
 import './Grocery.css';
 
 function GroceryList() {
-  // State to hold the grocery list items
   const [groceryList, setGroceryList] = useState([]);
-  
-  // State to hold the new item input
   const [newItem, setNewItem] = useState('');
+  const location = useLocation();
 
-  // Function to handle adding a new item to the list
-  const addItem = () => {
-    if (newItem) {
-      const updatedList = [...groceryList, newItem];
-      setGroceryList(updatedList);
-      // Save the updated list to localStorage
-      localStorage.setItem('groceryList', JSON.stringify(updatedList));
-      setNewItem('');
-    }
-  };
-
-  // Function to handle input change
-  const handleInputChange = (e) => {
-    setNewItem(e.target.value);
-  };
-
-  // Function to handle removing an item from the list
-  const removeItem = (itemToRemove) => {
-    const updatedList = groceryList.filter(item => item !== itemToRemove);
-    setGroceryList(updatedList);
-    // Save the updated list to localStorage
-    localStorage.setItem('groceryList', JSON.stringify(updatedList));
-  };
-
-  // UseEffect to load the list from localStorage when the component mounts
   useEffect(() => {
+    // Load the grocery list from localStorage when the component mounts
     const savedList = localStorage.getItem('groceryList');
     if (savedList) {
       setGroceryList(JSON.parse(savedList));
     }
-  }, []); // Empty array ensures this runs only once when the component mounts
+
+    // Initialize grocery list with ingredients passed from RecipeSearch if there are any
+    if (location.state && location.state.ingredients) {
+      setGroceryList((prevList) => {
+        const updatedList = [
+          ...prevList,
+          ...location.state.ingredients.filter(
+            (ingredient) => !prevList.includes(ingredient) // Avoid duplicates
+          ),
+        ];
+        localStorage.setItem('groceryList', JSON.stringify(updatedList)); // Save to localStorage
+        return updatedList;
+      });
+    }
+  }, [location.state]); // This will only run if location.state changes
+
+  const addItem = () => {
+    if (newItem && !groceryList.includes(newItem)) { // Ensure the item is not a duplicate
+      const updatedList = [...groceryList, newItem];
+      setGroceryList(updatedList);
+      localStorage.setItem('groceryList', JSON.stringify(updatedList)); // Save to localStorage
+      setNewItem('');
+    }
+  };
+
+  const handleInputChange = (e) => {
+    setNewItem(e.target.value);
+  };
+
+  const removeItem = (itemToRemove) => {
+    const updatedList = groceryList.filter((item) => item !== itemToRemove);
+    setGroceryList(updatedList);
+    localStorage.setItem('groceryList', JSON.stringify(updatedList)); // Save to localStorage
+  };
 
   return (
     <div className="GroceryList">
       <header className="GroceryList-header">
-        <h2>Create Your Grocery List</h2>
+        <h2>Your Grocery List</h2>
       </header>
 
       <div>
@@ -57,14 +65,18 @@ function GroceryList() {
       </div>
 
       <div>
-        <h3>Your Grocery List</h3>
+        <h3>Grocery List</h3>
         <ul>
-          {groceryList.map((item, index) => (
-            <li key={index}>
-              {item} 
-              <button onClick={() => removeItem(item)}>Remove</button>
-            </li>
-          ))}
+          {groceryList.length > 0 ? (
+            groceryList.map((item, index) => (
+              <li key={index}>
+                {item}
+                <button onClick={() => removeItem(item)}>Remove</button>
+              </li>
+            ))
+          ) : (
+            <p>No items in the grocery list.</p>
+          )}
         </ul>
       </div>
     </div>
@@ -72,4 +84,9 @@ function GroceryList() {
 }
 
 export default GroceryList;
+
+
+
+
+
 

@@ -4,18 +4,19 @@ import Navbar from "../components/DirNavbar/Navbar";
 
 // HOME RELATED PAGES
 import Home from "../pages/DirHome/Home";
-import AccCreate from "../pages/DirHome/DirAccCreate/AccCreate.js"
+import AccCreate from "../pages/DirHome/DirAccCreate/AccCreate";
+import Login from "../pages/DirHome/DirLogin/Login";
 
 // FOOD RELATED PAGES
 import Food from "../pages/DirFood/Food";
-import Diary from "../pages/DirFood/Diary"
-import MealPlan from "../pages/DirFood/MealPlan"
-import RecipeSearch from "../pages/DirFood/RecipeSearch"
+import Diary from "../pages/DirFood/Diary";
+import MealPlan from "../pages/DirFood/MealPlan";
+import RecipeSearch from "../pages/DirFood/RecipeSearch";
 
 // GROCERY RELATED PAGES
 import Grocery from "../pages/DirGrocery/Grocery";
-import GroceryList from "../pages/DirGrocery/GroceryList"
-import GrocerySearch from "../pages/DirGrocery/GrocerySearch"
+import GroceryList from "../pages/DirGrocery/GroceryList";
+import GrocerySearch from "../pages/DirGrocery/GrocerySearch";
 
 // NUTRITION RELATED PAGES
 import Nutrition from "../pages/DirNutrition/Nutrition";
@@ -43,13 +44,13 @@ function App() {
         {/* Home Routes */}
         <Route path="/" element={<Home />} />
         <Route path="/AccountCreation" element={<AccCreate />} />
+        <Route path="/Login" element={<Login />} />
 
         {/* Food Routes */}
         <Route path="/Food" element={<Food />} />
         <Route path="/Diary" element={<Diary />} />
         <Route path="/RecipeSearch" element={<RecipeSearch />} />
-        <Route path="/MealPlan" element={<MealPlan />} />
-
+        <Route path="/MealPlan" element={<MealPlan />} /> {/* Added wildcard for steps */}
         {/* Grocery Routes */}
         <Route path="/Grocery" element={<Grocery />} />
         <Route path="/GroceryList" element={<GroceryList />} />
