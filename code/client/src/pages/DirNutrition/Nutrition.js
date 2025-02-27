@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import './Nutrition.css';
 import { useNavigate } from 'react-router-dom';
-import { format } from 'date-fns';
+import { format, parseISO, addDays } from 'date-fns';
 
 const Nutrition = () => {
   const [error, setError] = useState(null);
@@ -240,15 +240,21 @@ const Nutrition = () => {
                     </tr>
                   </thead>
                   <tbody>
-                    {nutritionHistory.map((day) => (
-                      <tr key={day._id}>
-                        <td>{format(new Date(day.date), 'MMM dd, yyyy')}</td>
-                        <td>{day.totals.calories} kcal</td>
-                        <td>{day.totals.protein}g</td>
-                        <td>{day.totals.carbs}g</td>
-                        <td>{day.totals.fats}g</td>
-                      </tr>
-                    ))}
+                    {nutritionHistory.map((day) => {
+                      // Parse the date and adjust for timezone
+                      const date = parseISO(day.date);
+                      const adjustedDate = addDays(date, 1); // Add one day to account for UTC conversion
+                      
+                      return (
+                        <tr key={day._id}>
+                          <td>{format(adjustedDate, 'MMM dd, yyyy')}</td>
+                          <td>{day.totals.calories} kcal</td>
+                          <td>{day.totals.protein}g</td>
+                          <td>{day.totals.carbs}g</td>
+                          <td>{day.totals.fats}g</td>
+                        </tr>
+                      );
+                    })}
                   </tbody>
                 </table>
               </div>
