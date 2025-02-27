@@ -27,9 +27,29 @@ const ChartPie = ({ data }) => {
     { name: 'Fats', value: Number(data.fats) || 0 }
   ] : DEFAULT_DATA;
 
+  // Custom label renderer
+  const renderCustomizedLabel = ({ cx, cy, midAngle, innerRadius, outerRadius, percent, index, name, value }) => {
+    const RADIAN = Math.PI / 180;
+    const radius = outerRadius * 1.2; // Increased distance of labels from pie
+    const x = cx + radius * Math.cos(-midAngle * RADIAN);
+    const y = cy + radius * Math.sin(-midAngle * RADIAN);
+
+    return (
+      <text
+        x={x}
+        y={y}
+        fill="#000"
+        textAnchor={x > cx ? 'start' : 'end'}
+        dominantBaseline="central"
+      >
+        {`${name}: ${value}g`}
+      </text>
+    );
+  };
+
   return (
     <div className="chart-container">
-      <PieChart width={400} height={400}>
+      <PieChart width={500} height={400}> {/* Increased width */}
         <Pie
           data={chartData}
           cx="50%"
@@ -37,7 +57,8 @@ const ChartPie = ({ data }) => {
           outerRadius={120}
           fill="#8884d8"
           dataKey="value"
-          label={({ name, value }) => `${name}: ${value}g`}
+          labelLine={true}
+          label={renderCustomizedLabel}
         >
           {chartData.map((entry, index) => (
             <Cell 
@@ -47,7 +68,7 @@ const ChartPie = ({ data }) => {
           ))}
         </Pie>
         <Tooltip />
-        <Legend />
+        <Legend verticalAlign="bottom" height={36} />
       </PieChart>
       {!data && (
         <div className="chart-message">
