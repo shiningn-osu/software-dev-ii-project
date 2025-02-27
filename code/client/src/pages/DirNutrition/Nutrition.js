@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import './Nutrition.css';
+import { useNavigate } from 'react-router-dom';
 
 const Nutrition = () => {
   // Search states
@@ -28,35 +29,47 @@ const Nutrition = () => {
     fats: ''
   });
 
+  const navigate = useNavigate();
+
   // Add useEffect to fetch existing goals
   useEffect(() => {
     const fetchGoals = async () => {
       try {
+        const token = localStorage.getItem('token');
+        if (!token) {
+          navigate('/login');
+          return;
+        }
+
         const response = await fetch('/api/nutrition/goals', {
           headers: {
-            'Authorization': `Bearer ${localStorage.getItem('token')}`
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
           }
         });
 
-        if (response.ok) {
-          const data = await response.json();
-          setGoals({
-            calories: data.calories.toString(),
-            protein: data.protein.toString(),
-            carbs: data.carbs.toString(),
-            fats: data.fats.toString()
-          });
+        if (response.status === 401) {
+          localStorage.removeItem('token');
+          navigate('/login');
+          return;
         }
+
+        if (!response.ok) {
+          throw new Error('Network response was not ok');
+        }
+
+        const data = await response.json();
+        setGoals(data);
       } catch (err) {
-        setError('Error fetching nutrition goals');
         console.error('Error:', err);
+        setError('Error fetching nutrition data');
       }
     };
 
     if (showGoalsForm) {
       fetchGoals();
     }
-  }, [showGoalsForm]);
+  }, [showGoalsForm, navigate]);
 
   // Search USDA database
   const handleSearch = async (e) => {
@@ -65,7 +78,7 @@ const Nutrition = () => {
     setError(null);
 
     try {
-      const response = await fetch(`/api/nutrition/search?query=${searchQuery}`);
+      const response = await fetch('/api/nutrition/search?query=' + searchQuery);
       const data = await response.json();
       setSearchResults(data);
     } catch (err) {
@@ -137,29 +150,37 @@ const Nutrition = () => {
   const handleGoalsSubmit = async (e) => {
     e.preventDefault();
     try {
+      const token = localStorage.getItem('token');
+      if (!token) {
+        navigate('/login');
+        return;
+      }
+
       const response = await fetch('/api/nutrition/goals', {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('token')}`
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
         },
         body: JSON.stringify(goals)
       });
 
-      if (response.ok) {
-        alert('Goals updated successfully!');
-        setGoals({
-          calories: '',
-          protein: '',
-          carbs: '',
-          fats: ''
-        });
-      } else {
-        setError('Failed to update goals');
+      if (response.status === 401) {
+        localStorage.removeItem('token');
+        navigate('/login');
+        return;
       }
+
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
+      }
+
+      const data = await response.json();
+      setGoals(data);
+      alert('Goals updated successfully!');
     } catch (err) {
-      setError('Error saving goals');
       console.error('Error:', err);
+      setError('Error updating nutrition goals');
     }
   };
 

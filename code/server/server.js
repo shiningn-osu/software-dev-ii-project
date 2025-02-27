@@ -12,6 +12,7 @@ import cors from 'cors';
 import dotenv from 'dotenv';
 import NutritionGoals from './models/nutritionGoals.js';
 import jwt from 'jsonwebtoken';
+import DailyNutrition from './models/dailyNutrition.js';
 
 // Load environment variables
 dotenv.config();
@@ -25,9 +26,9 @@ app.use(express.json());
 
 // CORS configuration
 app.use(cors({
-  origin: ["https://meal-match-9nx72i8vk-duncan-eversons-projects.vercel.app", "http://localhost:3000"],
-  methods: ['GET', 'POST'],
-  allowedHeaders: ['Content-Type', 'Authorization', 'Edamam-Account-User']
+  origin: ["http://localhost:3000", "http://localhost:6000"],
+  methods: ['GET', 'POST', 'PUT', 'DELETE'],
+  allowedHeaders: ['Content-Type', 'Authorization']
 }));
 
 // Edamam API Configuration
@@ -90,6 +91,62 @@ app.get('/api/nutrition/recent', (req, res) => {
     date: new Date(),
     meals: []
   });
+});
+
+// Add this endpoint for nutrition goals
+app.post('/api/nutrition/goals', verifyToken, async (req, res) => {
+  try {
+    const { calories, protein, carbs, fats } = req.body;
+    
+    const goals = await NutritionGoals.findOneAndUpdate(
+      { userId: req.userId },
+      {
+        userId: req.userId,
+        calories,
+        protein,
+        carbs,
+        fats
+      },
+      { new: true, upsert: true }
+    );
+
+    res.json(goals);
+  } catch (error) {
+    console.error('Error saving nutrition goals:', error);
+    res.status(500).json({ message: 'Failed to save nutrition goals' });
+  }
+});
+
+// Add this new endpoint for current nutrition data
+app.get('/api/nutrition/current', verifyToken, async (req, res) => {
+  try {
+    // Get today's date at midnight
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    // Find today's nutrition entries for the user
+    const currentNutrition = await DailyNutrition.findOne({
+      userId: req.userId,
+      date: {
+        $gte: today,
+        $lt: new Date(today.getTime() + 24 * 60 * 60 * 1000)
+      }
+    });
+
+    if (!currentNutrition) {
+      return res.json({
+        calories: 0,
+        protein: 0,
+        carbs: 0,
+        fats: 0
+      });
+    }
+
+    res.json(currentNutrition);
+  } catch (error) {
+    console.error('Error fetching current nutrition:', error);
+    res.status(500).json({ message: 'Failed to fetch current nutrition data' });
+  }
 });
 
 // Meal Plan Generation endpoint
