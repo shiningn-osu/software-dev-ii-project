@@ -7,12 +7,13 @@
 import express from 'express';
 import connectDB from './config/db.js';
 import userRoutes from './routes/userRoutes.js';
-import nutritionRoutes from './routes/nutrition.js';
+import nutritionRoutes from './routes/nutritionRoutes.js';
 import cors from 'cors';
 import dotenv from 'dotenv';
 import NutritionGoals from './models/nutritionGoals.js';
 import jwt from 'jsonwebtoken';
 import DailyNutrition from './models/dailyNutrition.js';
+import fetch from 'node-fetch';
 
 // Load environment variables
 dotenv.config();
@@ -26,9 +27,10 @@ app.use(express.json());
 
 // CORS configuration
 app.use(cors({
-  origin: ["http://localhost:3000", "http://localhost:6000"],
+  origin: "http://localhost:3000",
+  credentials: true,  // Allow credentials
   methods: ['GET', 'POST', 'PUT', 'DELETE'],
-  allowedHeaders: ['Content-Type', 'Authorization']
+  allowedHeaders: ['Content-Type', 'Authorization', 'Accept']
 }));
 
 // Edamam API Configuration
@@ -149,9 +151,55 @@ app.get('/api/nutrition/current', verifyToken, async (req, res) => {
   }
 });
 
+// Add custom food endpoint
+app.post('/api/nutrition/add-custom', verifyToken, async (req, res) => {
+  try {
+    const { name, servingSize, calories, protein, carbs, fats } = req.body;
+    
+    // Get today's date at midnight
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    // Find or create today's nutrition entry
+    let dailyNutrition = await DailyNutrition.findOne({
+      userId: req.userId,
+      date: {
+        $gte: today,
+        $lt: new Date(today.getTime() + 24 * 60 * 60 * 1000)
+      }
+    });
+
+    if (!dailyNutrition) {
+      // Create new entry if none exists for today
+      dailyNutrition = new DailyNutrition({
+        userId: req.userId,
+        date: today,
+        calories: 0,
+        protein: 0,
+        carbs: 0,
+        fats: 0
+      });
+    }
+
+    // Add the custom food nutrients to daily totals
+    dailyNutrition.calories += Number(calories);
+    dailyNutrition.protein += Number(protein);
+    dailyNutrition.carbs += Number(carbs);
+    dailyNutrition.fats += Number(fats);
+
+    // Save the updated totals
+    await dailyNutrition.save();
+
+    res.json(dailyNutrition);
+  } catch (error) {
+    console.error('Error adding custom food:', error);
+    res.status(500).json({ message: 'Failed to add custom food' });
+  }
+});
+
 // Meal Plan Generation endpoint
-app.post("/generate-meal-plan", async (req, res) => {
-  const { allergies, diet, minCalories, maxCalories, nutrients } = req.body;
+app.post("/api/generate-meal-plan", async (req, res) => {
+  const { allergies, diet, minCalories, maxCalories } = req.body;
 
   const requestBody = {
     size: 7,
@@ -220,6 +268,16 @@ app.post("/generate-meal-plan", async (req, res) => {
     console.error("Internal Server Error:", error);
     res.status(500).json({ error: "Internal server error" });
   }
+});
+
+// Test route to verify server is working
+app.get('/test', (req, res) => {
+  res.json({ message: 'Server is working' });
+});
+
+// Add a test endpoint
+app.get('/api/test', (req, res) => {
+  res.json({ message: 'Server is working' });
 });
 
 // Start server

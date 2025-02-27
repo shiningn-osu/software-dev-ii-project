@@ -35,14 +35,14 @@ const Navbar = () => {
           <>
             {/* Original Navigation Items */}
             <Link to="/">Home</Link>
-            <Link to="/Food">Food</Link>
             <Link to="/Diary">Diary</Link>
             <Link to="/RecipeSearch">Recipe Search</Link>
             <Link to="/MealPlan">Meal Plan</Link>
-            <Link to="/Grocery">Grocery</Link>
             <Link to="/GroceryList">Grocery List</Link>
             <Link to="/GrocerySearch">Grocery Search</Link>
             <Link to="/NutritionDay">Nutrition</Link>
+            {/* Help link - available whether logged in or not */}
+            <a href="/help.html" target="_blank" rel="noopener noreferrer">Help</a>
             {/* Logout Button */}
             <button onClick={handleLogout} className="btn btn-outline-danger">
               Logout
@@ -52,6 +52,8 @@ const Navbar = () => {
           <>
             <Link to="/Login">Login</Link>
             <Link to="/AccountCreation">Sign Up</Link>
+            {/* Help link in non-authenticated state */}
+            <a href="/help.html" target="_blank" rel="noopener noreferrer">Help</a>
           </>
         )}
       </div>

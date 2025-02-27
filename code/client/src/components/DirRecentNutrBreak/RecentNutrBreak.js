@@ -3,12 +3,12 @@ import { useNavigate } from 'react-router-dom';
 import './RecentNutrBreak.css';
 
 const RecentNutrBreak = () => {
-  const [recentData, setRecentData] = useState(null);
+  const [latestMeal, setLatestMeal] = useState(null);
   const [error, setError] = useState('');
   const navigate = useNavigate();
 
   useEffect(() => {
-    const fetchRecent = async () => {
+    const fetchLatestMeal = async () => {
       try {
         const token = localStorage.getItem('token');
         if (!token) {
@@ -16,7 +16,7 @@ const RecentNutrBreak = () => {
           return;
         }
 
-        const response = await fetch('/api/nutrition/recent', {
+        const response = await fetch('/api/nutrition/today', {
           headers: {
             'Authorization': `Bearer ${token}`,
             'Content-Type': 'application/json'
@@ -34,46 +34,75 @@ const RecentNutrBreak = () => {
         }
         
         const data = await response.json();
-        setRecentData(data);
+        // Get the most recent meal from today's meals
+        const meals = data.meals || [];
+        const latest = meals.length > 0 ? 
+          meals.reduce((latest, current) => {
+            return new Date(current.timeEaten) > new Date(latest.timeEaten) ? current : latest;
+          }, meals[0]) 
+          : null;
+        
+        setLatestMeal(latest);
       } catch (err) {
-        setError('Failed to fetch recent nutrition data');
+        setError('Failed to fetch latest meal data');
         console.error('Error:', err);
       }
     };
 
-    fetchRecent();
+    fetchLatestMeal();
+    
+    // Fetch data every minute to keep it updated
+    const interval = setInterval(fetchLatestMeal, 60000);
+    
+    // Add event listener for nutrition updates
+    const handleNutritionUpdate = () => fetchLatestMeal();
+    window.addEventListener('nutritionUpdated', handleNutritionUpdate);
+    
+    // Cleanup interval and event listener on unmount
+    return () => {
+      clearInterval(interval);
+      window.removeEventListener('nutritionUpdated', handleNutritionUpdate);
+    };
   }, [navigate]);
 
   if (error) {
     return <div className="recent-nutr-break error">{error}</div>;
   }
 
-  if (!recentData) {
-    return <div className="recent-nutr-break loading">Loading...</div>;
+  if (!latestMeal) {
+    return <div className="recent-nutr-break">No meals recorded today</div>;
   }
 
   return (
     <div className="recent-nutr-break">
+      <h3>{latestMeal.name}</h3>
+      <p className="meal-time">
+        {new Date(latestMeal.timeEaten).toLocaleTimeString()}
+      </p>
       <table>
         <thead>
           <tr>
-            <th>Meal</th>
-            <th>Calories</th>
-            <th>Protein</th>
-            <th>Carbs</th>
-            <th>Fats</th>
+            <th>Nutrient</th>
+            <th>Amount</th>
           </tr>
         </thead>
         <tbody>
-          {recentData.meals.map((meal, index) => (
-            <tr key={index}>
-              <td>{meal.name}</td>
-              <td>{meal.calories} kcal</td>
-              <td>{meal.protein}g</td>
-              <td>{meal.carbs}g</td>
-              <td>{meal.fats}g</td>
-            </tr>
-          ))}
+          <tr>
+            <td>Calories</td>
+            <td>{latestMeal.calories} kcal</td>
+          </tr>
+          <tr>
+            <td>Protein</td>
+            <td>{latestMeal.protein}g</td>
+          </tr>
+          <tr>
+            <td>Carbs</td>
+            <td>{latestMeal.carbs}g</td>
+          </tr>
+          <tr>
+            <td>Fats</td>
+            <td>{latestMeal.fats}g</td>
+          </tr>
         </tbody>
       </table>
     </div>

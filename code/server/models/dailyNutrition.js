@@ -8,34 +8,25 @@ const dailyNutritionSchema = new mongoose.Schema({
   },
   date: {
     type: Date,
-    default: Date.now,
     required: true
   },
-  calories: {
-    type: Number,
-    default: 0,
-    required: true
-  },
-  protein: {
-    type: Number,
-    default: 0,
-    required: true
-  },
-  carbs: {
-    type: Number,
-    default: 0,
-    required: true
-  },
-  fats: {
-    type: Number,
-    default: 0,
-    required: true
+  meals: [{
+    name: String,
+    calories: Number,
+    protein: Number,
+    carbs: Number,
+    fats: Number,
+    timeEaten: Date
+  }],
+  totals: {
+    calories: { type: Number, default: 0 },
+    protein: { type: Number, default: 0 },
+    carbs: { type: Number, default: 0 },
+    fats: { type: Number, default: 0 }
   }
 });
 
-// Add index for faster queries
+// Add index for querying by user and date
 dailyNutritionSchema.index({ userId: 1, date: 1 });
 
-const DailyNutrition = mongoose.model('DailyNutrition', dailyNutritionSchema);
-
-export default DailyNutrition; 
+export default mongoose.model('DailyNutrition', dailyNutritionSchema); 
