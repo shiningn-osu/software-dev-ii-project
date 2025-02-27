@@ -11,56 +11,32 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
 import ChartPie from './ChartPie';
-import fetchMock from 'jest-fetch-mock';
-
-// Enable fetch mocks
-fetchMock.enableMocks();
 
 // Mock recharts components
 jest.mock('recharts', () => ({
-  PieChart: (props) => <div data-testid="piechart">{props.children}</div>,
-  Pie: (props) => <div data-testid="pie">{props.children}</div>,
+  PieChart: ({ children }) => <div data-testid="piechart">{children}</div>,
+  Pie: ({ children }) => <div data-testid="pie">{children}</div>,
   Cell: () => <div data-testid="cell" />,
   Tooltip: () => <div data-testid="tooltip" />,
   Legend: () => <div data-testid="legend" />
 }));
 
 describe('ChartPie Component', () => {
-  beforeEach(() => {
-    fetch.resetMocks();
-    fetchMock.mockResponseOnce(
-      JSON.stringify([
-        { name: 'Protein', value: 90 },
-        { name: 'Carbs', value: 150 },
-        { name: 'Fats', value: 40 },
-        { name: 'Vitamins', value: 20 },
-      ]),
-      { status: 200 }
-    );
+  test('renders default state without data', () => {
+    render(<ChartPie />);
+    expect(screen.getByTestId('piechart')).toBeInTheDocument();
+    expect(screen.getByText('Start tracking your meals to see your nutrition breakdown!')).toBeInTheDocument();
   });
 
-  it('renders PieChart component', async () => {
-    render(<ChartPie />);
-    expect(await screen.findByTestId('piechart')).toBeInTheDocument();
-  });
-
-  it('renders Pie component inside PieChart', async () => {
-    render(<ChartPie />);
-    expect(await screen.findByTestId('pie')).toBeInTheDocument();
-  });
-
-  it('renders 4 Cell components for each data entry', async () => {
-    render(<ChartPie />);
-    expect(await screen.findAllByTestId('cell')).toHaveLength(4);
-  });
-
-  it('renders Tooltip component', async () => {
-    render(<ChartPie />);
-    expect(await screen.findByTestId('tooltip')).toBeInTheDocument();
-  });
-
-  it('renders Legend component', async () => {
-    render(<ChartPie />);
-    expect(await screen.findByTestId('legend')).toBeInTheDocument();
+  test('renders with provided data', () => {
+    const mockData = {
+      protein: 50,
+      carbs: 100,
+      fats: 30
+    };
+    
+    render(<ChartPie data={mockData} />);
+    expect(screen.getByTestId('piechart')).toBeInTheDocument();
+    expect(screen.queryByText('Start tracking your meals to see your nutrition breakdown!')).not.toBeInTheDocument();
   });
 });

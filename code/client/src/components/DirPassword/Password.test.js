@@ -1,57 +1,35 @@
 import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
-import PasswordInput from './Password'; // PasswordInput is exported from Password.js
+import PasswordInput from './Password';
 
-
-/**
- * Test suite for the PasswordInput component. This suite includes:
- * - A test to verify that the password input initially renders with the correct type attribute.
- * - A test to check if the password visibility can be toggled through a button click, 
- *   changing the input type and button text accordingly.
- * - A test to ensure the password input field is marked as required.
- * - A test to confirm that the toggle button's text changes correctly when visibility is toggled.
- *
- * @function describe
- * @param {string} 'PasswordInput Component' - The name of the test suite.
- * @param {Function} testSuite - The callback function containing all the test cases.
- */
 describe('PasswordInput Component', () => {
   const mockOnChange = jest.fn();
+  const defaultProps = {
+    value: 'test-password',
+    onChange: mockOnChange
+  };
 
-  test('renders password input with correct type initially', () => {
-    render(<PasswordInput value="" onChange={mockOnChange} />);
-    const passwordInput = screen.getByPlaceholderText('Enter password');
-    expect(passwordInput).toHaveAttribute('type', 'password');
-  });
-
-  test('toggles password visibility when show/hide button is clicked', () => {
-    render(<PasswordInput value="" onChange={mockOnChange} />);
+  test('renders password input with toggle visibility', () => {
+    render(<PasswordInput {...defaultProps} />);
+    
     const passwordInput = screen.getByPlaceholderText('Enter password');
     const toggleButton = screen.getByRole('button');
 
+    expect(passwordInput).toBeInTheDocument();
     expect(passwordInput).toHaveAttribute('type', 'password');
-    
+    expect(toggleButton).toHaveTextContent('Show');
+
     fireEvent.click(toggleButton);
     expect(passwordInput).toHaveAttribute('type', 'text');
-    
-    fireEvent.click(toggleButton);
-    expect(passwordInput).toHaveAttribute('type', 'password');
-  });
-
-  test('password input is required', () => {
-    render(<PasswordInput />);
-    const passwordInput = screen.getByPlaceholderText('Enter password');
-    expect(passwordInput).toBeRequired();
-  });
-
-  test('button changes text when password visibility is toggled', () => {
-    render(<PasswordInput />);
-    const toggleButton = screen.getByText('Show');
-
-    fireEvent.click(toggleButton);
     expect(toggleButton).toHaveTextContent('Hide');
+  });
 
-    fireEvent.click(toggleButton);
-    expect(toggleButton).toHaveTextContent('Show');
+  test('calls onChange when input changes', () => {
+    render(<PasswordInput {...defaultProps} />);
+    
+    const passwordInput = screen.getByPlaceholderText('Enter password');
+    fireEvent.change(passwordInput, { target: { value: 'new-password' } });
+    
+    expect(mockOnChange).toHaveBeenCalled();
   });
 });

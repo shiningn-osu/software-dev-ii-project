@@ -1,5 +1,5 @@
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
-import { BrowserRouter } from 'react-router-dom';
+import { BrowserRouter, MemoryRouter } from 'react-router-dom';
 import AccCreate from './AccCreate';
 
 describe('AccCreate Component', () => {
@@ -25,9 +25,9 @@ describe('AccCreate Component', () => {
     );
 
     render(
-      <BrowserRouter>
+      <MemoryRouter>
         <AccCreate />
-      </BrowserRouter>
+      </MemoryRouter>
     );
 
     // Fill in form
