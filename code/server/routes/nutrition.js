@@ -133,33 +133,6 @@ const searchFoods = async (req, res) => {
  * @returns {Object} Detailed food information
  * @throws {Error} When the USDA API request fails
  */
-const getFoodDetails = async (req, res) => {
-  try {
-    const { id } = req.params;
-    const response = await fetch(
-      `${USDA_BASE_URL}/food/${id}?api_key=${USDA_API_KEY}`,
-      {
-        headers: {
-          Accept: 'application/json',
-        },
-      },
-    );
-
-    if (!response.ok) {
-      throw new Error(`USDA API responded with status: ${response.status}`);
-    }
-
-    const food = await response.json();
-    return res.json(food);
-  } catch (error) {
-    console.error('Food detail error:', error);
-    return res.status(500).json({
-      error: 'Error fetching food details',
-      details: error.message,
-      timestamp: new Date().toISOString(),
-    });
-  }
-};
 
 // Define verifyToken middleware here
 const verifyToken = (req, res, next) => {
@@ -259,6 +232,5 @@ router.post('/add-custom', verifyToken, async (req, res) => {
 
 // Route handlers
 router.get('/search', searchFoods);
-router.get('/food/:id', getFoodDetails);
 
 export default router;
