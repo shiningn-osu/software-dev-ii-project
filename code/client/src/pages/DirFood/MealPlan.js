@@ -46,12 +46,12 @@ const MealPlan = () => {
       if (!response.ok) throw new Error("Failed to fetch meal plan");
 
       const data = await response.json();
-      console.log("✅ Received Meal Plan Data from Server:", data);
+      console.log("Received Meal Plan Data from Server:", data);
 
       setMealPlan(data);
       fetchRecipeDetailsForAll(data.selection);
     } catch (error) {
-      console.error("❌ Error fetching meal plan:", error.message);
+      console.error("Error fetching meal plan:", error.message);
       setError(error.message);
     } finally {
       setLoading(false);
