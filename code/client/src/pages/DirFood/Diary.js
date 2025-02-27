@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import axios from "axios";
 import './food-diary.css';
 
@@ -10,9 +10,16 @@ const Diary = () => {
     const [ingredient, setIngredient] = useState("");
     const [weight, setWeight] = useState("");
     const [ingredients, setIngredients] = useState([]);
-    const [meals, setMeals] = useState([]);
+    const [meals, setMeals] = useState(() => {
+        const savedMeals = localStorage.getItem("diaryMeals");
+        return savedMeals ? JSON.parse(savedMeals) : [];
+    });
     const [mealName, setMealName] = useState("");
     const [error, setError] = useState("");
+
+    useEffect(() => {
+        localStorage.setItem("diaryMeals", JSON.stringify(meals));
+    }, [meals]);
 
     const fetchNutrition = async (name, weight) => {
         try {
@@ -28,15 +35,17 @@ const Diary = () => {
                 }
             });
 
-            if (!response.data?.calories) {
-                throw new Error('Nutrition data not found in response');
-            }
-
-            return Math.round(response.data.calories);
+            const nutrients = response.data?.totalNutrients || {};
+            return {
+                calories: Math.round(nutrients.ENERC_KCAL?.quantity || 0),
+                protein: Math.round(nutrients.PROCNT?.quantity || 0),
+                carbs: Math.round(nutrients.CHOCDF?.quantity || 0),
+                fats: Math.round(nutrients.FAT?.quantity || 0)
+            };
         } catch (error) {
             console.error("API Error:", error);
             setError(`Error: ${error.response?.data?.message || error.message}`);
-            return 0;
+            return { calories: 0, protein: 0, carbs: 0, fats: 0 };
         }
     };
 
@@ -47,11 +56,11 @@ const Diary = () => {
         }
         setError("");
 
-        const calories = await fetchNutrition(ingredient, weight);
+        const nutrition = await fetchNutrition(ingredient, weight);
         const newIngredient = {
             name: ingredient.trim(),
             weight: parseInt(weight),
-            calories
+            ...nutrition
         };
 
         setIngredients([...ingredients, newIngredient]);
@@ -59,7 +68,7 @@ const Diary = () => {
         setWeight("");
     };
 
-    const addMeal = () => {
+    const addMeal = async () => {
         if (!mealName) {
             setError("Please enter a meal name");
             return;
@@ -70,12 +79,19 @@ const Diary = () => {
         }
         setError("");
 
-        const totalCalories = ingredients.reduce((sum, ing) => sum + ing.calories, 0);
+        const totalNutrition = ingredients.reduce((acc, ing) => ({
+            calories: acc.calories + ing.calories,
+            protein: acc.protein + ing.protein,
+            carbs: acc.carbs + ing.carbs,
+            fats: acc.fats + ing.fats
+        }), { calories: 0, protein: 0, carbs: 0, fats: 0 });
+
         const newMeal = {
             name: mealName.trim(),
             date: new Date().toLocaleString(),
-            totalCalories,
-            ingredients: [...ingredients]
+            totalCalories: totalNutrition.calories,
+            ingredients: [...ingredients],
+            nutrition: totalNutrition
         };
 
         setMeals([...meals, newMeal]);
