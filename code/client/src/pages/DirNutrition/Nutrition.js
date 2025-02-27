@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import './Nutrition.css';
 
 const Nutrition = () => {
@@ -18,6 +18,45 @@ const Nutrition = () => {
     carbs: '',
     fats: ''
   });
+
+  // New states for goals and meals
+  const [showGoalsForm, setShowGoalsForm] = useState(false);
+  const [goals, setGoals] = useState({
+    calories: '',
+    protein: '',
+    carbs: '',
+    fats: ''
+  });
+
+  // Add useEffect to fetch existing goals
+  useEffect(() => {
+    const fetchGoals = async () => {
+      try {
+        const response = await fetch('/api/nutrition/goals', {
+          headers: {
+            'Authorization': `Bearer ${localStorage.getItem('token')}`
+          }
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+          setGoals({
+            calories: data.calories.toString(),
+            protein: data.protein.toString(),
+            carbs: data.carbs.toString(),
+            fats: data.fats.toString()
+          });
+        }
+      } catch (err) {
+        setError('Error fetching nutrition goals');
+        console.error('Error:', err);
+      }
+    };
+
+    if (showGoalsForm) {
+      fetchGoals();
+    }
+  }, [showGoalsForm]);
 
   // Search USDA database
   const handleSearch = async (e) => {
@@ -94,61 +133,118 @@ const Nutrition = () => {
     }
   };
 
+  // Update the fetch URL in handleGoalsSubmit
+  const handleGoalsSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      const response = await fetch('/api/nutrition/goals', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('token')}`
+        },
+        body: JSON.stringify(goals)
+      });
+
+      if (response.ok) {
+        alert('Goals updated successfully!');
+        setGoals({
+          calories: '',
+          protein: '',
+          carbs: '',
+          fats: ''
+        });
+      } else {
+        setError('Failed to update goals');
+      }
+    } catch (err) {
+      setError('Error saving goals');
+      console.error('Error:', err);
+    }
+  };
+
   return (
     <div className="nutrition-container">
       <h2>Nutrition Tracker</h2>
       
-      {/* Toggle between search and custom food */}
+      {/* Toggle buttons */}
       <div className="toggle-buttons">
         <button 
-          onClick={() => setShowCustomForm(false)}
-          className={!showCustomForm ? 'active' : ''}
+          onClick={() => {
+            setShowCustomForm(false);
+            setShowGoalsForm(false);
+          }}
+          className={!showCustomForm && !showGoalsForm ? 'active' : ''}
         >
           Search Foods
         </button>
         <button 
-          onClick={() => setShowCustomForm(true)}
-          className={showCustomForm ? 'active' : ''}
+          onClick={() => {
+            setShowCustomForm(true);
+            setShowGoalsForm(false);
+          }}
+          className={showCustomForm && !showGoalsForm ? 'active' : ''}
         >
           Add Custom Food
         </button>
+        <button 
+          onClick={() => {
+            setShowCustomForm(false);
+            setShowGoalsForm(true);
+          }}
+          className={showGoalsForm ? 'active' : ''}
+        >
+          Set Nutrition Goals
+        </button>
       </div>
 
-      {!showCustomForm ? (
-        // USDA Search Form
-        <div className="search-section">
-          <form onSubmit={handleSearch} className="search-form">
-            <input
-              type="text"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Search for a food..."
-              className="search-input"
-            />
-            <button type="submit" disabled={loading}>
-              {loading ? 'Searching...' : 'Search'}
-            </button>
-          </form>
-
-          {/* Search Results */}
-          <div className="search-results">
-            {searchResults.map((food) => (
-              <div key={food.fdcId} className="food-item">
-                <h3>{food.description}</h3>
-                <div className="nutrition-info">
-                  <p>Calories: {food.nutrients.energy || 'N/A'}</p>
-                  <p>Protein: {food.nutrients.protein || 'N/A'}g</p>
-                  <p>Carbs: {food.nutrients.carbohydrate || 'N/A'}g</p>
-                  <p>Fat: {food.nutrients['total lipid (fat)'] || 'N/A'}g</p>
-                </div>
-                <button onClick={() => handleAddFood(food)}>
-                  Add to Daily Log
-                </button>
-              </div>
-            ))}
+      {showGoalsForm ? (
+        // Goals Form
+        <form onSubmit={handleGoalsSubmit} className="goals-form">
+          <h3>Set Daily Nutrition Goals</h3>
+          <div className="form-group">
+            <label>Calories (kcal):
+              <input
+                type="number"
+                value={goals.calories}
+                onChange={(e) => setGoals({...goals, calories: e.target.value})}
+                required
+              />
+            </label>
           </div>
-        </div>
-      ) : (
+          <div className="form-group">
+            <label>Protein (g):
+              <input
+                type="number"
+                value={goals.protein}
+                onChange={(e) => setGoals({...goals, protein: e.target.value})}
+                required
+              />
+            </label>
+          </div>
+          <div className="form-group">
+            <label>Carbs (g):
+              <input
+                type="number"
+                value={goals.carbs}
+                onChange={(e) => setGoals({...goals, carbs: e.target.value})}
+                required
+              />
+            </label>
+          </div>
+          <div className="form-group">
+            <label>Fats (g):
+              <input
+                type="number"
+                value={goals.fats}
+                onChange={(e) => setGoals({...goals, fats: e.target.value})}
+                required
+              />
+            </label>
+          </div>
+          <button type="submit" className="btn btn-primary">Save Goals</button>
+        </form>
+      ) : showCustomForm ? (
         // Custom Food Form
         <form onSubmit={handleAddCustomFood} className="custom-food-form">
           <input
@@ -201,6 +297,40 @@ const Nutrition = () => {
           />
           <button type="submit">Add Custom Food</button>
         </form>
+      ) : (
+        // Search Section
+        <div className="search-section">
+          <form onSubmit={handleSearch} className="search-form">
+            <input
+              type="text"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder="Search for a food..."
+              className="search-input"
+            />
+            <button type="submit" disabled={loading}>
+              {loading ? 'Searching...' : 'Search'}
+            </button>
+          </form>
+
+          {/* Search Results */}
+          <div className="search-results">
+            {searchResults.map((food) => (
+              <div key={food.fdcId} className="food-item">
+                <h3>{food.description}</h3>
+                <div className="nutrition-info">
+                  <p>Calories: {food.nutrients.energy || 'N/A'}</p>
+                  <p>Protein: {food.nutrients.protein || 'N/A'}g</p>
+                  <p>Carbs: {food.nutrients.carbohydrate || 'N/A'}g</p>
+                  <p>Fat: {food.nutrients['total lipid (fat)'] || 'N/A'}g</p>
+                </div>
+                <button onClick={() => handleAddFood(food)}>
+                  Add to Daily Log
+                </button>
+              </div>
+            ))}
+          </div>
+        </div>
       )}
 
       {error && <div className="error-message">{error}</div>}
