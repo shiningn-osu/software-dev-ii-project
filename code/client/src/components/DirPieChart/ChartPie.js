@@ -7,19 +7,11 @@ const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042'];
 /**
  * A React component that renders a pie chart using the `recharts` library.
  * 
- * This component displays a simple pie chart with sections representing
- * nutritional data (protein, carbs, fats, and vitamins) along with a legend
- * and tooltip for further interaction.
- * 
- * The chart has a fixed width and height, and the colors for each slice
- * are defined in the `COLORS` array, which maps to the data indices.
+ * This component displays a pie chart only when user data is available.
+ * Otherwise, it shows a message prompting the user to add nutrition data.
  * 
  * @component
- * @example
- * // Example usage of the ChartPie component
- * <ChartPie />
- * 
- * @returns {JSX.Element} A pie chart displaying the nutritional data.
+ * @returns {JSX.Element} A pie chart or message based on data availability
  */
 const ChartPie = () => {
   const [data, setData] = useState([]);
@@ -29,14 +21,25 @@ const ChartPie = () => {
   useEffect(() => {
     const fetchNutritionData = async () => {
       try {
-        const response = await fetch('/api/nutrition/overview');
+        const token = localStorage.getItem('token');
+        const response = await fetch('/api/nutrition/overview', {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        });
         
         if (!response.ok) {
           throw new Error('Network response was not ok');
         }
         
         const nutritionData = await response.json();
-        setData(nutritionData);
+        // Only set data if there are actual values
+        if (nutritionData && nutritionData.length > 0 && 
+            nutritionData.some(item => item.value > 0)) {
+          setData(nutritionData);
+        } else {
+          setData([]);
+        }
       } catch (err) {
         setError('Failed to fetch nutrition data');
         console.error('Error:', err);
@@ -49,11 +52,21 @@ const ChartPie = () => {
   }, []);
 
   if (isLoading) {
-    return <div>Loading...</div>;
+    return <div className="chart-message">Loading...</div>;
   }
 
   if (error) {
-    return <div>Error: {error}</div>;
+    return <div className="chart-message error">Error: {error}</div>;
+  }
+
+  // If no data or all values are 0, show a message
+  if (!data.length || data.every(item => item.value === 0)) {
+    return (
+      <div className="chart-message">
+        <p>No nutrition data available yet.</p>
+        <p>Start tracking your meals to see your nutrition breakdown!</p>
+      </div>
+    );
   }
 
   return (
