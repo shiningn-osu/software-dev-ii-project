@@ -21,11 +21,16 @@ const app = express();
 // Middleware
 app.use(express.json());
 
+// Determine CORS origin based on environment
+const corsOrigin = process.env.NODE_ENV === "production"
+  ? "https://meal-match-9nx72i8vk-duncan-eversons-projects.vercel.app/"  // Production URL
+  : "*";                        // Development wildcard
+
 // cors for ensuring access only from our frontend
 app.use(cors({
-  origin: "http://10.162.0.184:3002",  // Allow only this origin
-  methods: ['GET', 'POST'],           // Allow necessary methods
-  allowedHeaders: ['Content-Type', "Edamam-Account-User"],   // Allow specific headers
+  origin: corsOrigin,
+  methods: ['GET', 'POST'],
+  allowedHeaders: ['Content-Type', "Edamam-Account-User"],
 }));
 
 
@@ -177,7 +182,7 @@ app.post("/generate-meal-plan", async (req, res) => {
       headers: {
         "accept": "application/json",
         "Content-Type": "application/json",
-        "Edamam-Account-User": EDAMAM_ACCOUNT_USER, 
+        "Edamam-Account-User": EDAMAM_ACCOUNT_USER,
       },
       body: JSON.stringify(requestBody),
     });
