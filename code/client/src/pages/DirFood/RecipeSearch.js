@@ -7,7 +7,7 @@ function RecipeSearch() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [searched, setSearched] = useState(false);
-  const [selectedIngredients, setSelectedIngredients] = useState([]); // Track selected ingredients
+  const [selectedIngredients, setSelectedIngredients] = useState([]);
   const navigate = useNavigate(); // Hook for navigation
 
   const handleAddToGroceryList = () => {
@@ -15,8 +15,8 @@ function RecipeSearch() {
     navigate("/GroceryList", { state: { ingredients: selectedIngredients } });
   };
 
-  const APP_ID = "14fa0a37";
-  const APP_KEY = "d938c99d056d72a1cb7267e86c60ff53";
+  const APP_ID = "91241cae";
+  const APP_KEY = "5c6774def039ba0705ae0750e48214e7";
 
   const fetchRecipes = async () => {
     if (!query.trim()) return; // Prevent empty searches
@@ -25,6 +25,7 @@ function RecipeSearch() {
     setSearched(true); // Mark that a search has been made
 
     const apiUrl = `https://api.edamam.com/api/recipes/v2?type=public&q=${query}&app_id=${APP_ID}&app_key=${APP_KEY}`;
+
 
     try {
       const response = await fetch(apiUrl);
@@ -46,8 +47,8 @@ function RecipeSearch() {
     // Update selected ingredients based on checkbox selection
     setSelectedIngredients((prevSelected) =>
       prevSelected.includes(ingredient)
-        ? prevSelected.filter((item) => item !== ingredient) // Deselect if already selected
-        : [...prevSelected, ingredient] // Select if not selected
+        ? prevSelected.filter((item) => item !== ingredient) 
+        : [...prevSelected, ingredient] 
     );
   };
 
@@ -141,6 +142,7 @@ function RecipeSearch() {
 }
 
 export default RecipeSearch;
+
 
 
 
