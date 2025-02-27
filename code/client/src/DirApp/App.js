@@ -50,8 +50,7 @@ function App() {
         <Route path="/Food" element={<Food />} />
         <Route path="/Diary" element={<Diary />} />
         <Route path="/RecipeSearch" element={<RecipeSearch />} />
-        <Route path="/MealPlan" element={<MealPlan />} />
-
+        <Route path="/MealPlan" element={<MealPlan />} /> {/* Added wildcard for steps */}
         {/* Grocery Routes */}
         <Route path="/Grocery" element={<Grocery />} />
         <Route path="/GroceryList" element={<GroceryList />} />
