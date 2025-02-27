@@ -1,32 +1,15 @@
 import React from 'react';
-import { render, screen, waitFor } from '@testing-library/react';
-import { BrowserRouter } from 'react-router-dom';
+import { render, screen } from '@testing-library/react';
 import DailyNutrGoals from './DailyNutrGoals';
-
-// Mock fetch globally
-global.fetch = jest.fn();
-
-// Helper function to wrap component with Router
-const renderWithRouter = (component) => {
-  return render(
-    <BrowserRouter>
-      {component}
-    </BrowserRouter>
-  );
-};
+import '@testing-library/jest-dom';
 
 describe('DailyNutrGoals', () => {
-  beforeEach(() => {
-    jest.clearAllMocks();
-    localStorage.setItem('token', 'fake-token');
-  });
-
-  test('shows loading state initially', () => {
-    renderWithRouter(<DailyNutrGoals />);
+  test('shows loading state when no data is provided', () => {
+    render(<DailyNutrGoals />);
     expect(screen.getByText('Loading...')).toBeInTheDocument();
   });
 
-  test('displays nutrition data when API calls succeed', async () => {
+  test('displays nutrition data when provided', () => {
     const mockData = {
       calories: 2000,
       protein: 150,
@@ -34,35 +17,28 @@ describe('DailyNutrGoals', () => {
       fats: 70
     };
 
-    global.fetch.mockImplementation(() => 
-      Promise.resolve({
-        ok: true,
-        status: 200,
-        json: () => Promise.resolve(mockData)
-      })
-    );
+    render(<DailyNutrGoals data={mockData} />);
 
-    renderWithRouter(<DailyNutrGoals />);
+    // Check for table headers
+    expect(screen.getByText('Nutrient')).toBeInTheDocument();
+    expect(screen.getByText('Daily Goal')).toBeInTheDocument();
+    expect(screen.getByText('Current')).toBeInTheDocument();
+    expect(screen.getByText('Remaining')).toBeInTheDocument();
 
-    await waitFor(() => {
-      expect(screen.getByText('Nutrient')).toBeInTheDocument();
-      
-      // Use getAllByText for elements that appear multiple times
-      const calorieElements = screen.getAllByText(/2000\s*kcal/);
-      expect(calorieElements.length).toBeGreaterThan(0);
-      
-      const proteinElements = screen.getAllByText(/150g/);
-      expect(proteinElements.length).toBeGreaterThan(0);
-    });
-  });
+    // Check for nutrient labels
+    expect(screen.getByText('Calories')).toBeInTheDocument();
+    expect(screen.getByText('Protein')).toBeInTheDocument();
+    expect(screen.getByText('Carbs')).toBeInTheDocument();
+    expect(screen.getByText('Fats')).toBeInTheDocument();
 
-  test('displays error message when API calls fail', async () => {
-    global.fetch.mockRejectedValue(new Error('Failed to fetch'));
+    // Check for goal values using getAllByText since these values appear in both goal and remaining columns
+    expect(screen.getAllByText(/2000 kcal/)).toHaveLength(2); // Goal and Remaining
+    expect(screen.getAllByText(/150g/)).toHaveLength(2);
+    expect(screen.getAllByText(/250g/)).toHaveLength(2);
+    expect(screen.getAllByText(/70g/)).toHaveLength(2);
 
-    renderWithRouter(<DailyNutrGoals />);
-
-    await waitFor(() => {
-      expect(screen.getByText('Failed to fetch nutrition data')).toBeInTheDocument();
-    });
+    // Check for current values (should all be 0)
+    expect(screen.getByText('0 kcal')).toBeInTheDocument();
+    expect(screen.getAllByText('0g')).toHaveLength(3); // protein, carbs, fats
   });
 }); 
