@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import './Home.css';
+import { Link } from 'react-router-dom';
 
 import ChartPie from "../../components/DirPieChart/ChartPie";
 
@@ -157,29 +158,66 @@ const RecentNutrBreak = () => {
 };
 
 /**
- * Home Component
+ * AuthOptions Component
  * 
- * The main display component for the home page.
- * Contains the caloric overview pie chart and nutrition tables.
+ * Displays login and signup options for unauthenticated users
  * 
- * @returns {JSX.Element} The complete home page
+ * @returns {JSX.Element} The authentication options
  */
-const Home = () => (
-  <div className="Home">
-    <header className="Home-header" />
-    <div>
-      <h2 className="centered">Caloric Overview</h2>
-      <ChartPie />
-    </div>
-    <div>
-      <h2>Daily Nutrition Goals</h2>
-      <DailyNutrGoals />
-    </div>
-    <div>
-      <h2>Most Recent Nutrition Breakdown</h2>
-      <RecentNutrBreak />
+const AuthOptions = () => (
+  <div className="auth-options centered">
+    <h2>Welcome to Meal Match</h2>
+    <p>Please login or create an account to continue</p>
+    <div className="auth-buttons">
+      <Link to="/login" className="btn btn-primary">Login</Link>
+      <Link to="/account-create" className="btn btn-success">Sign Up</Link>
     </div>
   </div>
 );
+
+/**
+ * Home Component
+ * 
+ * The main display component for the home page.
+ * Shows different content based on authentication status.
+ * 
+ * @returns {JSX.Element} The complete home page
+ */
+const Home = () => {
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+
+  useEffect(() => {
+    // Check if user is authenticated
+    const token = localStorage.getItem('token');
+    setIsAuthenticated(!!token);
+  }, []);
+
+  if (!isAuthenticated) {
+    return (
+      <div className="Home">
+        <header className="Home-header" />
+        <AuthOptions />
+      </div>
+    );
+  }
+
+  return (
+    <div className="Home">
+      <header className="Home-header" />
+      <div>
+        <h2 className="centered">Caloric Overview</h2>
+        <ChartPie />
+      </div>
+      <div>
+        <h2>Daily Nutrition Goals</h2>
+        <DailyNutrGoals />
+      </div>
+      <div>
+        <h2>Most Recent Nutrition Breakdown</h2>
+        <RecentNutrBreak />
+      </div>
+    </div>
+  );
+};
 
 export default Home;
