@@ -23,7 +23,7 @@ app.use(express.json());
 
 // Determine CORS origin based on environment
 const corsOrigin = process.env.NODE_ENV === "production"
-  ? "http://10.162.0.184:3002"  // Production URL
+  ? "https://meal-match-9nx72i8vk-duncan-eversons-projects.vercel.app/"  // Production URL
   : "*";                        // Development wildcard
 
 // cors for ensuring access only from our frontend
