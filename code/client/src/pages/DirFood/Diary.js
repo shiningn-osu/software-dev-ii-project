@@ -89,9 +89,8 @@ const Diary = () => {
         const newMeal = {
             name: mealName.trim(),
             date: new Date().toLocaleString(),
-            totalCalories: totalNutrition.calories,
-            ingredients: [...ingredients],
-            nutrition: totalNutrition
+            nutrition: totalNutrition,
+            ingredients: [...ingredients]
         };
 
         setMeals([...meals, newMeal]);
@@ -144,6 +143,9 @@ const Diary = () => {
                                 <th>Ingredient</th>
                                 <th>Weight</th>
                                 <th>Calories</th>
+                                <th>Protein</th>
+                                <th>Carbs</th>
+                                <th>Fats</th>
                                 <th>Actions</th>
                             </tr>
                         </thead>
@@ -153,6 +155,9 @@ const Diary = () => {
                                     <td>{ing.name}</td>
                                     <td>{ing.weight}g</td>
                                     <td>{ing.calories}kcal</td>
+                                    <td>{ing.protein}g</td>
+                                    <td>{ing.carbs}g</td>
+                                    <td>{ing.fats}g</td>
                                     <td>
                                         <button onClick={() => deleteIngredient(index)}>Delete</button>
                                     </td>
@@ -186,7 +191,10 @@ const Diary = () => {
                             <tr>
                                 <th>Meal</th>
                                 <th>Date</th>
-                                <th>Total Calories</th>
+                                <th>Calories</th>
+                                <th>Protein</th>
+                                <th>Carbs</th>
+                                <th>Fats</th>
                                 <th>Ingredients</th>
                                 <th>Actions</th>
                             </tr>
@@ -196,12 +204,15 @@ const Diary = () => {
                                 <tr key={index}>
                                     <td>{meal.name}</td>
                                     <td>{meal.date}</td>
-                                    <td>{meal.totalCalories}kcal</td>
+                                    <td>{meal.nutrition.calories}kcal</td>
+                                    <td>{meal.nutrition.protein}g</td>
+                                    <td>{meal.nutrition.carbs}g</td>
+                                    <td>{meal.nutrition.fats}g</td>
                                     <td>
                                         <ul>
                                             {meal.ingredients.map((ing, i) => (
                                                 <li key={i}>
-                                                    {ing.name} ({ing.weight}g) - {ing.calories}kcal
+                                                    {ing.name} ({ing.weight}g) - {ing.calories}kcal, {ing.protein}g protein, {ing.carbs}g carbs, {ing.fats}g fats
                                                 </li>
                                             ))}
                                         </ul>
