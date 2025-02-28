@@ -212,5 +212,5 @@ app.post("/generate-meal-plan", async (req, res) => {
 // app.use('/api/users', userRoutes);
 // app.use('/api/nutrition', nutritionRoutes);
 
-const PORT = process.env.PORT || 5005;
+const PORT = process.env.PORT || 6000;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
