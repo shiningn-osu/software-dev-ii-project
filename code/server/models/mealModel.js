@@ -34,4 +34,4 @@ const MealSchema = new mongoose.Schema({
   }
 });
 
-export default mongoose.model('Meal', MealSchema); 
+export default mongoose.model('Meal', MealSchema);

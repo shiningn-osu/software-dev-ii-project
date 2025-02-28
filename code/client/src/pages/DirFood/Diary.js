@@ -68,6 +68,19 @@ const Diary = () => {
         setWeight("");
     };
 
+    const sendMealToDatabase = async (meal) => {
+        try {
+            await axios.post("/api/nutrition/add-meal", meal, {
+                headers: {
+                    'Authorization': `Bearer ${localStorage.getItem('token')}`
+                }
+            });
+        } catch (error) {
+            console.error("Database Error:", error);
+            setError(`Error: ${error.response?.data?.message || error.message}`);
+        }
+    };
+
     const addMeal = async () => {
         if (!mealName) {
             setError("Please enter a meal name");
@@ -97,6 +110,9 @@ const Diary = () => {
         setMeals([...meals, newMeal]);
         setMealName("");
         setIngredients([]);
+
+        // Send the meal to the database
+        await sendMealToDatabase(newMeal);
     };
 
     return (
