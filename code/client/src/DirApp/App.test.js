@@ -51,7 +51,7 @@ describe('App Routing', () => {
 
     await user.click(screen.getByText(/Grocery Pages/i));
     await user.click(screen.getByText(/Grocery List/i));
-    expect(screen.getByText(/Create Your Grocery List/i)).toBeInTheDocument();
+    expect(screen.getByText(/Your Grocery List/i)).toBeInTheDocument();
   });
 });
 
@@ -108,7 +108,7 @@ describe('Navigation links', () => {
     await user.click(screen.getByText(/Grocery Pages/i));
     // Click "Grocery List" link (assuming this is the intended "Grocery page" test)
     await user.click(screen.getByRole('link', { name: /Grocery List/i }));
-    expect(screen.getByText(/Create Your Grocery List/i)).toBeInTheDocument();
+    expect(screen.getByText(/Your Grocery List/i)).toBeInTheDocument();
   });
 
   test('navigates to the Nutrition page', async () => {
