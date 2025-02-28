@@ -87,4 +87,3 @@ To report a bug, follow the steps outlined in this document:
 ### Known Bugs:
 - Price comparison across stores is still in progress.
 - Work in progress.
-
