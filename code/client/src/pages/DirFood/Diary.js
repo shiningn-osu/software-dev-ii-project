@@ -91,21 +91,21 @@ const Diary = () => {
             return;
         }
         setError("");
-    
+
         // Check for authentication token before sending the meal to the database
         const token = localStorage.getItem('token');
         if (!token) {
             setError("Authentication token is missing. Please log in.");
             return;
         }
-    
+
         const totalNutrition = ingredients.reduce((acc, ing) => ({
             calories: acc.calories + ing.calories,
             protein: acc.protein + ing.protein,
             carbs: acc.carbs + ing.carbs,
             fats: acc.fats + ing.fats
         }), { calories: 0, protein: 0, carbs: 0, fats: 0 });
-    
+
         const newMeal = {
             name: mealName.trim(),
             date: new Date().toLocaleString(),
@@ -113,19 +113,18 @@ const Diary = () => {
             ingredients: [...ingredients],
             nutrition: totalNutrition
         };
-    
+
         setMeals([...meals, newMeal]);
         setMealName("");
         setIngredients([]);
-    
+
         // Send the meal to the database
         try {
-            await sendMealToDatabase(newMeal, token);
+            await sendMealToDatabase(newMeal);
         } catch (error) {
             setError(`Error: ${error.response?.data?.message || error.message}`);
         }
     };
-    
 
     return (
         <div className="container">
@@ -160,6 +159,9 @@ const Diary = () => {
                                 <th>Ingredient</th>
                                 <th>Weight</th>
                                 <th>Calories</th>
+                                <th>Protein</th>
+                                <th>Carbs</th>
+                                <th>Fats</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -168,6 +170,9 @@ const Diary = () => {
                                     <td>{ing.name}</td>
                                     <td>{ing.weight}g</td>
                                     <td>{ing.calories}kcal</td>
+                                    <td>{ing.protein}g</td>
+                                    <td>{ing.carbs}g</td>
+                                    <td>{ing.fats}g</td>
                                 </tr>
                             ))}
                         </tbody>
@@ -199,6 +204,9 @@ const Diary = () => {
                                 <th>Meal</th>
                                 <th>Date</th>
                                 <th>Total Calories</th>
+                                <th>Protein</th>
+                                <th>Carbs</th>
+                                <th>Fats</th>
                                 <th>Ingredients</th>
                             </tr>
                         </thead>
@@ -208,11 +216,14 @@ const Diary = () => {
                                     <td>{meal.name}</td>
                                     <td>{meal.date}</td>
                                     <td>{meal.totalCalories}kcal</td>
+                                    <td>{meal.nutrition.protein}g</td>
+                                    <td>{meal.nutrition.carbs}g</td>
+                                    <td>{meal.nutrition.fats}g</td>
                                     <td>
                                         <ul>
                                             {meal.ingredients.map((ing, i) => (
                                                 <li key={i}>
-                                                    {ing.name} ({ing.weight}g) - {ing.calories}kcal
+                                                    {ing.name} ({ing.weight}g) - {ing.calories}kcal, {ing.protein}g protein, {ing.carbs}g carbs, {ing.fats}g fats
                                                 </li>
                                             ))}
                                         </ul>
