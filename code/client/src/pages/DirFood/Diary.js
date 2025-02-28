@@ -99,6 +99,18 @@ const Diary = () => {
         setIngredients([]);
     };
 
+    // Function to delete an ingredient by its index
+    const deleteIngredient = (index) => {
+        const updatedIngredients = ingredients.filter((_, i) => i !== index);
+        setIngredients(updatedIngredients);
+    };
+
+    // Function to delete a meal by its index
+    const deleteMeal = (index) => {
+        const updatedMeals = meals.filter((_, i) => i !== index);
+        setMeals(updatedMeals);
+    };
+
     return (
         <div className="container">
             <h1>Food Diary</h1>
@@ -132,6 +144,7 @@ const Diary = () => {
                                 <th>Ingredient</th>
                                 <th>Weight</th>
                                 <th>Calories</th>
+                                <th>Actions</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -140,6 +153,9 @@ const Diary = () => {
                                     <td>{ing.name}</td>
                                     <td>{ing.weight}g</td>
                                     <td>{ing.calories}kcal</td>
+                                    <td>
+                                        <button onClick={() => deleteIngredient(index)}>Delete</button>
+                                    </td>
                                 </tr>
                             ))}
                         </tbody>
@@ -172,6 +188,7 @@ const Diary = () => {
                                 <th>Date</th>
                                 <th>Total Calories</th>
                                 <th>Ingredients</th>
+                                <th>Actions</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -188,6 +205,9 @@ const Diary = () => {
                                                 </li>
                                             ))}
                                         </ul>
+                                    </td>
+                                    <td>
+                                        <button onClick={() => deleteMeal(index)}>Delete Meal</button>
                                     </td>
                                 </tr>
                             ))}
