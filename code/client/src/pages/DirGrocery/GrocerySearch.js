@@ -146,5 +146,4 @@ function GrocerySearch() {
     );
 }
 
->>>>>>> 8f8bbde (Added Grocery Search functionality, made necessary changes to sever to account for cors)
 export default GrocerySearch;
