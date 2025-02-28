@@ -110,6 +110,20 @@ const Diary = () => {
         setMeals(updatedMeals);
     };
 
+    // Calculate total macros for meals logged in the last 24 hours
+    const now = new Date();
+    const dailyMeals = meals.filter(meal => {
+        const mealDate = new Date(meal.date);
+        return (now - mealDate) <= 24 * 60 * 60 * 1000;
+    });
+
+    const totalDailyNutrition = dailyMeals.reduce((acc, meal) => ({
+        calories: acc.calories + meal.nutrition.calories,
+        protein: acc.protein + meal.nutrition.protein,
+        carbs: acc.carbs + meal.nutrition.carbs,
+        fats: acc.fats + meal.nutrition.fats
+    }), { calories: 0, protein: 0, carbs: 0, fats: 0 });
+
     return (
         <div className="container">
             <h1>Food Diary</h1>
@@ -227,6 +241,30 @@ const Diary = () => {
                 ) : (
                     <p>No meals recorded</p>
                 )}
+            </div>
+
+            <div className="section">
+                <h2>Daily Totals</h2>
+                <table>
+                    <tbody>
+                        <tr>
+                            <td>Total Calories:</td>
+                            <td>{totalDailyNutrition.calories}kcal</td>
+                        </tr>
+                        <tr>
+                            <td>Total Protein:</td>
+                            <td>{totalDailyNutrition.protein}g</td>
+                        </tr>
+                        <tr>
+                            <td>Total Carbs:</td>
+                            <td>{totalDailyNutrition.carbs}g</td>
+                        </tr>
+                        <tr>
+                            <td>Total Fats:</td>
+                            <td>{totalDailyNutrition.fats}g</td>
+                        </tr>
+                    </tbody>
+                </table>
             </div>
         </div>
     );
