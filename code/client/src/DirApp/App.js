@@ -1,6 +1,7 @@
 import React from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Navbar from "../components/DirNavbar/Navbar";
+import ProtectedRoute from "../components/DirProtectedRoute/ProtectedRoute";
 
 // HOME RELATED PAGES
 import Home from "../pages/DirHome/Home";
@@ -25,43 +26,85 @@ import Nutrition from "../pages/DirNutrition/Nutrition";
  * App component that serves as the main entry point for the Meal Match application.
  * 
  * This component sets up the routing for the application using React Router.
- * It renders the `Navbar` component on all pages and defines the routes for different
- * sections of the app: Home, Food, Grocery, and Nutrition subpages. It also handles a 
- * fallback route for any undefined paths by redirecting to the Home page.
+ * Public routes include login and account creation, while other routes are protected
+ * and require authentication.
  * 
  * @component
- * @example
- * // Usage:
- * <App />
- * 
- * @returns {JSX.Element} The rendered App component, including the navigation and routes.
+ * @returns {JSX.Element} The rendered App component
  */
 function App() {
   return (
     <Router>
-      <Navbar />  {/* Visible on all pages */}
+      <Navbar />
       <Routes>
-        {/* Home Routes */}
-        <Route path="/" element={<Home />} />
+        {/* Public Routes */}
         <Route path="/AccountCreation" element={<AccCreate />} />
         <Route path="/Login" element={<Login />} />
 
-        {/* Food Routes */}
-        <Route path="/Food" element={<Food />} />
-        <Route path="/Diary" element={<Diary />} />
-        <Route path="/RecipeSearch" element={<RecipeSearch />} />
-        <Route path="/MealPlan" element={<MealPlan />} /> {/* Added wildcard for steps */}
-        {/* Grocery Routes */}
-        <Route path="/Grocery" element={<Grocery />} />
-        <Route path="/GroceryList" element={<GroceryList />} />
-        <Route path="/GrocerySearch" element={<GrocerySearch />} />
+        {/* Protected Routes */}
+        <Route path="/" element={
+          <ProtectedRoute>
+            <Home />
+          </ProtectedRoute>
+        } />
 
-        {/* Nutrition Routes */}
-        <Route path="/NutritionDay" element={<Nutrition />} />
-        <Route path="/NutritionHistory" element={<Nutrition />} />
+        {/* Protected Food Routes */}
+        <Route path="/Food" element={
+          <ProtectedRoute>
+            <Food />
+          </ProtectedRoute>
+        } />
+        <Route path="/Diary" element={
+          <ProtectedRoute>
+            <Diary />
+          </ProtectedRoute>
+        } />
+        <Route path="/RecipeSearch" element={
+          <ProtectedRoute>
+            <RecipeSearch />
+          </ProtectedRoute>
+        } />
+        <Route path="/MealPlan" element={
+          <ProtectedRoute>
+            <MealPlan />
+          </ProtectedRoute>
+        } />
+
+        {/* Protected Grocery Routes */}
+        <Route path="/Grocery" element={
+          <ProtectedRoute>
+            <Grocery />
+          </ProtectedRoute>
+        } />
+        <Route path="/GroceryList" element={
+          <ProtectedRoute>
+            <GroceryList />
+          </ProtectedRoute>
+        } />
+        <Route path="/GrocerySearch" element={
+          <ProtectedRoute>
+            <GrocerySearch />
+          </ProtectedRoute>
+        } />
+
+        {/* Protected Nutrition Routes */}
+        <Route path="/NutritionDay" element={
+          <ProtectedRoute>
+            <Nutrition />
+          </ProtectedRoute>
+        } />
+        <Route path="/NutritionHistory" element={
+          <ProtectedRoute>
+            <Nutrition />
+          </ProtectedRoute>
+        } />
 
         {/* Catch-all Route */}
-        <Route path="*" element={<Home />} />
+        <Route path="*" element={
+          <ProtectedRoute>
+            <Home />
+          </ProtectedRoute>
+        } />
       </Routes>
     </Router>
   );

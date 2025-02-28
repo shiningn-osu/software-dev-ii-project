@@ -143,8 +143,3 @@ function RecipeSearch() {
 
 export default RecipeSearch;
 
-
-
-
-
-

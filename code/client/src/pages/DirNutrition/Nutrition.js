@@ -1,205 +1,306 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import './Nutrition.css';
+import { useNavigate } from 'react-router-dom';
+import { format } from 'date-fns';
 
 const Nutrition = () => {
-  // Search states
-  const [searchQuery, setSearchQuery] = useState('');
-  const [searchResults, setSearchResults] = useState([]);
-  const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-
-  // Custom food states
-  const [showCustomForm, setShowCustomForm] = useState(false);
-  const [customFood, setCustomFood] = useState({
-    name: '',
-    servingSize: '',
+  const [showGoalsForm, setShowGoalsForm] = useState(true); // Set to true by default now
+  const [goals, setGoals] = useState({
     calories: '',
     protein: '',
     carbs: '',
     fats: ''
   });
+  const [showHistory, setShowHistory] = useState(false);
+  const [nutritionHistory, setNutritionHistory] = useState([]);
+  const [historyLoading, setHistoryLoading] = useState(false);
+  const [historyDays, setHistoryDays] = useState(7);
 
-  // Search USDA database
-  const handleSearch = async (e) => {
-    e.preventDefault();
-    setLoading(true);
-    setError(null);
+  const navigate = useNavigate();
 
-    try {
-      const response = await fetch(`/api/nutrition/search?query=${searchQuery}`);
-      const data = await response.json();
-      setSearchResults(data);
-    } catch (err) {
-      setError('Error searching for foods. Please try again.');
-    } finally {
-      setLoading(false);
-    }
-  };
+  // Fetch existing goals
+  useEffect(() => {
+    const fetchGoals = async () => {
+      try {
+        const token = localStorage.getItem('token');
+        if (!token) {
+          navigate('/login');
+          return;
+        }
 
-  // Add USDA food to user's log
-  const handleAddFood = async (food) => {
-    try {
-      const response = await fetch('/api/nutrition/add', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          fdcId: food.fdcId,
-          servingSize: 100
-        }),
-      });
-      if (response.ok) {
-        alert('Food added successfully!');
-      }
-    } catch (err) {
-      setError('Error adding food. Please try again.');
-    }
-  };
-
-  // Handle custom food form changes
-  const handleCustomFoodChange = (e) => {
-    const { name, value } = e.target;
-    setCustomFood(prev => ({
-      ...prev,
-      [name]: value
-    }));
-  };
-
-  // Add custom food to user's log
-  const handleAddCustomFood = async (e) => {
-    e.preventDefault();
-    try {
-      const response = await fetch('/api/nutrition/add-custom', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(customFood),
-      });
-      if (response.ok) {
-        alert('Custom food added successfully!');
-        setCustomFood({
-          name: '',
-          servingSize: '',
-          calories: '',
-          protein: '',
-          carbs: '',
-          fats: ''
+        const response = await fetch('/api/nutrition/goals', {
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          }
         });
-        setShowCustomForm(false);
+
+        if (response.status === 401) {
+          localStorage.removeItem('token');
+          navigate('/login');
+          return;
+        }
+
+        if (!response.ok) {
+          throw new Error('Network response was not ok');
+        }
+
+        const data = await response.json();
+        setGoals(data);
+      } catch (err) {
+        console.error('Error:', err);
+        setError('Error fetching nutrition data');
       }
-    } catch (err) {
-      setError('Error adding custom food. Please try again.');
+    };
+
+    if (showGoalsForm) {
+      fetchGoals();
     }
+  }, [showGoalsForm, navigate]);
+
+  // Handle goals submission
+  const handleGoalsSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      const token = localStorage.getItem('token');
+      if (!token) {
+        navigate('/login');
+        return;
+      }
+
+      const response = await fetch('/api/nutrition/goals', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(goals)
+      });
+
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
+      }
+
+      const data = await response.json();
+      setGoals(data);
+      window.dispatchEvent(new CustomEvent('nutritionUpdated'));
+      alert('Goals updated successfully!');
+    } catch (err) {
+      console.error('Error:', err);
+      setError('Error updating nutrition goals');
+    }
+  };
+
+  // Fetch nutrition history
+  const fetchNutritionHistory = async () => {
+    setHistoryLoading(true);
+    try {
+      const token = localStorage.getItem('token');
+      if (!token) {
+        navigate('/login');
+        return;
+      }
+
+      const response = await fetch(`/api/nutrition/history?days=${historyDays}`, {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
+      });
+
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
+      }
+
+      const data = await response.json();
+      setNutritionHistory(data);
+    } catch (err) {
+      console.error('Error:', err);
+      setError('Error fetching nutrition history');
+    } finally {
+      setHistoryLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    if (showHistory) {
+      fetchNutritionHistory();
+    }
+  }, [showHistory]);
+
+  // Add this helper function to calculate averages
+  const calculateAverage = (history) => {
+    if (!history || history.length === 0) return null;
+
+    const totals = history.reduce((acc, day) => ({
+      calories: acc.calories + (day.totals?.calories || 0),
+      protein: acc.protein + (day.totals?.protein || 0),
+      carbs: acc.carbs + (day.totals?.carbs || 0),
+      fats: acc.fats + (day.totals?.fats || 0)
+    }), { calories: 0, protein: 0, carbs: 0, fats: 0 });
+
+    return {
+      calories: Math.round(totals.calories / history.length),
+      protein: Math.round(totals.protein / history.length),
+      carbs: Math.round(totals.carbs / history.length),
+      fats: Math.round(totals.fats / history.length)
+    };
   };
 
   return (
     <div className="nutrition-container">
       <h2>Nutrition Tracker</h2>
       
-      {/* Toggle between search and custom food */}
       <div className="toggle-buttons">
         <button 
-          onClick={() => setShowCustomForm(false)}
-          className={!showCustomForm ? 'active' : ''}
+          onClick={() => {
+            setShowGoalsForm(true);
+            setShowHistory(false);
+          }}
+          className={showGoalsForm ? 'active' : ''}
         >
-          Search Foods
+          Set Nutrition Goals
         </button>
         <button 
-          onClick={() => setShowCustomForm(true)}
-          className={showCustomForm ? 'active' : ''}
+          onClick={() => {
+            setShowGoalsForm(false);
+            setShowHistory(true);
+          }}
+          className={showHistory ? 'active' : ''}
         >
-          Add Custom Food
+          Nutrition History
         </button>
       </div>
 
-      {!showCustomForm ? (
-        // USDA Search Form
-        <div className="search-section">
-          <form onSubmit={handleSearch} className="search-form">
-            <input
-              type="text"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Search for a food..."
-              className="search-input"
-            />
-            <button type="submit" disabled={loading}>
-              {loading ? 'Searching...' : 'Search'}
-            </button>
-          </form>
-
-          {/* Search Results */}
-          <div className="search-results">
-            {searchResults.map((food) => (
-              <div key={food.fdcId} className="food-item">
-                <h3>{food.description}</h3>
-                <div className="nutrition-info">
-                  <p>Calories: {food.nutrients.energy || 'N/A'}</p>
-                  <p>Protein: {food.nutrients.protein || 'N/A'}g</p>
-                  <p>Carbs: {food.nutrients.carbohydrate || 'N/A'}g</p>
-                  <p>Fat: {food.nutrients['total lipid (fat)'] || 'N/A'}g</p>
-                </div>
-                <button onClick={() => handleAddFood(food)}>
-                  Add to Daily Log
-                </button>
-              </div>
-            ))}
+      {showHistory ? (
+        <div className="history-section">
+          <h3>Nutrition History</h3>
+          <div className="history-controls">
+            <label>
+              Show last 
+              <select 
+                value={historyDays} 
+                onChange={(e) => {
+                  setHistoryDays(e.target.value);
+                  fetchNutritionHistory();
+                }}
+              >
+                <option value="7">7 days</option>
+                <option value="14">14 days</option>
+                <option value="30">30 days</option>
+                <option value="90">90 days</option>
+              </select>
+            </label>
           </div>
+          {historyLoading ? (
+            <p>Loading history...</p>
+          ) : nutritionHistory.length > 0 ? (
+            <div>
+              <div className="average-stats">
+                <h4>Daily Average for Last {historyDays} Days</h4>
+                <div className="average-grid">
+                  {(() => {
+                    const averages = calculateAverage(nutritionHistory);
+                    return averages ? (
+                      <>
+                        <div className="average-item">
+                          <span className="label">Calories:</span>
+                          <span className="value">{averages.calories} kcal</span>
+                        </div>
+                        <div className="average-item">
+                          <span className="label">Protein:</span>
+                          <span className="value">{averages.protein}g</span>
+                        </div>
+                        <div className="average-item">
+                          <span className="label">Carbs:</span>
+                          <span className="value">{averages.carbs}g</span>
+                        </div>
+                        <div className="average-item">
+                          <span className="label">Fats:</span>
+                          <span className="value">{averages.fats}g</span>
+                        </div>
+                      </>
+                    ) : (
+                      <p>No data available for average calculation</p>
+                    );
+                  })()}
+                </div>
+              </div>
+              <div className="history-table-container">
+                <h4>Daily Breakdown</h4>
+                <table className="history-table">
+                  <thead>
+                    <tr>
+                      <th>Date</th>
+                      <th>Calories</th>
+                      <th>Protein</th>
+                      <th>Carbs</th>
+                      <th>Fats</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {nutritionHistory.map((day) => (
+                      <tr key={day._id}>
+                        <td>{format(new Date(day.date), 'MMM dd, yyyy')}</td>
+                        <td>{day.totals.calories} kcal</td>
+                        <td>{day.totals.protein}g</td>
+                        <td>{day.totals.carbs}g</td>
+                        <td>{day.totals.fats}g</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          ) : (
+            <p>No nutrition history available for the selected period.</p>
+          )}
         </div>
       ) : (
-        // Custom Food Form
-        <form onSubmit={handleAddCustomFood} className="custom-food-form">
-          <input
-            type="text"
-            name="name"
-            value={customFood.name}
-            onChange={handleCustomFoodChange}
-            placeholder="Food Name"
-            required
-          />
-          <input
-            type="number"
-            name="servingSize"
-            value={customFood.servingSize}
-            onChange={handleCustomFoodChange}
-            placeholder="Serving Size (g)"
-            required
-          />
-          <input
-            type="number"
-            name="calories"
-            value={customFood.calories}
-            onChange={handleCustomFoodChange}
-            placeholder="Calories"
-            required
-          />
-          <input
-            type="number"
-            name="protein"
-            value={customFood.protein}
-            onChange={handleCustomFoodChange}
-            placeholder="Protein (g)"
-            required
-          />
-          <input
-            type="number"
-            name="carbs"
-            value={customFood.carbs}
-            onChange={handleCustomFoodChange}
-            placeholder="Carbs (g)"
-            required
-          />
-          <input
-            type="number"
-            name="fats"
-            value={customFood.fats}
-            onChange={handleCustomFoodChange}
-            placeholder="Fats (g)"
-            required
-          />
-          <button type="submit">Add Custom Food</button>
+        <form onSubmit={handleGoalsSubmit} className="goals-form">
+          <h3>Set Daily Nutrition Goals</h3>
+          <div className="form-group">
+            <label>Calories (kcal):
+              <input
+                type="number"
+                value={goals.calories}
+                onChange={(e) => setGoals({...goals, calories: e.target.value})}
+                required
+              />
+            </label>
+          </div>
+          <div className="form-group">
+            <label>Protein (g):
+              <input
+                type="number"
+                value={goals.protein}
+                onChange={(e) => setGoals({...goals, protein: e.target.value})}
+                required
+              />
+            </label>
+          </div>
+          <div className="form-group">
+            <label>Carbs (g):
+              <input
+                type="number"
+                value={goals.carbs}
+                onChange={(e) => setGoals({...goals, carbs: e.target.value})}
+                required
+              />
+            </label>
+          </div>
+          <div className="form-group">
+            <label>Fats (g):
+              <input
+                type="number"
+                value={goals.fats}
+                onChange={(e) => setGoals({...goals, fats: e.target.value})}
+                required
+              />
+            </label>
+          </div>
+          <button type="submit" className="btn btn-primary">Save Goals</button>
         </form>
       )}
 

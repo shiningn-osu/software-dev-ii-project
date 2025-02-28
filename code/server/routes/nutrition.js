@@ -5,6 +5,8 @@
 
 import express from 'express';
 import dotenv from 'dotenv';
+import jwt from 'jsonwebtoken';
+import DailyNutrition from '../models/dailyNutrition.js';
 
 dotenv.config();
 
@@ -131,36 +133,104 @@ const searchFoods = async (req, res) => {
  * @returns {Object} Detailed food information
  * @throws {Error} When the USDA API request fails
  */
-const getFoodDetails = async (req, res) => {
-  try {
-    const { id } = req.params;
-    const response = await fetch(
-      `${USDA_BASE_URL}/food/${id}?api_key=${USDA_API_KEY}`,
-      {
-        headers: {
-          Accept: 'application/json',
-        },
-      },
-    );
 
-    if (!response.ok) {
-      throw new Error(`USDA API responded with status: ${response.status}`);
+// Define verifyToken middleware here
+const verifyToken = (req, res, next) => {
+  try {
+    const authHeader = req.headers.authorization;
+    if (!authHeader) {
+      return res.status(401).json({ message: 'No token provided' });
     }
 
-    const food = await response.json();
-    return res.json(food);
+    const token = authHeader.split(' ')[1];
+    if (!token) {
+      return res.status(401).json({ message: 'Invalid token format' });
+    }
+
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    req.userId = decoded.userId;
+    next();
   } catch (error) {
-    console.error('Food detail error:', error);
-    return res.status(500).json({
-      error: 'Error fetching food details',
-      details: error.message,
-      timestamp: new Date().toISOString(),
-    });
+    console.error('Token verification error:', error);
+    return res.status(401).json({ message: 'Invalid token' });
   }
 };
 
+// Get nutrition history for a date range
+router.get('/history', verifyToken, async (req, res) => {
+  try {
+    const { startDate, endDate } = req.query;
+    const start = startDate ? new Date(startDate) : new Date(new Date().setDate(new Date().getDate() - 7)); // Default to last 7 days
+    const end = endDate ? new Date(endDate) : new Date();
+    
+    const history = await DailyNutrition.find({
+      userId: req.userId,
+      date: {
+        $gte: start,
+        $lte: end
+      }
+    }).sort({ date: -1 });
+
+    res.json(history);
+  } catch (error) {
+    console.error('Error fetching nutrition history:', error);
+    res.status(500).json({ message: 'Failed to fetch nutrition history' });
+  }
+});
+
+// Update add-custom endpoint to store meal details
+router.post('/add-custom', verifyToken, async (req, res) => {
+  try {
+    const { name, servingSize, calories, protein, carbs, fats } = req.body;
+    
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    let dailyNutrition = await DailyNutrition.findOne({
+      userId: req.userId,
+      date: {
+        $gte: today,
+        $lt: new Date(today.getTime() + 24 * 60 * 60 * 1000)
+      }
+    });
+
+    if (!dailyNutrition) {
+      dailyNutrition = new DailyNutrition({
+        userId: req.userId,
+        date: today,
+        calories: 0,
+        protein: 0,
+        carbs: 0,
+        fats: 0,
+        meals: []
+      });
+    }
+
+    // Add the meal to the meals array
+    dailyNutrition.meals.push({
+      name,
+      servingSize,
+      calories: Number(calories),
+      protein: Number(protein),
+      carbs: Number(carbs),
+      fats: Number(fats)
+    });
+
+    // Update daily totals
+    dailyNutrition.calories += Number(calories);
+    dailyNutrition.protein += Number(protein);
+    dailyNutrition.carbs += Number(carbs);
+    dailyNutrition.fats += Number(fats);
+
+    await dailyNutrition.save();
+    res.json(dailyNutrition);
+  } catch (error) {
+    console.error('Error adding custom food:', error);
+    res.status(500).json({ message: 'Failed to add custom food' });
+  }
+});
+
 // Route handlers
 router.get('/search', searchFoods);
-router.get('/food/:id', getFoodDetails);
 
 export default router;
