@@ -91,14 +91,21 @@ const Diary = () => {
             return;
         }
         setError("");
-
+    
+        // Check for authentication token before sending the meal to the database
+        const token = localStorage.getItem('token');
+        if (!token) {
+            setError("Authentication token is missing. Please log in.");
+            return;
+        }
+    
         const totalNutrition = ingredients.reduce((acc, ing) => ({
             calories: acc.calories + ing.calories,
             protein: acc.protein + ing.protein,
             carbs: acc.carbs + ing.carbs,
             fats: acc.fats + ing.fats
         }), { calories: 0, protein: 0, carbs: 0, fats: 0 });
-
+    
         const newMeal = {
             name: mealName.trim(),
             date: new Date().toLocaleString(),
@@ -106,14 +113,19 @@ const Diary = () => {
             ingredients: [...ingredients],
             nutrition: totalNutrition
         };
-
+    
         setMeals([...meals, newMeal]);
         setMealName("");
         setIngredients([]);
-
+    
         // Send the meal to the database
-        await sendMealToDatabase(newMeal);
+        try {
+            await sendMealToDatabase(newMeal, token);
+        } catch (error) {
+            setError(`Error: ${error.response?.data?.message || error.message}`);
+        }
     };
+    
 
     return (
         <div className="container">
