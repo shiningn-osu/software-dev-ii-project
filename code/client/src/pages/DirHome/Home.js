@@ -79,6 +79,7 @@ const Home = () => {
 
   return (
     <div className="Home">
+      {!localStorage.getItem('token') && <AuthOptions />}
       <header className="Home-header" />
       <div>
         <h2 className="centered">Caloric Overview</h2>

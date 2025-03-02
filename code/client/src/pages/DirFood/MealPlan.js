@@ -16,7 +16,9 @@ const MealPlan = () => {
   const [savedPlans, setSavedPlans] = useState([]);
   const [planName, setPlanName] = useState('');
   const [showSaveDialog, setShowSaveDialog] = useState(false);
+  // eslint-disable-next-line no-unused-vars
   const [isSaving, setIsSaving] = useState(false);
+  // eslint-disable-next-line no-unused-vars
   const [isLoading, setIsLoading] = useState(false);
 
   const EDAMAM_APP_ID = "16138714";

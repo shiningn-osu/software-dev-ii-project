@@ -78,7 +78,7 @@ function GroceryList() {
 
   useEffect(() => {
     fetchGroceryList();
-  }, []);
+  }, [fetchGroceryList]);
 
   useEffect(() => {
     if (location.state && location.state.ingredients) {
@@ -91,7 +91,7 @@ function GroceryList() {
       setGroceryList(newList);
       saveGroceryList(newList);
     }
-  }, [location.state]);
+  }, [location.state, groceryList, saveGroceryList]);
 
   const addItem = async () => {
     if (newItem && !groceryList.includes(newItem)) {

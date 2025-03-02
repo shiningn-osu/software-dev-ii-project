@@ -27,8 +27,12 @@ app.use(express.json());
 
 // CORS configuration
 app.use(cors({
-  origin: "http://localhost:3000",
-  credentials: true,  // Allow credentials
+  origin: [
+    'http://localhost:3000',
+    'https://cloneski.vercel.app/',  // Add your frontend URL here
+    process.env.CLIENT_URL // Will use this if set
+  ].filter(Boolean),
+  credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE'],
   allowedHeaders: ['Content-Type', 'Authorization', 'Accept']
 }));
@@ -283,9 +287,11 @@ app.get('/api/test', (req, res) => {
 // Modify the server start section
 if (process.env.NODE_ENV !== 'test') {
   const PORT = process.env.PORT || 6000;
-  app.listen(PORT, () => {
-    console.log(`Server is running on port ${PORT}`);
-  });
+  if (process.env.NODE_ENV !== 'production') {
+    app.listen(PORT, () => {
+      console.log(`Server is running on port ${PORT}`);
+    });
+  }
 }
 
 export default app;

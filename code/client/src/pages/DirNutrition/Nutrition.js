@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import './Nutrition.css';
 import { useNavigate } from 'react-router-dom';
 import { format, parseISO, addDays } from 'date-fns';
@@ -93,7 +93,7 @@ const Nutrition = () => {
   };
 
   // Fetch nutrition history
-  const fetchNutritionHistory = async () => {
+  const fetchNutritionHistory = useCallback(async () => {
     setHistoryLoading(true);
     try {
       const token = localStorage.getItem('token');
@@ -121,13 +121,11 @@ const Nutrition = () => {
     } finally {
       setHistoryLoading(false);
     }
-  };
+  }, [historyDays, navigate]);
 
   useEffect(() => {
-    if (showHistory) {
-      fetchNutritionHistory();
-    }
-  }, [showHistory]);
+    fetchNutritionHistory();
+  }, [fetchNutritionHistory]);
 
   // Add this helper function to calculate averages
   const calculateAverage = (history) => {

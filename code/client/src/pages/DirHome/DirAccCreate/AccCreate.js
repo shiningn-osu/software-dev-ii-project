@@ -2,7 +2,6 @@
 
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import PasswordInput from "../../../components/DirPassword/Password";
 
 /**
  * Handles the account creation form submission
@@ -65,8 +64,6 @@ const AccCreate = () => {
             className="centered" 
             id="accountCreateForm" 
             onSubmit={onSubmit}
-            role="form"
-            aria-label="Create Account Form"
           >
             <div className="text-input d-flex align-items-center">
               <label htmlFor="username" id="searchLabel" className="d-flex align-items-center justify-content-center">
