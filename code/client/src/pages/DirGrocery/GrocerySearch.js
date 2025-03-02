@@ -15,60 +15,75 @@ function GrocerySearch() {
         if (!query) return;
         setLoading(true);
         setError(null);
-        //const LOCATION_ID = "01400943";
         
-        //run in wsl for valid accessToken (depricated):
-        //curl -X POST 'https://api.kroger.com/v1/connect/oauth2/token' -H 'Content-Type: application/x-www-form-urlencoded' -u 'mealmatchschoolproj-2432612430342464692f6e61622e526776482e424d774336534854364f346b726c4a6d616a527355624a684157517566624973743433416e7556304b6653388385405507052:QWnIltimqgeLCVeStjB-kfU8Kz9tsuPaoNhnmYxH' -d 'grant_type=client_credentials&scope=product.compact'
-        
-          try {
-              const response = await fetch("http://localhost:5000/api/krogerLocations");
-              const data = await response.json();
-              console.log("Locations1:", data);
+        try {
+          const response = await fetch("/api/krogerLocations", {
+            headers: {
+              'Accept': 'application/json',
+              'Content-Type': 'application/json'
+            }
+          });
 
-              if (data.data && data.data.length > 0) {
-                setLocData(data.data[0]);  
-              } else {
-                
-                setError("No Kroger locations found.");
-                setLoading(false);
-                return;
-              }
-              //console.log("RAW LOCATION RESPONSE:", JSON.stringify(data, null, 2));
+          if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+          }
 
-          } catch (error) {
-            console.error("Error fetching locations:", error);
-            setError("Location fetch error.");
+          const data = await response.json();
+          console.log("Locations1:", data);
+
+          if (data.data && data.data.length > 0) {
+            setLocData(data.data[0]);  
+          } else {
+            setError("No Kroger locations found.");
             setLoading(false);
             return;
           }
+          //console.log("RAW LOCATION RESPONSE:", JSON.stringify(data, null, 2));
+
+        } catch (error) {
+          console.error("Error fetching locations:", error);
+          setError("Location fetch error.");
+          setLoading(false);
+          return;
+        }
+      };
+
+
+
+      useEffect(() => {  //triggered when locData updates
+        if (!locData || !query) return;
+        console.log("LOC DATA UPDATED:", locData);
+
+        const fetchKrogerProducts = async () => {
+          try {
+              console.log("LOC DATA:", locData);
+              console.log("LOC NAME: ", locData.name)
+              const response = await fetch(`/api/krogerProducts?query=${encodeURIComponent(query)}&locationId=${locData.locationId}`, {
+                headers: {
+                  'Accept': 'application/json',
+                  'Content-Type': 'application/json'
+                }
+              });
+
+              if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+              }
+
+              const data = await response.json();
+              console.log("Products:", data);
+              
+              setGroceries(data.data || []);  
+          } catch (error) {
+              console.error("Error fetching products:", error);
+              setError("Product fetch error.");
+          }
+          finally {
+              setLoading(false);
+          }
         };
 
-
-
-        useEffect(() => {  //triggered when locData updates
-          if (!locData || !query) return;
-          console.log("LOC DATA UPDATED:", locData);
-
-          const fetchKrogerProducts = async () => {
-            try {
-                console.log("LOC DATA:", locData);
-                console.log("LOC NAME: ", locData.name)
-                const response = await fetch(`http://localhost:5000/api/krogerProducts?query=${query}&locationId=${locData.locationId}`);
-                const data = await response.json();
-                console.log("Products:", data);
-                
-                setGroceries(data.data || []);  
-            } catch (error) {
-                console.error("Error fetching products:", error);
-                setError("Product fetch error.");
-            }
-            finally {
-                setLoading(false);
-            }
-          };
-
-          fetchKrogerProducts();
-        }, [locData]);
+        fetchKrogerProducts();
+      }, [locData, query]);
       
           
             // Handle form submission
@@ -86,11 +101,6 @@ function GrocerySearch() {
 
     return (
         <div className="GrocerySearch">
-            <header className="GrocerySearch-header">
-                Grocery Search Page
-            </header>
-            <p>This is the Grocery Search Page</p>
-
       <div className="container mt-4" style={{ marginBottom: '20px' }}>
         <form className="d-flex mt-4" onSubmit={handleSubmit}>
           <input

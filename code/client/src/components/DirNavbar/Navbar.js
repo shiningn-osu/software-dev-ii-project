@@ -40,7 +40,7 @@ const Navbar = () => {
             <Link to="/MealPlan">Meal Plan</Link>
             <Link to="/GroceryList">Grocery List</Link>
             <Link to="/GrocerySearch">Grocery Search</Link>
-            <Link to="/NutritionDay">Nutrition</Link>
+            <Link to="/Nutrition">Nutrition</Link>
             {/* Help link - available whether logged in or not */}
             <a href="/help.html" target="_blank" rel="noopener noreferrer">Help</a>
             {/* Logout Button */}

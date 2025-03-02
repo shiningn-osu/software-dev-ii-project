@@ -158,7 +158,7 @@ const Nutrition = () => {
           }}
           className={showGoalsForm ? 'active' : ''}
         >
-          Set Nutrition Goals
+          Edit Nutrition Goals
         </button>
         <button 
           onClick={() => {

@@ -75,24 +75,27 @@ const loginUser = async (req, res) => {
   const { username, password } = req.body;
 
   try {
+    console.log('Login attempt for username:', username);
+    
     const user = await User.findOne({ username });
-
     if (!user) {
+      console.log('User not found:', username);
       return res.status(401).json({ message: 'Invalid credentials' });
     }
 
     const isMatch = await bcrypt.compare(password, user.password);
-
     if (!isMatch) {
+      console.log('Invalid password for user:', username);
       return res.status(401).json({ message: 'Invalid credentials' });
     }
 
     const token = jwt.sign(
       { userId: user._id },
-      process.env.JWT_SECRET,
-      { expiresIn: '30d' },
+      process.env.JWT_SECRET || 'fallback_secret',
+      { expiresIn: '30d' }
     );
 
+    console.log('Login successful for user:', username);
     return res.json({
       message: 'Login successful',
       user: {
@@ -102,7 +105,11 @@ const loginUser = async (req, res) => {
       token,
     });
   } catch (error) {
-    return res.status(500).json({ message: 'Server error', error: error.message });
+    console.error('Server error during login:', error);
+    return res.status(500).json({ 
+      message: 'Server error during login', 
+      error: error.message 
+    });
   }
 };
 

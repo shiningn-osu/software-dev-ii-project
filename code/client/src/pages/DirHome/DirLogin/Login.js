@@ -1,6 +1,6 @@
 // CSS stylings are in index.css, as they all apply between both AccCreate.js and Login.js
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import PasswordInput from '../../../components/DirPassword/Password';
 
@@ -11,14 +11,27 @@ import PasswordInput from '../../../components/DirPassword/Password';
 function Login() {
   const [error, setError] = useState('');
   const [password, setPassword] = useState('');
+  const [showNutritionGoals, setShowNutritionGoals] = useState(false);
+  const [goals, setGoals] = useState({
+    calories: '',
+    protein: '',
+    carbs: '',
+    fats: ''
+  });
   const navigate = useNavigate();
+
+  useEffect(() => {
+    // Check if user is already logged in
+    const token = localStorage.getItem('token');
+    if (token) {
+      navigate('/');
+    }
+  }, [navigate]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setError('');
     const username = e.target.username.value;
-
-    const userData = { username, password };
-    console.log('Sending login data:', userData);
 
     try {
       const response = await fetch('/api/users/login', {
@@ -26,24 +39,38 @@ function Login() {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(userData),
+        body: JSON.stringify({ username, password }),
       });
 
-      console.log('Response status:', response.status);
-
       const data = await response.json();
-      console.log('Response data:', data);
 
       if (response.ok) {
         localStorage.setItem('token', data.token);
         localStorage.setItem('user', JSON.stringify(data.user));
-        navigate('/');
+        
+        // If nutrition goals were set, submit them
+        if (showNutritionGoals && Object.values(goals).some(value => value !== '')) {
+          try {
+            await fetch('/api/nutrition/goals', {
+              method: 'POST',
+              headers: {
+                'Authorization': `Bearer ${data.token}`,
+                'Content-Type': 'application/json'
+              },
+              body: JSON.stringify(goals)
+            });
+          } catch (err) {
+            console.error('Error saving nutrition goals:', err);
+          }
+        }
+        
+        navigate('/', { replace: true });
       } else {
-        setError(data.message || 'Login failed');
+        setError(data.message || 'Login failed. Please check your credentials.');
       }
     } catch (err) {
-      console.error('Error:', err);
-      setError('Failed to login');
+      console.error('Login error:', err);
+      setError('Server error. Please try again later.');
     }
   };
 
@@ -54,11 +81,7 @@ function Login() {
         <section className='account-box'>
           <h2 className='centered'>Login to Your Account</h2>
           {error && <div className="alert alert-danger">{error}</div>}
-          <form 
-            onSubmit={handleSubmit} 
-            className='centered' 
-            id="accountLoginForm"
-          >
+          <form onSubmit={handleSubmit} className='centered' id="accountLoginForm">
             <div className='text-input d-flex align-items-center'>
               <label htmlFor="username" className="d-flex align-items-center justify-content-center"
                 id="searchLabel">Username: </label>
@@ -77,7 +100,68 @@ function Login() {
                 onChange={(e) => setPassword(e.target.value)}
               />
             </div>
-            <button className="btn btn-success" type="submit">Login</button>
+            
+            <div className="nutrition-goals-option mt-3">
+              <button 
+                type="button" 
+                className="btn btn-secondary"
+                onClick={() => setShowNutritionGoals(!showNutritionGoals)}
+              >
+                {showNutritionGoals ? 'Skip Nutrition Goals' : 'Set Initial Nutrition Goals'}
+              </button>
+              
+              {showNutritionGoals && (
+                <div className="nutrition-goals-form mt-3">
+                  <h4>Set Your Daily Nutrition Goals</h4>
+                  <div className="form-group">
+                    <label>Calories (kcal):
+                      <input
+                        type="number"
+                        value={goals.calories}
+                        onChange={(e) => setGoals({...goals, calories: e.target.value})}
+                        className="form-control"
+                        placeholder="Enter daily calorie goal"
+                      />
+                    </label>
+                  </div>
+                  <div className="form-group">
+                    <label>Protein (g):
+                      <input
+                        type="number"
+                        value={goals.protein}
+                        onChange={(e) => setGoals({...goals, protein: e.target.value})}
+                        className="form-control"
+                        placeholder="Enter daily protein goal"
+                      />
+                    </label>
+                  </div>
+                  <div className="form-group">
+                    <label>Carbs (g):
+                      <input
+                        type="number"
+                        value={goals.carbs}
+                        onChange={(e) => setGoals({...goals, carbs: e.target.value})}
+                        className="form-control"
+                        placeholder="Enter daily carbs goal"
+                      />
+                    </label>
+                  </div>
+                  <div className="form-group">
+                    <label>Fats (g):
+                      <input
+                        type="number"
+                        value={goals.fats}
+                        onChange={(e) => setGoals({...goals, fats: e.target.value})}
+                        className="form-control"
+                        placeholder="Enter daily fats goal"
+                      />
+                    </label>
+                  </div>
+                </div>
+              )}
+            </div>
+            
+            <button className="btn btn-success mt-3" type="submit">Login</button>
           </form>
         </section>
       </div>

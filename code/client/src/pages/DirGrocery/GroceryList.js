@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import './Grocery.css';
 
@@ -9,8 +9,8 @@ function GroceryList() {
   const location = useLocation();
   const navigate = useNavigate();
 
-  // Fetch grocery list from server
-  const fetchGroceryList = async () => {
+  // Move fetchGroceryList inside useCallback to prevent infinite loop
+  const fetchGroceryList = useCallback(async () => {
     try {
       const token = localStorage.getItem('token');
       if (!token) {
@@ -41,7 +41,26 @@ function GroceryList() {
       console.error('Error:', err);
       setError('Failed to load grocery list');
     }
-  };
+  }, [navigate]);
+
+  // Initial fetch
+  useEffect(() => {
+    fetchGroceryList();
+  }, [fetchGroceryList]);
+
+  // Handle location updates
+  useEffect(() => {
+    if (location.state?.ingredients) {
+      const newIngredients = location.state.ingredients.filter(
+        (ingredient) => !groceryList.includes(ingredient)
+      );
+      if (newIngredients.length > 0) {
+        const newList = [...groceryList, ...newIngredients];
+        setGroceryList(newList);
+        saveGroceryList(newList);
+      }
+    }
+  }, [location.state]);
 
   // Save grocery list to server
   const saveGroceryList = async (items) => {
@@ -75,23 +94,6 @@ function GroceryList() {
       setError('Failed to save grocery list');
     }
   };
-
-  useEffect(() => {
-    fetchGroceryList();
-  }, [fetchGroceryList]);
-
-  useEffect(() => {
-    if (location.state && location.state.ingredients) {
-      const newList = [
-        ...groceryList,
-        ...location.state.ingredients.filter(
-          (ingredient) => !groceryList.includes(ingredient)
-        )
-      ];
-      setGroceryList(newList);
-      saveGroceryList(newList);
-    }
-  }, [location.state, groceryList, saveGroceryList]);
 
   const addItem = async () => {
     if (newItem && !groceryList.includes(newItem)) {

@@ -8,10 +8,11 @@ import { useNavigate } from 'react-router-dom';
  * @async
  * @param {Event} e - Form submission event
  * @param {Function} setError - Function to set error state
+ * @param {Function} setSuccess - Function to set success state
  * @param {Function} navigate - React Router navigation function
  * @returns {Promise<void>}
  */
-const handleSubmit = async (e, setError, navigate) => {
+const handleSubmit = async (e, setError, setSuccess, navigate) => {
   e.preventDefault();
   const formData = new FormData(e.target);
   const username = formData.get('username');
@@ -30,12 +31,21 @@ const handleSubmit = async (e, setError, navigate) => {
 
     if (!response.ok) {
       setError(data.message || 'Failed to create account');
+      setSuccess('');
       return;
     }
 
-    navigate('/login');
+    setError('');
+    setSuccess('Account created successfully! Redirecting to login...');
+    
+    // Wait for 2 seconds before redirecting to show the success message
+    setTimeout(() => {
+      navigate('/login', { replace: true });
+    }, 2000);
+    
   } catch (err) {
     setError('Failed to create account');
+    setSuccess('');
     console.error('Error:', err);
   }
 };
@@ -47,10 +57,16 @@ const handleSubmit = async (e, setError, navigate) => {
  */
 const AccCreate = () => {
   const [error, setError] = useState('');
+  const [success, setSuccess] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
   const navigate = useNavigate();
 
   const onSubmit = (e) => {
-    handleSubmit(e, setError, navigate);
+    handleSubmit(e, setError, setSuccess, navigate);
+  };
+
+  const togglePasswordVisibility = () => {
+    setShowPassword(!showPassword);
   };
 
   return (
@@ -59,7 +75,8 @@ const AccCreate = () => {
       <div className="centered">
         <section className="account-box">
           <h2 className="centered">Create An Account</h2>
-          {error && <div className="error-message">{error}</div>}
+          {error && <div className="alert alert-danger">{error}</div>}
+          {success && <div className="alert alert-success">{success}</div>}
           <form 
             className="centered" 
             id="accountCreateForm" 
@@ -84,14 +101,20 @@ const AccCreate = () => {
                   Password:
                 </label>
                 <input
-                  type="password"
+                  type={showPassword ? "text" : "password"}
                   id="password"
                   name="password"
                   className="form-control"
                   placeholder="Enter password"
                   required
                 />
-                <button type="button" className="btn btn-info">Show</button>
+                <button 
+                  type="button" 
+                  className="btn btn-info"
+                  onClick={togglePasswordVisibility}
+                >
+                  {showPassword ? 'Hide' : 'Show'}
+                </button>
               </div>
             </div>
             <button type="submit" className="btn btn-primary">Create Account</button>

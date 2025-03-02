@@ -24,8 +24,12 @@ connectDB();
 
 // Middleware
 app.use(express.json());
-app.use(cors()); // Allow frontend to access backend
-app.use(express.json());
+app.use(cors({
+  origin: 'http://localhost:3000', // Frontend URL
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'Accept']
+}));
 
 //api keys and access tokens:
 
@@ -117,18 +121,6 @@ app.get("/api/krogerProducts", ensureValidToken, async (req, res) => {
       res.status(500).json({ error: "Failed to fetch products" });
   }
 });
-
-// CORS configuration
-app.use(cors({
-  origin: [
-    'http://localhost:3000',
-    'https://cloneski.vercel.app/',  // Add your frontend URL here
-    process.env.CLIENT_URL // Will use this if set
-  ].filter(Boolean),
-  credentials: true,
-  methods: ['GET', 'POST', 'PUT', 'DELETE'],
-  allowedHeaders: ['Content-Type', 'Authorization', 'Accept']
-}));
 
 // Edamam API Configuration
 const EDAMAM_APP_ID = process.env.EDAMAM_APP_ID || "16138714";

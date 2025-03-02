@@ -88,12 +88,7 @@ function App() {
         } />
 
         {/* Protected Nutrition Routes */}
-        <Route path="/NutritionDay" element={
-          <ProtectedRoute>
-            <Nutrition />
-          </ProtectedRoute>
-        } />
-        <Route path="/NutritionHistory" element={
+        <Route path="/Nutrition" element={
           <ProtectedRoute>
             <Nutrition />
           </ProtectedRoute>
