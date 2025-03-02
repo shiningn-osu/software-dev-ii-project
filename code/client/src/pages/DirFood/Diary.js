@@ -10,16 +10,26 @@ const Diary = () => {
     const [ingredient, setIngredient] = useState("");
     const [weight, setWeight] = useState("");
     const [ingredients, setIngredients] = useState([]);
-    const [meals, setMeals] = useState(() => {
-        const savedMeals = localStorage.getItem("diaryMeals");
-        return savedMeals ? JSON.parse(savedMeals) : [];
-    });
+    const [meals, setMeals] = useState([]);
     const [mealName, setMealName] = useState("");
     const [error, setError] = useState("");
 
     useEffect(() => {
-        localStorage.setItem("diaryMeals", JSON.stringify(meals));
-    }, [meals]);
+        const fetchMeals = async () => {
+            try {
+                const token = localStorage.getItem('token');
+                if (!token) return;
+                
+                const response = await axios.get("/api/meals", {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                setMeals(response.data);
+            } catch (error) {
+                setError(`Error fetching meals: ${error.response?.data?.message || error.message}`);
+            }
+        };
+        fetchMeals();
+    }, []);
 
     const fetchNutrition = async (name, weight) => {
         try {
@@ -68,16 +78,21 @@ const Diary = () => {
         setWeight("");
     };
 
+    const deleteIngredient = (index) => {
+        const newIngredients = ingredients.filter((_, i) => i !== index);
+        setIngredients(newIngredients);
+    };
+
     const sendMealToDatabase = async (meal) => {
         try {
-            await axios.post("/api/nutrition/add-meal", meal, {
+            const response = await axios.post("/api/nutrition/add-meal", meal, {
                 headers: {
                     'Authorization': `Bearer ${localStorage.getItem('token')}`
                 }
             });
+            return response.data;
         } catch (error) {
-            console.error("Database Error:", error);
-            setError(`Error: ${error.response?.data?.message || error.message}`);
+            throw error;
         }
     };
 
@@ -92,7 +107,6 @@ const Diary = () => {
         }
         setError("");
 
-        // Check for authentication token before sending the meal to the database
         const token = localStorage.getItem('token');
         if (!token) {
             setError("Authentication token is missing. Please log in.");
@@ -108,19 +122,17 @@ const Diary = () => {
 
         const newMeal = {
             name: mealName.trim(),
-            date: new Date().toLocaleString(),
+            date: new Date().toISOString(),
             totalCalories: totalNutrition.calories,
             ingredients: [...ingredients],
             nutrition: totalNutrition
         };
 
-        setMeals([...meals, newMeal]);
-        setMealName("");
-        setIngredients([]);
-
-        // Send the meal to the database
         try {
-            await sendMealToDatabase(newMeal);
+            const savedMeal = await sendMealToDatabase(newMeal);
+            setMeals([...meals, savedMeal]);
+            setMealName("");
+            setIngredients([]);
         } catch (error) {
             setError(`Error: ${error.response?.data?.message || error.message}`);
         }
@@ -162,6 +174,7 @@ const Diary = () => {
                                 <th>Protein</th>
                                 <th>Carbs</th>
                                 <th>Fats</th>
+                                <th>Action</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -173,6 +186,9 @@ const Diary = () => {
                                     <td>{ing.protein}g</td>
                                     <td>{ing.carbs}g</td>
                                     <td>{ing.fats}g</td>
+                                    <td>
+                                        <button onClick={() => deleteIngredient(index)}>Delete</button>
+                                    </td>
                                 </tr>
                             ))}
                         </tbody>
@@ -214,11 +230,11 @@ const Diary = () => {
                             {meals.map((meal, index) => (
                                 <tr key={index}>
                                     <td>{meal.name}</td>
-                                    <td>{meal.date}</td>
+                                    <td>{new Date(meal.date).toLocaleString()}</td>
                                     <td>{meal.totalCalories}kcal</td>
-                                    <td>{meal.nutrition.protein}g</td>
-                                    <td>{meal.nutrition.carbs}g</td>
-                                    <td>{meal.nutrition.fats}g</td>
+                                    <td>{meal.nutrition?.protein ?? 0}g</td>
+                                    <td>{meal.nutrition?.carbs ?? 0}g</td>
+                                    <td>{meal.nutrition?.fats ?? 0}g</td>
                                     <td>
                                         <ul>
                                             {meal.ingredients.map((ing, i) => (

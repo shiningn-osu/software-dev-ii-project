@@ -8,6 +8,8 @@ import express from 'express';
 import connectDB from './config/db.js';
 import userRoutes from './routes/userRoutes.js';
 import nutritionRoutes from './routes/nutritionRoutes.js';
+import mealRoutes from './routes/mealRout.js';
+import Meal from './models/mealModel.js';
 import cors from 'cors';
 import dotenv from 'dotenv';
 import NutritionGoals from './models/nutritionGoals.js';
@@ -64,6 +66,7 @@ const verifyToken = (req, res, next) => {
 // Routes
 app.use('/api/users', userRoutes);
 app.use('/api/nutrition', nutritionRoutes);
+app.use('/api/meals', mealRoutes);
 
 // Nutrition endpoints
 app.get('/api/nutrition/overview', (req, res) => {
@@ -200,43 +203,49 @@ app.post('/api/nutrition/add-custom', verifyToken, async (req, res) => {
 // Add a new endpoint to save meal information
 app.post('/api/nutrition/add-meal', verifyToken, async (req, res) => {
   try {
-    const { name, date, totalCalories, ingredients, nutrition } = req.body;
+    const { name, ingredients, nutrition } = req.body;
 
-    // Get today's date at midnight
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-
-    // Find or create today's nutrition entry
-    let dailyNutrition = await DailyNutrition.findOne({
-      userId: req.userId,
-      date: {
-        $gte: today,
-        $lt: new Date(today.getTime() + 24 * 60 * 60 * 1000)
-      }
+    const newMeal = new Meal({
+      name,
+      creator: req.userId,
+      ingredients: ingredients.map(ing => ({
+        name: ing.name,
+        amount: ing.weight,
+        unit: 'g',
+        calories: ing.calories,
+        protein: ing.protein,
+        carbs: ing.carbs,
+        fats: ing.fats
+      })),
+      nutrition: {
+        calories: nutrition.calories,
+        protein: nutrition.protein,
+        carbs: nutrition.carbs,
+        fats: nutrition.fats
+      },
+      recipe: "" 
     });
 
-    if (!dailyNutrition) {
-      // Create new entry if none exists for today
-      dailyNutrition = new DailyNutrition({
-        userId: req.userId,
-        date: today,
-        calories: 0,
-        protein: 0,
-        carbs: 0,
-        fats: 0
-      });
-    }
+    const savedMeal = await newMeal.save();
 
-    // Add the meal nutrients to daily totals
-    dailyNutrition.calories += Number(nutrition.calories);
-    dailyNutrition.protein += Number(nutrition.protein);
-    dailyNutrition.carbs += Number(nutrition.carbs);
-    dailyNutrition.fats += Number(nutrition.fats);
+    // Update daily nutrition
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    
+    await DailyNutrition.findOneAndUpdate(
+      { userId: req.userId, date: { $gte: today } },
+      {
+        $inc: {
+          calories: nutrition.calories,
+          protein: nutrition.protein,
+          carbs: nutrition.carbs,
+          fats: nutrition.fats
+        }
+      },
+      { upsert: true, new: true }
+    );
 
-    // Save the updated totals
-    await dailyNutrition.save();
-
-    res.json(dailyNutrition);
+    res.json(savedMeal);
   } catch (error) {
     console.error('Error adding meal:', error);
     res.status(500).json({ message: 'Failed to add meal' });

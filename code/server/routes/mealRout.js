@@ -1,6 +1,6 @@
 import express from 'express';
 import { addMeal, getMeals } from '../controllers/mealController.js';
-import { verifyToken } from '../middleware/authMiddleware.js';
+import { verifyToken } from '../middlewares/authMiddleware.js';
 
 const router = express.Router();
 
