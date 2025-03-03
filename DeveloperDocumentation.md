@@ -101,7 +101,8 @@ To target test a specific .test.js file, add the target file full name after tes
 Are there any naming conventions/patterns to follow when naming test files? Is there a particular test harness to use?
 
 Current standard is to use the JEST formatting, whos files are marked by the .test.js filetype. 
-Other options for testing include the React testing library, Supertest, and JUnit. However, primary testing operations will be using Jest.
+
+To add a test to the code base, one needs to create a file with the .test.js extension within either the client or the server directories. Then, the test adder needs to create a test function with a string description and an arrow function as parameters. This arrow function should incorporate an assertion which will be run by the Jest test command. Then to run the test in the project, navigate to either the client or server directories, and run the ‘npm test’ command to test every unit test in the project. Alternatively, testing the single file is possible with the ‘npm test <fileName>’ command that includes the actual full file name.
 
 New tests, either within the App.test.js file, or within a new file, can be created by writing using the React testing library, along with Jest, using this documentation:
 
@@ -112,25 +113,19 @@ https://testing-library.com/docs/react-testing-library/intro/
 
 
 #### - **How to build a release of the software.** 
-Describe any tasks that are not automated. For example, should a developer update a version number (in code and documentation) prior to invoking the build system? Are there any sanity checks a developer should perform after building a release?
 
-As the system is server based, building a release is not currently dependent on a version system. 
-Starting the server via:
+Since the system is server-based and does not currently rely on a formal versioning system, building a release primarily involves preparing the server and client code for deployment. The build process is largely automated via npm, but there are a few manual tasks and checks a developer should perform:
 
-navigate into the SERVER of the directory:
-```
-cd code
-cd server
-```
+##### Manual Tasks Before Building:
+**Update Documentation:** Ensure that DeveloperDocumentation.md and UserDocumentation.md reflect any recent changes to functionality, API endpoints, or usage instructions. While no version number is tracked in the code, consider adding a date or informal release identifier (e.g., "Release - March 2025") to these files for clarity.
+**Dependency Check:** Verify that all dependencies listed in code/server/package.json and code/client/package.json are up-to-date and compatible. Manually update any critical dependencies if needed (e.g., npm outdated to identify outdated packages, then npm update <package-name>).
+**Environment Configuration:** Confirm that the .env file (if used) in the code/server directory contains the correct production settings, such as database connection strings or API keys, and remove any development-specific values.
+**API Endpoints:** Ensure that all API endpoints and requests between the client and server utilize the correct URL addresses for the production environments that they are going to be released in.
 
-install the client using npm:
-```
-npm install
-```
-
-and run the client using npm:
-```
-npm start
+Finally, run the following commands from the software-dev-ii-project directory to build the client for deployment
+```Bash
+cd code/client
+npm run build
 ```
 
-is all that is needed to start running the server for service, and operating on the client is all that is needed to see changes.
+Now you have a server and build directory that can be used in deployment.
