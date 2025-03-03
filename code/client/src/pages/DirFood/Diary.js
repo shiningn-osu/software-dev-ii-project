@@ -2,9 +2,9 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import './food-diary.css';
 
-const EDAMAM_APP_ID = process.env.REACT_APP_EDAMAM_APP_ID;
-const EDAMAM_APP_KEY = process.env.REACT_APP_EDAMAM_APP_KEY;
-const EDAMAM_USER_ID = process.env.REACT_APP_EDAMAM_USER_ID;
+const EDAMAM_APP_ID = "9271dc90";
+const EDAMAM_APP_KEY = "5b1927dab9fa37d8635b5f53bd2ceb4c";
+const EDAMAM_USER_ID = "Bkono2003";
 
 const Diary = () => {
     const [ingredient, setIngredient] = useState("");
