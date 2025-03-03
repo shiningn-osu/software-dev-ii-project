@@ -14,17 +14,35 @@ const Diary = () => {
     const [mealName, setMealName] = useState("");
     const [error, setError] = useState("");
 
-    // Fetch existing meals from the API on component mount
+    // Fetch existing meals
     useEffect(() => {
         const fetchMeals = async () => {
             try {
                 const token = localStorage.getItem('token');
                 if (!token) return;
-                
+              
                 const response = await axios.get("/api/meals", {
                     headers: { 'Authorization': `Bearer ${token}` }
                 });
-                setMeals(response.data);
+
+                const mealsWithNutrition = response.data.map(meal => ({
+                    ...meal,
+                    timeEaten: new Date(meal.createdAt).toISOString(),
+                    date: new Date(meal.createdAt).toLocaleString(),
+                    totalCalories: meal.nutrition?.calories || 0,
+                    ingredients: meal.ingredients.map(ing => ({
+                        name: ing.name,
+                        weight: ing.weight,
+                        nutrition: {
+                            calories: ing.nutrition?.calories || 0,
+                            protein: ing.nutrition?.protein || 0,
+                            carbs: ing.nutrition?.carbs || 0,
+                            fats: ing.nutrition?.fats || 0
+                        }
+                    }))
+                }));
+
+                setMeals(mealsWithNutrition);
             } catch (error) {
                 setError(`Error fetching meals: ${error.response?.data?.message || error.message}`);
             }
@@ -32,7 +50,7 @@ const Diary = () => {
         fetchMeals();
     }, []);
 
-    // Fetch nutrition information for a given ingredient and weight
+    // Fetch nutrition data
     const fetchNutrition = async (name, weight) => {
         try {
             const response = await axios.get("https://api.edamam.com/api/nutrition-data", {
@@ -61,7 +79,7 @@ const Diary = () => {
         }
     };
 
-    // Add a new ingredient with nutrition details
+    // Add ingredient
     const addIngredient = async () => {
         if (!ingredient || !weight) {
             setError("Please fill in both fields");
@@ -81,13 +99,13 @@ const Diary = () => {
         setWeight("");
     };
 
-    // Remove an ingredient from the list
+    // Delete ingredient
     const deleteIngredient = (index) => {
         const newIngredients = ingredients.filter((_, i) => i !== index);
         setIngredients(newIngredients);
     };
 
-    // Send a meal to the database
+    // Save meal to database
     const sendMealToDatabase = async (meal) => {
         try {
             const response = await axios.post("/api/nutrition/add-meal", meal, {
@@ -101,7 +119,30 @@ const Diary = () => {
         }
     };
 
-    // Create a new meal entry with total nutrition details
+    // Delete meal
+    const deleteMeal = async (mealId) => {
+        try {
+            const token = localStorage.getItem('token');
+            if (!token) {
+                setError("Authentication token missing");
+                return;
+            }
+
+            await axios.delete(`/api/meals/${mealId}`, {
+                headers: { 
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json'
+                }
+            });
+
+            setMeals(prev => prev.filter(meal => meal._id !== mealId));
+            window.dispatchEvent(new Event('nutritionUpdated'));
+        } catch (error) {
+            setError(`Delete failed: ${error.response?.data?.message || error.message}`);
+        }
+    };
+
+    // Create new meal
     const addMeal = async () => {
         if (!mealName) {
             setError("Please enter a meal name");
@@ -115,11 +156,10 @@ const Diary = () => {
 
         const token = localStorage.getItem('token');
         if (!token) {
-            setError("Authentication token is missing. Please log in.");
+            setError("Authentication token missing");
             return;
         }
 
-        // Calculate total nutrition for the meal
         const totalNutrition = ingredients.reduce((acc, ing) => ({
             calories: acc.calories + ing.calories,
             protein: acc.protein + ing.protein,
@@ -129,17 +169,34 @@ const Diary = () => {
 
         const newMeal = {
             name: mealName.trim(),
-            date: new Date().toISOString(),
+            createdAt: new Date().toISOString(),
+            timeEaten: new Date().toISOString(),
             totalCalories: totalNutrition.calories,
-            ingredients: [...ingredients],
+            ingredients: ingredients.map(ing => ({
+                name: ing.name,
+                weight: ing.weight,
+                unit: 'g',
+                nutrition: {
+                    calories: ing.calories,
+                    protein: ing.protein,
+                    carbs: ing.carbs,
+                    fats: ing.fats
+                }
+            })),
             nutrition: totalNutrition
         };
 
         try {
             const savedMeal = await sendMealToDatabase(newMeal);
-            setMeals([...meals, savedMeal]);
+            setMeals([...meals, {
+                ...savedMeal,
+                timeEaten: new Date().toISOString(),
+                date: new Date().toLocaleString(),
+                totalCalories: savedMeal.nutrition.calories
+            }]);
             setMealName("");
             setIngredients([]);
+            window.dispatchEvent(new Event('nutritionUpdated'));
         } catch (error) {
             setError(`Error: ${error.response?.data?.message || error.message}`);
         }
@@ -194,7 +251,12 @@ const Diary = () => {
                                     <td>{ing.carbs}g</td>
                                     <td>{ing.fats}g</td>
                                     <td>
-                                        <button onClick={() => deleteIngredient(index)}>Delete</button>
+                                        <button 
+                                            onClick={() => deleteIngredient(index)}
+                                            className="delete-button"
+                                        >
+                                            Delete
+                                        </button>
                                     </td>
                                 </tr>
                             ))}
@@ -226,18 +288,19 @@ const Diary = () => {
                             <tr>
                                 <th>Meal</th>
                                 <th>Date</th>
-                                <th>Total Calories</th>
+                                <th>Calories</th>
                                 <th>Protein</th>
                                 <th>Carbs</th>
                                 <th>Fats</th>
                                 <th>Ingredients</th>
+                                <th>Action</th>
                             </tr>
                         </thead>
                         <tbody>
                             {meals.map((meal, index) => (
                                 <tr key={index}>
                                     <td>{meal.name}</td>
-                                    <td>{new Date(meal.date).toLocaleString()}</td>
+                                    <td>{new Date(meal.timeEaten).toLocaleString()}</td>
                                     <td>{meal.totalCalories}kcal</td>
                                     <td>{meal.nutrition?.protein ?? 0}g</td>
                                     <td>{meal.nutrition?.carbs ?? 0}g</td>
@@ -246,10 +309,22 @@ const Diary = () => {
                                         <ul>
                                             {meal.ingredients.map((ing, i) => (
                                                 <li key={i}>
-                                                    {ing.name} ({ing.weight}g) - {ing.calories}kcal, {ing.protein}g protein, {ing.carbs}g carbs, {ing.fats}g fats
+                                                    {ing.name} ({ing.weight}g) -{' '}
+                                                    {ing.nutrition?.calories || 0}kcal,{' '}
+                                                    {ing.nutrition?.protein || 0}g protein,{' '}
+                                                    {ing.nutrition?.carbs || 0}g carbs,{' '}
+                                                    {ing.nutrition?.fats || 0}g fats
                                                 </li>
                                             ))}
                                         </ul>
+                                    </td>
+                                    <td>
+                                        <button 
+                                            onClick={() => deleteMeal(meal._id)}
+                                            className="delete-button"
+                                        >
+                                            Delete
+                                        </button>
                                     </td>
                                 </tr>
                             ))}
