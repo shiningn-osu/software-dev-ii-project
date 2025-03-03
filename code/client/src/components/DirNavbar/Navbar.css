@@ -116,3 +116,44 @@ a {
 }
 
 /* END NAV SECTION */
+
+.navbar {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 1rem 2rem;
+  background-color: #f8f9fa;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  text-align: center;
+}
+
+.nav-brand {
+  font-size: 1.5rem;
+  font-weight: bold;
+  text-decoration: none;
+  color: #333;
+  margin-bottom: 1rem;
+}
+
+.nav-links {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.nav-links a {
+  text-decoration: none;
+  color: #666;
+  padding: 0.5rem 1rem;
+}
+
+.nav-links a:hover {
+  color: #333;
+}
+
+/* Add some spacing between wrapped items */
+.nav-links > * {
+  margin: 0.25rem;
+}

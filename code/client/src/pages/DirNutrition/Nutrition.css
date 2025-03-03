@@ -6,21 +6,22 @@
 
 .toggle-buttons {
   display: flex;
+  justify-content: center;
   gap: 10px;
   margin-bottom: 20px;
 }
 
 .toggle-buttons button {
   padding: 10px 20px;
-  border: 1px solid #ddd;
-  background: white;
+  border: none;
+  border-radius: 4px;
+  background-color: #4CAF50;
   cursor: pointer;
 }
 
 .toggle-buttons button.active {
-  background: #4CAF50;
+  background-color: #007bff;
   color: white;
-  border-color: #4CAF50;
 }
 
 .search-form, .custom-food-form {
@@ -51,7 +52,7 @@
 
 button {
   background-color: #4CAF50;
-  color: white;
+  color: rgb(255, 255, 255);
   border: none;
   padding: 8px 16px;
   border-radius: 4px;
@@ -76,4 +77,136 @@ input {
 .custom-food-form {
   max-width: 400px;
   margin: 0 auto;
+}
+
+.goals-form {
+  max-width: 500px;
+  margin: 20px auto;
+  padding: 20px;
+  background-color: #f8f9fa;
+  border-radius: 8px;
+}
+
+.goals-form input {
+  width: 100%;
+  padding: 8px;
+  margin-bottom: 10px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.goals-form h3 {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.history-section {
+  padding: 20px;
+}
+
+.history-controls {
+  margin-bottom: 20px;
+}
+
+.history-controls select {
+  margin: 0 10px;
+  padding: 5px;
+  border-radius: 4px;
+}
+
+.history-table-container {
+  overflow-x: auto;
+  margin-top: 20px;
+}
+
+.history-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.history-table th,
+.history-table td {
+  padding: 10px;
+  text-align: left;
+  border-bottom: 1px solid #ddd;
+}
+
+.history-table th {
+  background-color: #4CAF50;
+}
+
+.meal-details {
+  padding: 10px;
+  background-color: #f9f9f9;
+  border-radius: 4px;
+  margin-top: 10px;
+}
+
+.meal-item {
+  padding: 10px;
+  border-bottom: 1px solid #eee;
+}
+
+.meal-item:last-child {
+  border-bottom: none;
+}
+
+details summary {
+  cursor: pointer;
+  color: #0066cc;
+}
+
+details summary:hover {
+  text-decoration: underline;
+}
+
+.average-stats {
+  background-color: #f8f9fa;
+  border-radius: 8px;
+  padding: 20px;
+  margin-bottom: 30px;
+}
+
+.average-stats h4 {
+  margin-top: 0;
+  margin-bottom: 15px;
+  color: #333;
+}
+
+.average-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 20px;
+}
+
+.average-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 15px;
+  background-color: white;
+  border-radius: 6px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.average-item .label {
+  font-size: 0.9em;
+  color: #666;
+  margin-bottom: 5px;
+}
+
+.average-item .value {
+  font-size: 1.2em;
+  font-weight: bold;
+  color: #2c3e50;
+}
+
+.history-table-container h4 {
+  margin-bottom: 15px;
+  color: #333;
+}
+
+/* Update existing history table styles */
+.history-table {
+  margin-top: 10px;
 } 
