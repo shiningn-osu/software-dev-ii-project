@@ -87,3 +87,19 @@ tr:hover {
 .auth-buttons .btn {
   min-width: 100px;
 }
+
+/* Add new styles for the header */
+.Home-header {
+  text-align: center;
+  margin: 2rem 0;
+}
+
+.Home-header h1 {
+  font-size: 2.5rem;
+  margin-bottom: 1rem;
+}
+
+.Home-header h2 {
+  font-size: 1.8rem;
+  color: #3b883d;  /* Using the same green as table headers for consistency */
+}

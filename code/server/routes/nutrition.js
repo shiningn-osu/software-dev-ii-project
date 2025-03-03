@@ -156,25 +156,55 @@ const verifyToken = (req, res, next) => {
   }
 };
 
+// Add these utility functions at the top of your file
+const getStartOfDay = (date) => {
+  // Get the user's timezone offset in minutes
+  const timezoneOffset = -480; // PST offset in minutes (-8 hours * 60)
+  
+  // Create a new date object for the start of the day in PST
+  const startOfDay = new Date(date);
+  startOfDay.setHours(0, 0, 0, 0);
+  
+  // Adjust for timezone
+  startOfDay.setMinutes(startOfDay.getMinutes() - timezoneOffset);
+  
+  return startOfDay;
+};
+
+const getEndOfDay = (date) => {
+  // Get the user's timezone offset in minutes
+  const timezoneOffset = -480; // PST offset in minutes (-8 hours * 60)
+  
+  // Create a new date object for the end of the day in PST
+  const endOfDay = new Date(date);
+  endOfDay.setHours(23, 59, 59, 999);
+  
+  // Adjust for timezone
+  endOfDay.setMinutes(endOfDay.getMinutes() - timezoneOffset);
+  
+  return endOfDay;
+};
+
 // Get nutrition history for a date range
 router.get('/history', verifyToken, async (req, res) => {
   try {
-    const { startDate, endDate } = req.query;
-    const start = startDate ? new Date(startDate) : new Date(new Date().setDate(new Date().getDate() - 7)); // Default to last 7 days
-    const end = endDate ? new Date(endDate) : new Date();
-    
+    const days = parseInt(req.query.days) || 7;
+    const endDate = getEndOfDay(new Date());
+    const startDate = getStartOfDay(new Date());
+    startDate.setDate(startDate.getDate() - days + 1);
+
     const history = await DailyNutrition.find({
       userId: req.userId,
       date: {
-        $gte: start,
-        $lte: end
+        $gte: startDate,
+        $lte: endDate
       }
     }).sort({ date: -1 });
 
     res.json(history);
   } catch (error) {
-    console.error('Error fetching nutrition history:', error);
-    res.status(500).json({ message: 'Failed to fetch nutrition history' });
+    console.error('Error:', error);
+    res.status(500).json({ message: 'Server error' });
   }
 });
 

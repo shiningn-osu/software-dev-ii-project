@@ -24,16 +24,110 @@ const app = express();
 // Connect to MongoDB
 connectDB();
 
+// Determine CORS origin based on environment
+const corsOrigin = process.env.NODE_ENV === 'production'
+  ? 'https://meal-match-9nx72i8vk-duncan-eversons-projects.vercel.app/' // Production URL
+  : 'http://localhost:3000'; // Development URL (specific, not wildcard)
+
 // Middleware
 app.use(express.json());
-
-// CORS configuration
 app.use(cors({
-  origin: "http://localhost:3000",
-  credentials: true,  // Allow credentials
-  methods: ['GET', 'POST', 'PUT', 'DELETE'],
-  allowedHeaders: ['Content-Type', 'Authorization', 'Accept']
+  origin: corsOrigin,          // Use the dynamically determined origin
+  credentials: true,           // Allow cookies or auth headers
+  methods: ['GET', 'POST', 'PUT', 'DELETE'], // Allowed HTTP methods
+  allowedHeaders: ['Content-Type', 'Authorization', 'Accept'] // Allowed headers
 }));
+
+//api keys and access tokens:
+
+//kroger:
+const client_id = "mealmatchschoolproj-2432612430342464692f6e61622e526776482e424d774336534854364f346b726c4a6d616a527355624a684157517566624973743433416e7556304b6653388385405507052";
+const client_secret = "QWnIltimqgeLCVeStjB-kfU8Kz9tsuPaoNhnmYxH";
+
+let accessToken = null;
+let tokenExpiration = 0;
+//
+async function getAccessToken() {
+  const credentials = Buffer.from(`${client_id}:${client_secret}`).toString("base64");
+
+  try {
+    const response = await fetch("https://api.kroger.com/v1/connect/oauth2/token", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/x-www-form-urlencoded",
+        "Authorization": `Basic ${credentials}`,
+      },
+      body: new URLSearchParams({
+        "grant_type": "client_credentials",
+        "scope": "product.compact" // Adjust scope as needed
+      })
+    });
+
+    const data = await response.json();
+    if (data.access_token) {
+      accessToken = data.access_token;
+      tokenExpiration = Date.now() + data.expires_in * 1000; // Store expiration time
+      console.log("New Access Token Obtained");
+    } else {
+      throw new Error("Failed to obtain access token");
+    }
+  } catch (error) {
+    console.error("Error fetching access token:", error);
+  }
+}
+
+// Middleware to Ensure Token is Valid
+async function ensureValidToken(req, res, next) {
+  if (!accessToken || Date.now() >= tokenExpiration) {
+    console.log("Refreshing Access Token...");
+    await getAccessToken();
+  }
+  next();
+}
+//kroger
+app.get("/api/krogerLocations", ensureValidToken, async (req, res) => {
+  try {
+    const locResponse = await fetch("https://api.kroger.com/v1/locations?filter.zipCode.near=97333", {
+      headers: { "Authorization": `Bearer ${accessToken}` }
+    });
+
+    if (!locResponse.ok) {
+      throw new Error(`Kroger API error: ${locResponse.status}`);
+    }
+
+    const locationData = await locResponse.json();
+    res.json(locationData);
+  } catch (error) {
+    console.error("Error fetching locations:", error);
+    res.status(500).json({ error: "Failed to fetch locations" });
+  }
+});
+
+// Proxy Route to Fetch Products
+app.get("/api/krogerProducts", ensureValidToken, async (req, res) => {
+  const { query, locationId } = req.query; // Extract query and locationId from frontend request
+
+  if (!query || !locationId) {
+    return res.status(400).json({ error: "Missing query or locationId" });
+  }
+
+  try {
+    const apiUrl = `https://api.kroger.com/v1/products?filter.term=${query}&filter.locationId=${locationId}`;
+    const response = await fetch(apiUrl, {
+      headers: { "Authorization": `Bearer ${accessToken}` }
+    });
+
+    if (!response.ok) {
+      throw new Error(`Kroger API error: ${response.status}`);
+    }
+
+    const productData = await response.json();
+    res.json(productData);
+  } catch (error) {
+    console.error("Error fetching products:", error);
+    res.status(500).json({ error: "Failed to fetch products" });
+  }
+});
 
 // Edamam API Configuration
 const EDAMAM_APP_ID = process.env.EDAMAM_APP_ID || "16138714";
@@ -102,7 +196,7 @@ app.get('/api/nutrition/recent', (req, res) => {
 app.post('/api/nutrition/goals', verifyToken, async (req, res) => {
   try {
     const { calories, protein, carbs, fats } = req.body;
-    
+
     const goals = await NutritionGoals.findOneAndUpdate(
       { userId: req.userId },
       {
@@ -158,7 +252,7 @@ app.get('/api/nutrition/current', verifyToken, async (req, res) => {
 app.post('/api/nutrition/add-custom', verifyToken, async (req, res) => {
   try {
     const { name, servingSize, calories, protein, carbs, fats } = req.body;
-    
+
     // Get today's date at midnight
     const today = new Date();
     today.setHours(0, 0, 0, 0);
@@ -307,7 +401,7 @@ app.post("/api/generate-meal-plan", async (req, res) => {
       headers: {
         "accept": "application/json",
         "Content-Type": "application/json",
-        "Edamam-Account-User": EDAMAM_ACCOUNT_USER, 
+        "Edamam-Account-User": EDAMAM_ACCOUNT_USER,
       },
       body: JSON.stringify(requestBody),
     });
@@ -338,9 +432,11 @@ app.get('/api/test', (req, res) => {
 // Modify the server start section
 if (process.env.NODE_ENV !== 'test') {
   const PORT = process.env.PORT || 6000;
-  app.listen(PORT, () => {
-    console.log(`Server is running on port ${PORT}`);
-  });
+  if (process.env.NODE_ENV !== 'production') {
+    app.listen(PORT, () => {
+      console.log(`Server is running on port ${PORT}`);
+    });
+  }
 }
 
 export default app;
