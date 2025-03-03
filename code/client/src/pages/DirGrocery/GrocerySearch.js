@@ -72,7 +72,7 @@ function GrocerySearch() {
     };
 
     fetchKrogerProducts();
-  }, [locData]);
+  }, [locData, query]);
 
 
   // Handle form submission

@@ -4,7 +4,7 @@ import "./mealPlan.css";
 const MealPlan = () => {
   const [formData, setFormData] = useState({
     allergies: [],
-    diet: "",
+    diet: [],
     minCalories: 1000,
     maxCalories: 2000,
   });
@@ -326,8 +326,10 @@ const MealPlan = () => {
           <div className="col-md-3">
             <label>Allergies:</label>
             <select name="allergies" multiple onChange={handleChange} className="form-control">
-              <option value="DAIRY_FREE">Dairy-Free</option>
-              <option value="SOY_FREE">Soy-Free</option>
+              <option value="dairy-free">Dairy-Free</option>
+              <option value="soy-free">Soy-Free</option>
+              <option value="peanut-free">Peanut-Free</option>
+              <option value="gluten-free">Gluten-Free</option>
             </select>
           </div>
 
@@ -337,6 +339,9 @@ const MealPlan = () => {
               <option value="">Select Diet</option>
               <option value="high-protein">High-Protein</option>
               <option value="low-carb">Low-Carb</option>
+              <option value="low-fat">Low-Fat</option>
+              <option value="low-sodium">Low-Sodium</option>
+              <option value="low-fiber">Low-Fiber</option>
             </select>
           </div>
 
@@ -356,76 +361,69 @@ const MealPlan = () => {
       {loading && <p>Loading...</p>}
       {error && <p className="text-danger">{error}</p>}
 
-      {/* Add the meal-plan-display class here */}
       <div className="meal-plan-display">
-        {mealPlan && mealPlan.selection.length > 0 ? (
-          <div>
-            {mealPlan.selection.map((day, index) => (
-              <div key={index} className="mb-5">
-                <h2 className="text-center mb-4">Day {index + 1}</h2>
+  {mealPlan && mealPlan.selection.length > 0 ? (
+    <div>
+      {mealPlan.selection.map((day, index) => (
+        <div key={index} className="mb-5">
+          <h2 className="text-center mb-4">Day {index + 1}</h2>
 
-                {/* Meal Type Headers */}
-                <div className="row text-center">
-                  <div className="col-md-4"><h3>Breakfast</h3></div>
-                  <div className="col-md-4"><h3>Lunch</h3></div>
-                  <div className="col-md-4"><h3>Dinner</h3></div>
-                </div>
+          {/* Meal Type Headers and Meal Cards in the Same Row */}
+          <div className="row text-center align-items-start">
+            {["Breakfast", "Lunch", "Dinner"].map((mealType) => {
+              const meal = day.sections[mealType];
+              const recipeId = meal ? meal.assigned.split("#recipe_").pop() : null;
+              const details = recipeDetails[recipeId];
 
-                {/* Meal Cards */}
-                <div className="row">
-                  {["Breakfast", "Lunch", "Dinner"].map((mealType) => {
-                    const meal = day.sections[mealType];
-                    if (!meal) return <div className="col-md-4"><p>No {mealType} assigned</p></div>;
+              return (
+                <div className="col-md-4 d-flex flex-column align-items-center" key={mealType}>
+                  {/* Meal Header */}
+                  <h3 className="meal-header">{mealType}</h3>
 
-                    const recipeId = meal.assigned.split("#recipe_").pop();
-                    const details = recipeDetails[recipeId];
-
-                    return (
-                      <div className="col-md-4" key={mealType}>
-                        <div className="card shadow-sm p-3 mb-4">
-                          {details ? (
-                            <>
-                              <img src={details.image} alt={details.name} className="card-img-top meal-image" />
-                              <div className="card-body">
-                                <h4 className="card-title">{details.name}</h4>
-                                <p><strong>{details.servings}</strong> servings</p>
-                                <p><strong>{details.calories}</strong> kcal</p>
-                                <p><strong>Protein:</strong> {details.protein} g</p>
-                                <p><strong>Fat:</strong> {details.fat} g</p>
-                                <p><strong>Carbs:</strong> {details.carbs} g</p>
-                                <button className="btn btn-info w-100" onClick={() => window.open(details.url, "_blank")}>
-                                  View Recipe
-                                </button>
-                              </div>
-                            </>
-                          ) : (
-                            <p>Loading details...</p>
-                          )}
-                        </div>
+                  {/* Meal Card */}
+                  {details ? (
+                    <div className="card shadow-sm p-2 mb-3 meal-card">
+                      <img src={details.image} alt={details.name} className="card-img-top meal-image" />
+                      <div className="card-body text-center">
+                        <h5 className="card-title">{details.name}</h5>
+                        <p><strong>{details.servings}</strong> servings</p>
+                        <p><strong>{Math.round(details.calories / details.servings)}</strong> kcal per serving</p>
+                        <p><strong>Protein:</strong> {Math.round(details.protein / details.servings)} g per serving</p>
+                        <p><strong>Fat:</strong> {Math.round(details.fat / details.servings)} g per serving</p>
+                        <p><strong>Carbs:</strong> {Math.round(details.carbs / details.servings)} g per serving</p>
+                        <button className="btn btn-info w-100" onClick={() => window.open(details.url, "_blank")}>
+                          View Recipe
+                        </button>
                       </div>
-                    );
-                  })}
+                    </div>
+                  ) : (
+                    <div className="empty-card">No meal assigned</div>
+                  )}
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
-        ) : (
-          <p>No meal plan available. Please generate one or load a saved plan.</p>
-        )}
-      </div>
-
-      {mealPlan && (
-        <button 
-          className="btn btn-success mt-3"
-          onClick={() => setShowSaveDialog(true)}
-        >
-          Save This Meal Plan
-        </button>
-      )}
-      
-      {showSaveDialog && renderSaveDialog()}
-      {renderSavedPlans()}
+        </div>
+      ))}
     </div>
+  ) : (
+    <p>No meal plan available. Please generate one or load a saved plan.</p>
+  )}
+</div>
+
+{/* Save Meal Plan Button */}
+{mealPlan && (
+  <button 
+    className="btn btn-success mt-3"
+    onClick={() => setShowSaveDialog(true)}
+  >
+    Save This Meal Plan
+  </button>
+)}
+
+{showSaveDialog && renderSaveDialog()}
+{renderSavedPlans()}
+</div>
   );
 };
 
