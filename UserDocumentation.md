@@ -82,11 +82,9 @@ To install and run Meal Match, ensure you have the following installed:
 
 ### Log Food in a Diary
 1. Navigate to the Meal Plan page by clicking "Diary" navbar item from the navbar at the top of the screen.
-2. Click the "Add Food" button, and then fill out the fields for the nutritional information related to the food you'd like to log.
-3. Once you add the food, the nutritional information of the day's meals will be displayed under the "Today's Totals" section, and the food entries will be presented under the "Today's Meals" section.
-4. You can then return back to the homepage by selecting the "Home" navbar item from the navbar at the top of the page.
-  4.1 You can then view that the pie chart has be updated with distributions related to the much macro nutrients you've logged for the day.
-  4.2 Additionally, you can view the nutrient information about the most recent meal you've logged in the table under the "Most Recent Nutrition Breakdown" header.
+2. List the ingredient name and gram amount in the corresponding fields, and then save the ingredient.
+  2.1 Optionally, you can delete the listed ingredient if you don't wish to include it in the saved meal.
+3. Go down to the create a meal field, type in a meal name, and then click the "Create Meal" button to take all listed ingredients and store them inside of a meal entry.
 
 ### Find Recipes
 1. Navigate to the Recipe Search page by clicking the "Recipe Search" navbar item from the navbar at the top of the screen.

@@ -159,14 +159,14 @@ const Home = () => {
         <div className="row">
           <div className="col-12">
             <h2 className="centered">Caloric Overview</h2>
-            <ChartPie data={nutritionData} />
+            <ChartPie data={nutritionData?.goals || nutritionData} />
           </div>
         </div>
         
         <div className="row mt-4">
           <div className="col-12">
             <h2>Daily Nutrition Goals</h2>
-            <DailyNutrGoals data={nutritionData} />
+            <DailyNutrGoals data={nutritionData?.goals || nutritionData} />
           </div>
         </div>
         
