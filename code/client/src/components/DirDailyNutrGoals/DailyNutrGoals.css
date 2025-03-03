@@ -1,0 +1,43 @@
+.daily-nutr-goals table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 20px 0;
+  background-color: #ffffff;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+  border-radius: 8px;
+}
+
+.daily-nutr-goals th,
+.daily-nutr-goals td {
+  padding: 12px 15px;
+  text-align: left;
+  border-bottom: 1px solid #ddd;
+}
+
+.daily-nutr-goals th {
+  background-color: #f8f9fa;
+  font-weight: bold;
+  color: #333;
+}
+
+.daily-nutr-goals tr:last-child td {
+  border-bottom: none;
+}
+
+.daily-nutr-goals tr:hover {
+  background-color: #f5f5f5;
+}
+
+.daily-nutr-goals .error {
+  color: #dc3545;
+  padding: 10px;
+  margin: 10px 0;
+  border-radius: 4px;
+  background-color: #f8d7da;
+}
+
+.daily-nutr-goals .loading {
+  text-align: center;
+  padding: 20px;
+  color: #666;
+} 

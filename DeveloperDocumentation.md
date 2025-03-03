@@ -15,75 +15,86 @@ All are visible through the above link.
 
 #### **The layout of your directory structure.** 
 
-Within the GitHub repository directory, there are several pieces of documentation. This includes the user and developer manuals, as well as the Living document which categorizes the plan of the project.
+Within the top-level GitHub directory, there are several pieces of documentation. This includes the user and developer manuals, as well as the Living document which categorizes the plan of the project.
 Within the subdirectories, REPORTS contain weekly reports on status updates of the project.
 
-For the builds of Meal Match, CODE contains the CLIENT and SERVER structures. SERVER currently contains the node.js server functionality, which opens on the port 6000.
-CLIENT contains all other pages and functionality currently within the main repository.
-
-within CLIENT, PUBLIC contains the index.html which is the home page. SRC contains all css and js files which control the navigation, api calls, and all other functionality within the service.
-
+For the builds of Meal Match, CODE contains the CLIENT and SERVER structures. CLIENT contains all the viewable pages and functionality currently within the main repository, and runs on the port 3000. Within CLIENT, PUBLIC contains the index.html which is the home page. SRC contains all css and js files which control the navigation, api calls, and all other functionality within the service. SERVER currently contains the node.js server functionality of API and DB calls, which is exposed on port 6000. 
 
 #### - **How to build the software.** 
 To build Meal Match, you will need to install:
 
 git:
-Download: [https://git-scm.com/downloads/win](https://git-scm.com/downloads/win)
+Download: [https://git-scm.com/downloads/](https://git-scm.com/downloads/)
 Node.js:
 Download: [https://nodejs.org/en](https://nodejs.org/en)
-MongoDB:
-Download: [https://www.mongodb.com/try/download/community](https://www.mongodb.com/try/download/community)
-npm:
-https://www.npmjs.com
 
+To allow for server functionality, you will need to utilize MongoDB from the web:
+MongoDB Utilization steps:
+  0. Go to the server repository and add a .env file.
+    0.1 Make sure to create two variables named MONGODB_URI and JWT_SECRET
+    0.2 For the JWT_SECRET, you can set that to any combination of 32 characters
+  1. Go to the MongoDB Atlas website [https://www.mongodb.com] (https://www.mongodb.com)
+  2. Either try for free or sign in with an account
+  3. Once inside of the Atlas, within a project, go to the "Overview" tab on the left side-nav, and create a new cluster if one does not already show up for you. 
+  4. Go to the "Network Access" tab and whitelist your current IP address, or just whitelist all IP addresses.
+    4.1 To add a new IP address, click on the add IP address button.
+      4.1.1 If you want to whitelist all IP addresses, under the "Access List Entry" field, add the text "0.0.0.0/0"
+  5. Go to the "Database Access" side-nav tab, and select to add a new database user. 
+    5.1 Create a new username and password, and grant them read/write access to the database for their built in role.
+    5.2 Make sure to add click the button to add the user.
+  6. Go the "Clusters" side-nav tab, and click on the connect button
+    6.1 Select "Drivers", and then copy and paste that selection string into the .env file, setting MONGODB_URI to be equal to that connection string.
+    6.2 Replace the username and password in the connection string with your created user's username and password.
+Now the server should be ready to run and connect to the database.
+
+##### Build from a Branch
 To build from a branch, either download the branch as a zip file, and navigate into the directory through your command line, or in git:
-
-```
+```Bash
 git clone https://github.com/shiningn-osu/software-dev-ii-project/tree/NAME_OF_BRANCH
-
+cd software-dev-ii-project
 ```
 
-navigate into the CLIENT of the directory:
-```
-cd code
-cd client
-```
-
-install the client using npm:
-```
+install all dependencies from inside of software-dev-ii-project:
+```Bash
+cd code/client
+npm install 
+cd ../server
 npm install
 ```
 
-and run the client using npm:
+run the server from inside the server directory:
+```Bash
+npm run start
 ```
+
+run the client:
+- create a new terminal and navigate to the software-dev-ii-project directory
+```Bash
+cd code/client
 npm start
 ```
 
 
 #### - **How to test the software.**
-Provide clear instructions for how to run the system’s test cases. In some cases, the instructions may need to include information such as how to access data sources or how to interact with external systems. You may reference the user documentation (e.g., prerequisites) to avoid duplication.
 
-Primary testing of the software is done through the App.test.js Jest file within 
-```
-code/client/src/DirApp
-```
-
-This is a Jest file which can be run via:
-
-
-navigate into the CLIENT of the directory:
-```
-cd code
-cd client
+To test the software one can navigate to either the CLIENT or SERVER directories in the code directory, and execute the following command:
+```Bash
+npm test
 ```
 
-run the test via the command "test" within the package.json found within the client directory:
-
+Below is an example of navigating into the CLIENT of the directory from the software-dev-ii-project directory and testing:
+```Bash
+cd code/client
+npm test
 ```
-npm test --.\code\client\src\DirApp\App.test.js
+
+Below is an example of navigating into the SERVER of the directory from the software-dev-ii-project directory and testing:
+```Bash
+cd code/server
+npm test
 ```
 
-This will run the test file through npm
+To target test a specific .test.js file, add the target file full name after test in the 'npm test' command
 
 
 #### - **How to add new tests.** 
