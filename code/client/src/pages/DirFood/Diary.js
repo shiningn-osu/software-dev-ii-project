@@ -14,6 +14,7 @@ const Diary = () => {
     const [mealName, setMealName] = useState("");
     const [error, setError] = useState("");
 
+    // Fetch existing meals from the API on component mount
     useEffect(() => {
         const fetchMeals = async () => {
             try {
@@ -31,6 +32,7 @@ const Diary = () => {
         fetchMeals();
     }, []);
 
+    // Fetch nutrition information for a given ingredient and weight
     const fetchNutrition = async (name, weight) => {
         try {
             const response = await axios.get("https://api.edamam.com/api/nutrition-data", {
@@ -59,6 +61,7 @@ const Diary = () => {
         }
     };
 
+    // Add a new ingredient with nutrition details
     const addIngredient = async () => {
         if (!ingredient || !weight) {
             setError("Please fill in both fields");
@@ -78,11 +81,13 @@ const Diary = () => {
         setWeight("");
     };
 
+    // Remove an ingredient from the list
     const deleteIngredient = (index) => {
         const newIngredients = ingredients.filter((_, i) => i !== index);
         setIngredients(newIngredients);
     };
 
+    // Send a meal to the database
     const sendMealToDatabase = async (meal) => {
         try {
             const response = await axios.post("/api/nutrition/add-meal", meal, {
@@ -96,6 +101,7 @@ const Diary = () => {
         }
     };
 
+    // Create a new meal entry with total nutrition details
     const addMeal = async () => {
         if (!mealName) {
             setError("Please enter a meal name");
@@ -113,6 +119,7 @@ const Diary = () => {
             return;
         }
 
+        // Calculate total nutrition for the meal
         const totalNutrition = ingredients.reduce((acc, ing) => ({
             calories: acc.calories + ing.calories,
             protein: acc.protein + ing.protein,
