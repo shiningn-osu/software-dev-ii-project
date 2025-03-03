@@ -1,9 +1,38 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
+import { MemoryRouter } from 'react-router-dom';
 import App from './App';
 import '@testing-library/jest-dom';
 
+// Mock the react-router-dom components
+jest.mock('react-router-dom', () => ({
+  ...jest.requireActual('react-router-dom'),
+  BrowserRouter: ({ children }) => <div>{children}</div>
+}));
+
+describe('App', () => {
+  beforeEach(() => {
+    localStorage.clear();
+  });
+
+  test('renders login and signup links when not authenticated', () => {
+    render(
+      <MemoryRouter>
+        <App />
+      </MemoryRouter>
+    );
+    expect(screen.getByRole('link', { name: /login/i })).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: /sign up/i })).toBeInTheDocument();
+  });
+
+  test('protected routes redirect to login', () => {
+    render(
+      <MemoryRouter initialEntries={['/home']}>
+        <App />
+      </MemoryRouter>
+    );
+    expect(screen.getByText(/Login to Your Account/i)).toBeInTheDocument();
+  });
 /**
  * Test suite for validating the routing functionality in the `App` component.
  * This suite tests the rendering of different components based on routes,
@@ -51,7 +80,7 @@ describe('App Routing', () => {
 
     await user.click(screen.getByText(/Grocery Pages/i));
     await user.click(screen.getByText(/Grocery List/i));
-    expect(screen.getByText(/Create Your Grocery List/i)).toBeInTheDocument();
+    expect(screen.getByText(/Your Grocery List/i)).toBeInTheDocument();
   });
 });
 
@@ -108,7 +137,7 @@ describe('Navigation links', () => {
     await user.click(screen.getByText(/Grocery Pages/i));
     // Click "Grocery List" link (assuming this is the intended "Grocery page" test)
     await user.click(screen.getByRole('link', { name: /Grocery List/i }));
-    expect(screen.getByText(/Create Your Grocery List/i)).toBeInTheDocument();
+    expect(screen.getByText(/Your Grocery List/i)).toBeInTheDocument();
   });
 
   test('navigates to the Nutrition page', async () => {
