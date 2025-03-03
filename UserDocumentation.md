@@ -37,22 +37,29 @@ To install and run Meal Match, ensure you have the following installed:
     npm install
     cd ../..
     ```
-3. **Set up a MongoDB Server Connection**  
-    3.0. Go to the server repository and add a .env file.
-      3.0.1 Make sure to create two variables named MONGODB_URI and JWT_SECRET
-      3.0.2 For the JWT_SECRET, you can set that to any combination of 32 random characters
-    3.1. Go to the MongoDB website [https://www.mongodb.com] (https://www.mongodb.com)
-    3.2. Either create an account for free or sign in with an existing account
-    3.3. Once inside of the Atlas, within a project, go to the "Overview" tab on the left side-nav, and create a new cluster if one does not already show up for you. 
-    3.4. Go to the "Network Access" tab and whitelist your current IP address, or just whitelist all IP addresses.
-      3.4.1 To add a new IP address, click on the add IP address button.
-        3.4.1.1 If you want to whitelist all IP addresses, under the "Access List Entry" field, add the text "0.0.0.0/0"
-    3.5. Go to the "Database Access" side-nav tab, and select to add a new database user. 
-      3.5.1 Create a new username and password, and grant them read/write access to the database for their built in role.
-      3.5.2 Make sure to add click the button to add the user.
-    3.6. Go the "Clusters" side-nav tab, and click on the connect button
-      3.6.1 Select "Drivers", and then copy and paste that selection string into the .env file, setting MONGODB_URI to be equal to that connection string.
+3. **Set up a MongoDB Server Connection**
+   OPTION 1
+    3.0. Go to the server repository and add a .env file.  
+      3.0.1 Make sure to create two variables named MONGODB_URI and JWT_SECRET  
+      3.0.2 For the JWT_SECRET, you can set that to any combination of 64 random characters  
+    3.1. Go to the MongoDB website [https://www.mongodb.com] (https://www.mongodb.com)  
+    3.2. Either create an account for free or sign in with an existing account  
+    3.3. Once inside of the Atlas, within a project, go to the "Overview" tab on the left side-nav, and create a new cluster if one does not already show up for you.   
+    3.4. Go to the "Network Access" tab and whitelist your current IP address, or just whitelist all IP addresses.  
+      3.4.1 To add a new IP address, click on the add IP address button.  
+        3.4.1.1 If you want to whitelist all IP addresses, under the "Access List Entry" field, add the text "0.0.0.0/0"  
+    3.5. Go to the "Database Access" side-nav tab, and select to add a new database user.   
+      3.5.1 Create a new username and password, and grant them read/write access to the database for their built in role.  
+      3.5.2 Make sure to add click the button to add the user.  
+    3.6. Go the "Clusters" side-nav tab, and click on the connect button  
+      3.6.1 Select "Drivers", and then copy and paste that selection string into the .env file, setting MONGODB_URI to be equal to that connection string.  
       3.6.2 Replace the username and password in the connection string with your created user's username and password.
+   
+    - Examples of what the .env file variables should look like to make it run:
+    ```Bash
+    MONGODB_URI=mongodb+srv://meal-match-USER:Vr0VhP08El1vzPam@cluster0.0zuqz.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0
+    JWT_SECRET=2f5be5c1d7e02a64e8720514f97d35470bcce228c9a6c1f11036576fbd2dbe0f
+    ```
 
   Now the server should be ready to run and connect to the database.
    
@@ -85,6 +92,7 @@ To install and run Meal Match, ensure you have the following installed:
 2. List the ingredient name and gram amount in the corresponding fields, and then save the ingredient.
   2.1 Optionally, you can delete the listed ingredient if you don't wish to include it in the saved meal.
 3. Go down to the create a meal field, type in a meal name, and then click the "Create Meal" button to take all listed ingredients and store them inside of a meal entry.
+4. Go back to the home page via the "Home" navbar element at the top of the screen to view that the most recent nutrition breakdown table new has the most recent meal's information.
 
 ### Find Recipes
 1. Navigate to the Recipe Search page by clicking the "Recipe Search" navbar item from the navbar at the top of the screen.
@@ -103,7 +111,7 @@ To install and run Meal Match, ensure you have the following installed:
 2. Add a new item to the grocery list by entering the item name, and then clicking the "Add Item" button.
 3. View your added item underneath the adding item field under the "Grocery List" header.
 
-### Grocery List Search
+### Grocery List Search (Currently Bugged)
 1. Navigate to the Grocery Search page by clicking the "Grocery Search" navbar item from the navbar at the top of the screen.
 2. Enter in the name of the ingredient you are looking for (ex. chicken, rice, brocolli, tuna, etc.) and search by clicking the "Search" button.
 3. View the product information from the nearest Kroger's ingredient offerings that match the ingredient you searched for underneath the search bar. (Currently only uses Corvallis' Fred Meyers, but we are working on making it link to a local Kroger based on IP address).
@@ -123,6 +131,9 @@ To install and run Meal Match, ensure you have the following installed:
 To report a bug, follow the steps outlined in this document:  
 [Bug Reporting Guidelines](https://bugzilla.mozilla.org/page.cgi?id=bug-writing.html).  
 
+Please submit bugs reports through github issues.
+
 ### Known Bugs:
 - Price comparison across stores is still in progress.
-- Work in progress.
+- Logging food in Diary doesn't allow for macro-nutrient information to be input.
+- Grocery Search functionality fails to retrieve grocery information.
