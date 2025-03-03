@@ -1,9 +1,35 @@
+import React from 'react';
 import { render, screen } from '@testing-library/react';
-import Home from './Home'; // Adjust path
-import fetchMock from 'jest-fetch-mock';
+import { BrowserRouter } from 'react-router-dom';
+import Home from './Home';
+import '@testing-library/jest-dom';
 
-// Enable fetch mocks globally (can also be in a setup file)
-fetchMock.enableMocks();
+// Mock the useNavigate hook
+jest.mock('react-router-dom', () => ({
+  ...jest.requireActual('react-router-dom'),
+  useNavigate: () => jest.fn()
+}));
+
+// Mock localStorage
+const mockLocalStorage = {
+  getItem: jest.fn(() => 'fake-token'),
+  removeItem: jest.fn()
+};
+Object.defineProperty(window, 'localStorage', { value: mockLocalStorage });
+
+// Mock fetch
+global.fetch = jest.fn(() =>
+  Promise.resolve({
+    ok: true,
+    status: 200,
+    json: () => Promise.resolve({
+      calories: 2000,
+      protein: 150,
+      carbs: 200,
+      fats: 65
+    })
+  })
+);
 
 /**
  * Test suite for the Home component.
@@ -21,58 +47,16 @@ fetchMock.enableMocks();
  * @group Components
  */
 describe('Home Component', () => {
-  beforeEach(() => {
-    // Reset mocks to ensure clean state
-    fetch.resetMocks();
-    // Explicitly mock each endpoint to avoid order issues
-    fetchMock.mockResponse(req => {
-      if (req.url.endsWith('/api/nutrition/goals')) {
-        return Promise.resolve({
-          body: JSON.stringify({ calories: 2000, protein: 150, carbs: 250, fats: 70 }),
-          status: 200,
-        });
-      }
-      if (req.url.endsWith('/api/nutrition/current')) {
-        return Promise.resolve({
-          body: JSON.stringify({ calories: 1200, protein: 90, carbs: 150, fats: 40 }),
-          status: 200,
-        });
-      }
-      if (req.url.endsWith('/api/nutrition/recent')) {
-        return Promise.resolve({
-          body: JSON.stringify({
-            meals: [{ name: 'Breakfast', calories: 500, protein: 30, carbs: 60, fats: 20 }],
-          }),
-          status: 200,
-        });
-      }
-      if (req.url.endsWith('/api/nutrition/overview')) {
-        return Promise.resolve({
-          body: JSON.stringify([
-            { name: 'Protein', value: 90 },
-            { name: 'Carbs', value: 150 },
-            { name: 'Fats', value: 40 },
-            { name: 'Vitamins', value: 20 },
-          ]),
-          status: 200,
-        });
-      }
-      return Promise.reject(new Error('Unknown endpoint'));
-    });
-  });
-
-  it('renders the Home component without crashing', async () => {
-    render(<Home />);
-
-    // Immediate render check
+  test('renders basic structure', () => {
+    render(
+      <BrowserRouter>
+        <Home />
+      </BrowserRouter>
+    );
+    
+    // Check for main headings
     expect(screen.getByText('Caloric Overview')).toBeInTheDocument();
-
-    // Wait for async renders
-    expect(await screen.findByText('Daily Nutrition Goals')).toBeInTheDocument();
-    expect(await screen.findByText('Most Recent Nutrition Breakdown')).toBeInTheDocument();
-
-    // Check for two Calories headers
-    const caloriesHeaders = await screen.findAllByText('Calories');
-    expect(caloriesHeaders).toHaveLength(2);
+    expect(screen.getByText('Daily Nutrition Goals')).toBeInTheDocument();
+    expect(screen.getByText('Most Recent Nutrition Breakdown')).toBeInTheDocument();
   });
 });

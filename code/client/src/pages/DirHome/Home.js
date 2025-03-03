@@ -1,185 +1,184 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import './Home.css';
-
+import { Link, useNavigate } from 'react-router-dom';
 import ChartPie from "../../components/DirPieChart/ChartPie";
+import DailyNutrGoals from "../../components/DirDailyNutrGoals/DailyNutrGoals";
+import RecentNutrBreak from "../../components/DirRecentNutrBreak/RecentNutrBreak";
 
-/**
- * DailyNutrGoals Component
- * 
- * Displays the daily nutrition goals and current values fetched from the backend API.
- * Shows a comparison between target goals and actual consumption.
- * 
- * @returns {JSX.Element} The table displaying the daily nutrition goals and current values
- */
-const DailyNutrGoals = () => {
-  const [goals, setGoals] = useState(null);
-  const [current, setCurrent] = useState(null);
-  const [error, setError] = useState('');
+const AuthOptions = () => (
+  <div className="auth-options centered">
+    <h2>Welcome to Meal Match</h2>
+    <p>Please login or create an account to continue</p>
+    <div className="auth-buttons">
+      <Link to="/login" className="btn btn-primary">Login</Link>
+      <Link to="/account-create" className="btn btn-success">Sign Up</Link>
+    </div>
+  </div>
+);
+
+const Home = () => {
+  const [error, setError] = useState(null);
+  const [nutritionData, setNutritionData] = useState(null);
+  const [user, setUser] = useState(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        // Fetch both goals and current values
-        const [goalsResponse, currentResponse] = await Promise.all([
-          fetch('/api/nutrition/goals'),
-          fetch('/api/nutrition/current')
-        ]);
+        const token = localStorage.getItem('token');
+        const userStr = localStorage.getItem('user');
         
-        if (!goalsResponse.ok || !currentResponse.ok) {
+        if (!token || !userStr) {
+          navigate('/login');
+          return;
+        }
+
+        try {
+          const userData = JSON.parse(userStr);
+          setUser(userData);
+        } catch (error) {
+          console.error('Error parsing user data:', error);
+          navigate('/login');
+          return;
+        }
+
+        const response = await fetch('/api/nutrition/goals', {
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          }
+        });
+
+        if (response.status === 401) {
+          localStorage.removeItem('token');
+          navigate('/login');
+          return;
+        }
+
+        if (!response.ok) {
           throw new Error('Network response was not ok');
         }
-        
-        const goalsData = await goalsResponse.json();
-        const currentData = await currentResponse.json();
-        
-        setGoals(goalsData);
-        setCurrent(currentData);
+
+        const data = await response.json();
+        setNutritionData(data);
       } catch (err) {
-        setError('Failed to fetch nutrition data');
         console.error('Error:', err);
+        setError('Error fetching nutrition data');
       }
     };
 
     fetchData();
-  }, []);
+  }, [navigate]);
+
+  const renderNutritionGoalsCard = () => {
+    if (!nutritionData || (nutritionData.calories === 0 && nutritionData.protein === 0 && nutritionData.carbs === 0 && nutritionData.fats === 0)) {
+      return (
+        <div className="col-md-4">
+          <div className="card">
+            <div className="card-body">
+              <h5 className="card-title">Set Nutrition Goals</h5>
+              <p className="card-text">Set up your daily nutrition goals to get started</p>
+              <button 
+                className="btn btn-primary"
+                onClick={() => navigate('/nutrition')}
+              >
+                Set Goals
+              </button>
+            </div>
+          </div>
+        </div>
+      );
+    }
+    return null;
+  };
 
   if (error) {
-    return <div>Error: {error}</div>;
-  }
-
-  if (!goals || !current) {
-    return <div>Loading...</div>;
+    return <div className="error-message">{error}</div>;
   }
 
   return (
-    <table>
-      <thead>
-        <tr>
-          <th>Nutrient</th>
-          <th>Daily Goal</th>
-          <th>Current</th>
-          <th>Remaining</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td>Calories</td>
-          <td>{goals.calories} kcal</td>
-          <td>{current.calories} kcal</td>
-          <td>{goals.calories - current.calories} kcal</td>
-        </tr>
-        <tr>
-          <td>Protein</td>
-          <td>{goals.protein}g</td>
-          <td>{current.protein}g</td>
-          <td>{goals.protein - current.protein}g</td>
-        </tr>
-        <tr>
-          <td>Carbs</td>
-          <td>{goals.carbs}g</td>
-          <td>{current.carbs}g</td>
-          <td>{goals.carbs - current.carbs}g</td>
-        </tr>
-        <tr>
-          <td>Fats</td>
-          <td>{goals.fats}g</td>
-          <td>{current.fats}g</td>
-          <td>{goals.fats - current.fats}g</td>
-        </tr>
-      </tbody>
-    </table>
+    <div className="Home">
+      {!localStorage.getItem('token') && <AuthOptions />}
+      
+      <header className="Home-header">
+        <h1>Welcome to Meal Match</h1>
+        {user && <h2>Welcome, {user.username}!</h2>}
+      </header>
+
+      <div className="container mb-5">
+        <div className="row mt-4">
+          <div className="col-md-4">
+            <div className="card">
+              <div className="card-body">
+                <h5 className="card-title">Meal Planning</h5>
+                <p className="card-text">Create and manage your meal plans</p>
+                <button 
+                  className="btn btn-primary"
+                  onClick={() => navigate('/MealPlan')}
+                >
+                  Go to Meal Planning
+                </button>
+              </div>
+            </div>
+          </div>
+          
+          <div className="col-md-4">
+            <div className="card">
+              <div className="card-body">
+                <h5 className="card-title">Grocery List</h5>
+                <p className="card-text">View and manage your grocery list</p>
+                <button 
+                  className="btn btn-primary"
+                  onClick={() => navigate('/GroceryList')}
+                >
+                  Go to Grocery List
+                </button>
+              </div>
+            </div>
+          </div>
+          
+          <div className="col-md-4">
+            <div className="card">
+              <div className="card-body">
+                <h5 className="card-title">Nutrition Tracking</h5>
+                <p className="card-text">Track your daily nutrition</p>
+                <button 
+                  className="btn btn-primary"
+                  onClick={() => navigate('/nutrition')}
+                >
+                  Go to Nutrition
+                </button>
+              </div>
+            </div>
+          </div>
+          {renderNutritionGoalsCard()}
+        </div>
+      </div>
+
+      <div className="container">
+        <div className="row">
+          <div className="col-12">
+            <h2 className="centered">Caloric Overview</h2>
+            <ChartPie data={nutritionData} />
+          </div>
+        </div>
+        
+        <div className="row mt-4">
+          <div className="col-12">
+            <h2>Daily Nutrition Goals</h2>
+            <DailyNutrGoals data={nutritionData} />
+          </div>
+        </div>
+        
+        <div className="row mt-4">
+          <div className="col-12">
+            <h2>Most Recent Nutrition Breakdown</h2>
+            <RecentNutrBreak />
+          </div>
+        </div>
+      </div>
+    </div>
   );
 };
-
-/**
- * RecentNutrBreak Component
- * 
- * Displays the most recent nutrition breakdown fetched from the backend API.
- * 
- * @returns {JSX.Element} The table displaying the most recent nutrition breakdown
- */
-const RecentNutrBreak = () => {
-  const [recentData, setRecentData] = useState(null);
-  const [error, setError] = useState('');
-
-  useEffect(() => {
-    const fetchRecent = async () => {
-      try {
-        const response = await fetch('/api/nutrition/recent');
-        
-        if (!response.ok) {
-          throw new Error('Network response was not ok');
-        }
-        
-        const data = await response.json();
-        setRecentData(data);
-      } catch (err) {
-        setError('Failed to fetch recent nutrition data');
-        console.error('Error:', err);
-      }
-    };
-
-    fetchRecent();
-  }, []);
-
-  if (error) {
-    return <div>Error: {error}</div>;
-  }
-
-  if (!recentData) {
-    return <div>Loading...</div>;
-  }
-
-  return (
-    <table>
-      <thead>
-        <tr>
-          <th>Meal</th>
-          <th>Calories</th>
-          <th>Protein</th>
-          <th>Carbs</th>
-          <th>Fats</th>
-        </tr>
-      </thead>
-      <tbody>
-        {recentData.meals.map((meal, index) => (
-          <tr key={index}>
-            <td>{meal.name}</td>
-            <td>{meal.calories} kcal</td>
-            <td>{meal.protein}g</td>
-            <td>{meal.carbs}g</td>
-            <td>{meal.fats}g</td>
-          </tr>
-        ))}
-      </tbody>
-    </table>
-  );
-};
-
-/**
- * Home Component
- * 
- * The main display component for the home page.
- * Contains the caloric overview pie chart and nutrition tables.
- * 
- * @returns {JSX.Element} The complete home page
- */
-const Home = () => (
-  <div className="Home">
-    <header className="Home-header" />
-    <div>
-      <h2 className="centered">Caloric Overview</h2>
-      <ChartPie />
-    </div>
-    <div>
-      <h2>Daily Nutrition Goals</h2>
-      <DailyNutrGoals />
-    </div>
-    <div>
-      <h2>Most Recent Nutrition Breakdown</h2>
-      <RecentNutrBreak />
-    </div>
-  </div>
-);
 
 export default Home;

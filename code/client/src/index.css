@@ -80,3 +80,33 @@ label {
 }
 
 /* END CLASSES SECTION */
+
+.nutrition-goals-option {
+  max-width: 400px;
+  margin: 2rem auto;
+  text-align: center;
+}
+
+.nutrition-goals-form {
+  background-color: #f8f9fa;
+  padding: 2rem;
+  border-radius: 8px;
+  margin-top: 1rem;
+}
+
+.nutrition-goals-form .form-group {
+  margin-bottom: 1rem;
+  text-align: left;
+}
+
+.nutrition-goals-form label {
+  display: block;
+  margin-bottom: 0.5rem;
+}
+
+.nutrition-goals-form input {
+  width: 100%;
+  padding: 0.5rem;
+  border: 1px solid #ced4da;
+  border-radius: 4px;
+}
