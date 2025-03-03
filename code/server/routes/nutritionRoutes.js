@@ -1,6 +1,7 @@
 import express from 'express';
 import { verifyToken } from '../middlewares/authMiddleware.js';
 import DailyNutrition from '../models/dailyNutrition.js';
+import Meal from '../models/mealModel.js';
 
 const router = express.Router();
 
@@ -63,36 +64,63 @@ router.post('/log', verifyToken, async (req, res) => {
 });
 
 // Get today's nutrition
+// nutritionRoutes.js - Updated /today endpoint
 router.get('/today', verifyToken, async (req, res) => {
   try {
-    // Get today's date at midnight UTC
     const today = new Date();
     today.setUTCHours(0, 0, 0, 0);
+    const tomorrow = new Date(today);
+    tomorrow.setUTCDate(tomorrow.getUTCDate() + 1);
 
-    // Find today's nutrition log
-    let dailyLog = await DailyNutrition.findOne({
-      userId: req.userId,
-      date: today
-    });
+    // Get all relevant nutrition data
+    const [dailyLog, meals] = await Promise.all([
+      DailyNutrition.findOne({ 
+        userId: req.userId,
+        date: { $gte: today, $lt: tomorrow }
+      }),
+      Meal.find({
+        creator: req.userId,
+        createdAt: { $gte: today, $lt: tomorrow }
+      })
+    ]);
 
-    // If no log exists for today, return empty data structure
-    if (!dailyLog) {
-      return res.json({
-        meals: [],
-        totals: {
-          calories: 0,
-          protein: 0,
-          carbs: 0,
-          fats: 0
+    // Process meals from both sources
+    const processedMeals = [
+      ...(dailyLog?.meals?.map(m => ({
+        name: m.name,
+        timeEaten: m.timeEaten,
+        nutrition: {
+          calories: m.calories,
+          protein: m.protein,
+          carbs: m.carbs,
+          fats: m.fats
         }
-      });
-    }
+      })) || []),
+      ...meals.map(m => ({
+        name: m.name,
+        timeEaten: m.createdAt,
+        nutrition: m.nutrition,
+        ingredients: m.ingredients
+      }))
+    ];
 
-    console.log('Found daily log:', dailyLog); // Debug log
-    res.json(dailyLog);
+    // Calculate totals
+    const totals = processedMeals.reduce((acc, meal) => ({
+      calories: acc.calories + (meal.nutrition?.calories || 0),
+      protein: acc.protein + (meal.nutrition?.protein || 0),
+      carbs: acc.carbs + (meal.nutrition?.carbs || 0),
+      fats: acc.fats + (meal.nutrition?.fats || 0)
+    }), { calories: 0, protein: 0, carbs: 0, fats: 0 });
+
+    res.json({
+      meals: processedMeals.sort((a, b) => 
+        new Date(b.timeEaten) - new Date(a.timeEaten)
+      ),
+      totals
+    });
   } catch (error) {
-    console.error('Error fetching today\'s nutrition:', error);
-    res.status(500).json({ message: 'Failed to fetch today\'s nutrition' });
+    console.error('Error:', error);
+    res.status(500).json({ message: 'Failed to fetch data' });
   }
 });
 

@@ -1,155 +1,147 @@
 /* GENERAL STYLES */
 .container {
-    margin: 0 auto;
-    max-width: 800px;
-    color: black;
-    font-family: "Trebuchet MS", sans-serif;
-    text-align: center;
-  }
-  
-  h1 {
-    font-size: 2.5rem;
-    color: #2c3e50;
-  }
-  
-  h2 {
-    font-size: 1.8rem;
-    color: #34495e;
-  }
-  
-  .section {
-    background: white;
-    padding: 20px;
-    border-radius: 10px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-    margin: 20px 0;
-  }
-  
-  input {
-    width: 100%;
-    padding: 8px;
-    margin: 5px 0;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-    font-size: 1rem;
-  }
-  
-  button {
-    background-color: #3498db;
-    color: white;
-    padding: 10px;
-    border: none;
-    border-radius: 5px;
-    font-size: 1.1rem;
-    cursor: pointer;
-    margin-top: 10px;
-  }
-  
-  button:hover {
-    background-color: #2980b9;
-  }
-  
-/* TABLE ELEMENT SECTION */
+  margin: 0 auto;
+  max-width: 800px;
+  color: black;
+  font-family: "Trebuchet MS", sans-serif;
+  text-align: center;
+}
 
-/* Name: TABLE STYLE -- adjust relevant styles for creating table position 
-on the page, and for applying curved corners */
-table {
-  /* Full page width */
-  width: 100%;
-  /* Collapse borders for cleaner look */
-  border-collapse: collapse;
-  /* Add margin around the table */
+h1 {
+  font-size: 2.5rem;
+  color: #2c3e50;
+}
+
+h2 {
+  font-size: 1.8rem;
+  color: #34495e;
+}
+
+.section {
+  background: white;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
   margin: 20px 0;
+}
 
-  /* Round the corners of the table */
+input {
+  width: 100%;
+  padding: 8px;
+  margin: 5px 0;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  font-size: 1rem;
+}
+
+button {
+  background-color: #3498db;
+  color: white;
+  padding: 10px;
+  border: none;
+  border-radius: 5px;
+  font-size: 1.1rem;
+  cursor: pointer;
+  margin-top: 10px;
+  transition: background-color 0.3s ease;
+}
+
+button:hover {
+  background-color: #2980b9;
+}
+
+/* DELETE BUTTON STYLES */
+.delete-button {
+  background-color: #dc3545;
+  padding: 6px 12px;
+  font-size: 0.9rem;
+  margin: 0;
+}
+
+.delete-button:hover {
+  background-color: #bb2d3b;
+}
+
+/* TABLE ELEMENT SECTION */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 20px 0;
   border-radius: 8px;
-  /* Prevent rounded corners from being cut off */
   overflow: hidden;
 }
 
-/* Name: TABLE HEAD STYLE -- adjust colors of table headers, and adjust font and font weight*/
+table td ul li {
+  font-size: 0.9rem;
+  padding: 3px 0;
+}
+
+table td {
+  vertical-align: top;
+}
 th {
-  /* adjust important colors for headers */
   background-color: #3b883d;
   color: white;
-
-  /* Use a different font for headers */
   font-family: 'Arial', sans-serif;
   font-weight: bold;
 }
 
-/* Name: CELL GENERAL STYLES -- Modify cell position relative to the table. 
-Also, add borders and increase font size of cells */
 th,
 td {
-  /* Add padding for space between text and borders */
   padding: 12px 15px;
-  /* Align text to the left (default) */
   text-align: left;
-  /* Increase line height for readability */
   line-height: 1.5;
-
-  /* Add borders for each cell */
   border: 1px solid #ddd;
-
-  /* Set a comfortable font size */
   font-size: 14px;
 }
 
-/* Name: EVEN ROW COLOR -- make even rows a slightly different color than odd rows */
 tr:nth-child(even) {
-  /* Light gray for even rows */
   background-color: #f2f2f2;
 }
 
-/* Name: ODD ROW COLOR -- make odd rows a slightly different color than even rows */
 tr:nth-child(odd) {
-  /* white for odd rows */
   background-color: #ffffff;
 }
 
-/* Name: ROW HOVER -- make row a heavier color on hover */
 tr:hover {
-  /* Change background color on hover */
   background-color: #ddd;
 }
 
 /* END TABLE ELEMENT SECTION */
-  
-  /* INGREDIENT LIST */
-  ul {
-    list-style-type: none;
-    padding: 0;
-  }
-  
-  ul li {
-    background: #ecf0f1;
-    padding: 8px;
-    margin: 5px 0;
-    border-radius: 5px;
-  }
 
-  .error-message {
-    color: #dc3545;
-    background-color: #f8d7da;
-    padding: 10px;
-    border-radius: 5px;
-    margin: 10px 0;
-    border: 1px solid #f5c6cb;
+/* INGREDIENT LIST */
+ul {
+  list-style-type: none;
+  padding: 0;
+}
+
+ul li {
+  background: #ecf0f1;
+  padding: 8px;
+  margin: 5px 0;
+  border-radius: 5px;
+}
+
+.error-message {
+  color: #dc3545;
+  background-color: #f8d7da;
+  padding: 10px;
+  border-radius: 5px;
+  margin: 10px 0;
+  border: 1px solid #f5c6cb;
 }
 
 .input-group {
-    display: flex;
-    gap: 10px;
-    margin-bottom: 15px;
+  display: flex;
+  gap: 10px;
+  margin-bottom: 15px;
 }
 
 .input-group input {
-    flex: 1;
-    max-width: 300px;
+  flex: 1;
+  max-width: 300px;
 }
 
 .input-group button {
-    flex-shrink: 0;
+  flex-shrink: 0;
 }
-  

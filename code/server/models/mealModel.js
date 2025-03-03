@@ -19,7 +19,13 @@ const MealSchema = new mongoose.Schema({
   ingredients: [{
     name: String,
     amount: Number,
-    unit: String
+    unit: String,
+    nutrition: {
+      calories: Number,
+      protein: Number,
+      carbs: Number,
+      fats: Number
+    }
   }],
   nutrition: {
     calories: Number,
