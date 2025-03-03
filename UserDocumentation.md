@@ -111,7 +111,7 @@ To install and run Meal Match, ensure you have the following installed:
 2. Add a new item to the grocery list by entering the item name, and then clicking the "Add Item" button.
 3. View your added item underneath the adding item field under the "Grocery List" header.
 
-### Grocery List Search (Currently Bugged)
+### Grocery List Search
 1. Navigate to the Grocery Search page by clicking the "Grocery Search" navbar item from the navbar at the top of the screen.
 2. Enter in the name of the ingredient you are looking for (ex. chicken, rice, brocolli, tuna, etc.) and search by clicking the "Search" button.
 3. View the product information from the nearest Kroger's ingredient offerings that match the ingredient you searched for underneath the search bar. (Currently only uses Corvallis' Fred Meyers, but we are working on making it link to a local Kroger based on IP address).
@@ -136,4 +136,3 @@ Please submit bugs reports through github issues.
 ### Known Bugs:
 - Price comparison across stores is still in progress.
 - Logging food in Diary doesn't allow for macro-nutrient information to be input.
-- Grocery Search functionality fails to retrieve grocery information.
