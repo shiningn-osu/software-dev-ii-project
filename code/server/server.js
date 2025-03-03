@@ -29,7 +29,13 @@ app.use(cors({
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE'],
   allowedHeaders: ['Content-Type', 'Authorization', 'Accept']
-}));
+=======
+
+// Determine CORS origin based on environment
+const corsOrigin = process.env.NODE_ENV === "production"
+  ? "https://meal-match-9nx72i8vk-duncan-eversons-projects.vercel.app/"  // Production URL
+  : "*";                        // Development wildcard
+
 
 //api keys and access tokens:
 
@@ -341,7 +347,7 @@ app.post("/api/generate-meal-plan", async (req, res) => {
       headers: {
         "accept": "application/json",
         "Content-Type": "application/json",
-        "Edamam-Account-User": EDAMAM_ACCOUNT_USER, 
+        "Edamam-Account-User": EDAMAM_ACCOUNT_USER,
       },
       body: JSON.stringify(requestBody),
     });
@@ -380,3 +386,6 @@ if (process.env.NODE_ENV !== 'test') {
 }
 
 export default app;
+
+const PORT = process.env.PORT || 6000;
+app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
