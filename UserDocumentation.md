@@ -54,9 +54,10 @@ To install and run Meal Match, ensure you have the following installed:
     3.6. Go the "Clusters" side-nav tab, and click on the connect button  
       3.6.1 Select "Drivers", and then copy and paste that selection string into the .env file, setting MONGODB_URI to be equal to that connection string.  
       3.6.2 Replace the username and password in the connection string with your created user's username and password.
+   
    OPTION 2
    3.0b create a file ".env" and place it into the server directory
-   3.1b place the following code into .env:
+   3.1b place the following text into .env:
 ```
 NODE_ENV=Test 
 MONGODB_URI=mongodb+srv://meal-match-USER:Vr0VhP08El1vzPam@cluster0.0zuqz.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0
