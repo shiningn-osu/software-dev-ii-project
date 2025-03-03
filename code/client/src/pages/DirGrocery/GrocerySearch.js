@@ -25,7 +25,7 @@ function GrocerySearch() {
     //curl -X POST 'https://api.kroger.com/v1/connect/oauth2/token' -H 'Content-Type: application/x-www-form-urlencoded' -u 'mealmatchschoolproj-2432612430342464692f6e61622e526776482e424d774336534854364f346b726c4a6d616a527355624a684157517566624973743433416e7556304b6653388385405507052:QWnIltimqgeLCVeStjB-kfU8Kz9tsuPaoNhnmYxH' -d 'grant_type=client_credentials&scope=product.compact'
 
     try {
-      const response = await fetch("http://localhost:5000/api/krogerLocations");
+      const response = await fetch("api/krogerLocations");
       const data = await response.json();
       console.log("Locations1:", data);
 
@@ -57,7 +57,7 @@ function GrocerySearch() {
       try {
         console.log("LOC DATA:", locData);
         console.log("LOC NAME: ", locData.name)
-        const response = await fetch(`http://localhost:5000/api/krogerProducts?query=${query}&locationId=${locData.locationId}`);
+        const response = await fetch(`api/krogerProducts?query=${query}&locationId=${locData.locationId}`);
         const data = await response.json();
         console.log("Products:", data);
 
@@ -72,7 +72,7 @@ function GrocerySearch() {
     };
 
     fetchKrogerProducts();
-  }, [locData]);
+  }, [locData, query]);
 
 
   // Handle form submission

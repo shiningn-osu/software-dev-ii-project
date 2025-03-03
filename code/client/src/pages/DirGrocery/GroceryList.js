@@ -48,20 +48,6 @@ function GroceryList() {
     fetchGroceryList();
   }, [fetchGroceryList]);
 
-  // Handle location updates
-  useEffect(() => {
-    if (location.state?.ingredients) {
-      const newIngredients = location.state.ingredients.filter(
-        (ingredient) => !groceryList.includes(ingredient)
-      );
-      if (newIngredients.length > 0) {
-        const newList = [...groceryList, ...newIngredients];
-        setGroceryList(newList);
-        saveGroceryList(newList);
-      }
-    }
-  }, [location.state]);
-
   // Save grocery list to server
   const saveGroceryList = async (items) => {
     try {
@@ -94,6 +80,20 @@ function GroceryList() {
       setError('Failed to save grocery list');
     }
   };
+  
+  // Handle location updates
+  useEffect(() => {
+    if (location.state?.ingredients) {
+      const newIngredients = location.state.ingredients.filter(
+        (ingredient) => !groceryList.includes(ingredient)
+      );
+      if (newIngredients.length > 0) {
+        const newList = [...groceryList, ...newIngredients];
+        setGroceryList(newList);
+        saveGroceryList(newList);
+      }
+    }
+  }, [location.state, groceryList, saveGroceryList]);
 
   const addItem = async () => {
     if (newItem && !groceryList.includes(newItem)) {
