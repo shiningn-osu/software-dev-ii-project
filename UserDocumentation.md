@@ -55,14 +55,11 @@ To install and run Meal Match, ensure you have the following installed:
       3.6.1 Select "Drivers", and then copy and paste that selection string into the .env file, setting MONGODB_URI to be equal to that connection string.  
       3.6.2 Replace the username and password in the connection string with your created user's username and password.
    
-   OPTION 2
-   3.0b create a file ".env" and place it into the server directory
-   3.1b place the following text into .env:
-```
-NODE_ENV=Test 
-MONGODB_URI=mongodb+srv://meal-match-USER:Vr0VhP08El1vzPam@cluster0.0zuqz.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0
-JWT_SECRET=2f5be5c1d7e02a64e8720514f97d35470bcce228c9a6c1f11036576fbd2dbe0f
-```
+    - Examples of what the .env file variables should look like to make it run:
+    ```Bash
+    MONGODB_URI=mongodb+srv://meal-match-USER:Vr0VhP08El1vzPam@cluster0.0zuqz.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0
+    JWT_SECRET=2f5be5c1d7e02a64e8720514f97d35470bcce228c9a6c1f11036576fbd2dbe0f
+    ```
 
   Now the server should be ready to run and connect to the database.
    
@@ -95,6 +92,7 @@ JWT_SECRET=2f5be5c1d7e02a64e8720514f97d35470bcce228c9a6c1f11036576fbd2dbe0f
 2. List the ingredient name and gram amount in the corresponding fields, and then save the ingredient.
   2.1 Optionally, you can delete the listed ingredient if you don't wish to include it in the saved meal.
 3. Go down to the create a meal field, type in a meal name, and then click the "Create Meal" button to take all listed ingredients and store them inside of a meal entry.
+4. Go back to the home page via the "Home" navbar element at the top of the screen to view that the most recent nutrition breakdown table new has the most recent meal's information.
 
 ### Find Recipes
 1. Navigate to the Recipe Search page by clicking the "Recipe Search" navbar item from the navbar at the top of the screen.
@@ -113,7 +111,7 @@ JWT_SECRET=2f5be5c1d7e02a64e8720514f97d35470bcce228c9a6c1f11036576fbd2dbe0f
 2. Add a new item to the grocery list by entering the item name, and then clicking the "Add Item" button.
 3. View your added item underneath the adding item field under the "Grocery List" header.
 
-### Grocery List Search
+### Grocery List Search (Currently Bugged)
 1. Navigate to the Grocery Search page by clicking the "Grocery Search" navbar item from the navbar at the top of the screen.
 2. Enter in the name of the ingredient you are looking for (ex. chicken, rice, brocolli, tuna, etc.) and search by clicking the "Search" button.
 3. View the product information from the nearest Kroger's ingredient offerings that match the ingredient you searched for underneath the search bar. (Currently only uses Corvallis' Fred Meyers, but we are working on making it link to a local Kroger based on IP address).
@@ -133,6 +131,9 @@ JWT_SECRET=2f5be5c1d7e02a64e8720514f97d35470bcce228c9a6c1f11036576fbd2dbe0f
 To report a bug, follow the steps outlined in this document:  
 [Bug Reporting Guidelines](https://bugzilla.mozilla.org/page.cgi?id=bug-writing.html).  
 
+Please submit bugs reports through github issues.
+
 ### Known Bugs:
 - Price comparison across stores is still in progress.
-- Work in progress.
+- Logging food in Diary doesn't allow for macro-nutrient information to be input.
+- Grocery Search functionality fails to retrieve grocery information.
