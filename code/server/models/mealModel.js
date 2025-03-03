@@ -14,7 +14,7 @@ const MealSchema = new mongoose.Schema({
   img: String,
   recipe: {
     type: String,
-    required: true
+    required: false
   },
   ingredients: [{
     name: String,
@@ -34,4 +34,5 @@ const MealSchema = new mongoose.Schema({
   }
 });
 
-export default mongoose.model('Meal', MealSchema); 
+const Meal = mongoose.model('Meal', MealSchema);
+export default Meal;

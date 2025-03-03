@@ -8,6 +8,8 @@ import express from 'express';
 import connectDB from './config/db.js';
 import userRoutes from './routes/userRoutes.js';
 import nutritionRoutes from './routes/nutritionRoutes.js';
+import mealRoutes from './routes/mealRout.js';
+import Meal from './models/mealModel.js';
 import cors from 'cors';
 import dotenv from 'dotenv';
 import NutritionGoals from './models/nutritionGoals.js';
@@ -158,6 +160,7 @@ const verifyToken = (req, res, next) => {
 // Routes
 app.use('/api/users', userRoutes);
 app.use('/api/nutrition', nutritionRoutes);
+app.use('/api/meals', mealRoutes);
 
 // Nutrition endpoints
 app.get('/api/nutrition/overview', (req, res) => {
@@ -288,6 +291,58 @@ app.post('/api/nutrition/add-custom', verifyToken, async (req, res) => {
   } catch (error) {
     console.error('Error adding custom food:', error);
     res.status(500).json({ message: 'Failed to add custom food' });
+  }
+});
+
+// Add a new endpoint to save meal information
+app.post('/api/nutrition/add-meal', verifyToken, async (req, res) => {
+  try {
+    const { name, ingredients, nutrition } = req.body;
+
+    const newMeal = new Meal({
+      name,
+      creator: req.userId,
+      ingredients: ingredients.map(ing => ({
+        name: ing.name,
+        amount: ing.weight,
+        unit: 'g',
+        calories: ing.calories,
+        protein: ing.protein,
+        carbs: ing.carbs,
+        fats: ing.fats
+      })),
+      nutrition: {
+        calories: nutrition.calories,
+        protein: nutrition.protein,
+        carbs: nutrition.carbs,
+        fats: nutrition.fats
+      },
+      recipe: "" 
+    });
+
+    const savedMeal = await newMeal.save();
+
+    // Update daily nutrition
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    
+    await DailyNutrition.findOneAndUpdate(
+      { userId: req.userId, date: { $gte: today } },
+      {
+        $inc: {
+          calories: nutrition.calories,
+          protein: nutrition.protein,
+          carbs: nutrition.carbs,
+          fats: nutrition.fats
+        }
+      },
+      { upsert: true, new: true }
+    );
+
+    res.json(savedMeal);
+  } catch (error) {
+    console.error('Error adding meal:', error);
+    res.status(500).json({ message: 'Failed to add meal' });
   }
 });
 
