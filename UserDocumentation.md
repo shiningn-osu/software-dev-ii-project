@@ -41,7 +41,7 @@ To install and run Meal Match, ensure you have the following installed:
    OPTION 1
     3.0. Go to the server repository and add a .env file.  
       3.0.1 Make sure to create two variables named MONGODB_URI and JWT_SECRET  
-      3.0.2 For the JWT_SECRET, you can set that to any combination of 32 random characters  
+      3.0.2 For the JWT_SECRET, you can set that to any combination of 64 random characters  
     3.1. Go to the MongoDB website [https://www.mongodb.com] (https://www.mongodb.com)  
     3.2. Either create an account for free or sign in with an existing account  
     3.3. Once inside of the Atlas, within a project, go to the "Overview" tab on the left side-nav, and create a new cluster if one does not already show up for you.   
