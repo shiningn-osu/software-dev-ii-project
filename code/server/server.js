@@ -432,11 +432,9 @@ app.get('/api/test', (req, res) => {
 // Modify the server start section
 if (process.env.NODE_ENV !== 'test') {
   const PORT = process.env.PORT || 6000;
-  if (process.env.NODE_ENV !== 'production') {
-    app.listen(PORT, () => {
-      console.log(`Server is running on port ${PORT}`);
-    });
-  }
+  app.listen(PORT, () => {
+    console.log(`Server is running on port ${PORT}`);
+  });
 }
 
 export default app;
