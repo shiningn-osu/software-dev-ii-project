@@ -34,7 +34,8 @@ function Login() {
     const username = e.target.username.value;
 
     try {
-      const response = await fetch('/api/users/login', {
+      const PRE_URL = process.env.PROD_SERVER_URL || '';
+      const response = await fetch(`${PRE_URL}/api/users/login`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -47,11 +48,12 @@ function Login() {
       if (response.ok) {
         localStorage.setItem('token', data.token);
         localStorage.setItem('user', JSON.stringify(data.user));
-        
+
         // If nutrition goals were set, submit them
         if (showNutritionGoals && Object.values(goals).some(value => value !== '')) {
           try {
-            await fetch('/api/nutrition/goals', {
+            const PRE_URL = process.env.PROD_SERVER_URL || '';
+            await fetch(`${PRE_URL}/api/nutrition/goals`, {
               method: 'POST',
               headers: {
                 'Authorization': `Bearer ${data.token}`,
@@ -63,7 +65,7 @@ function Login() {
             console.error('Error saving nutrition goals:', err);
           }
         }
-        
+
         navigate('/', { replace: true });
       } else {
         setError(data.message || 'Login failed. Please check your credentials.');
@@ -85,31 +87,31 @@ function Login() {
             <div className='text-input d-flex align-items-center'>
               <label htmlFor="username" className="d-flex align-items-center justify-content-center"
                 id="searchLabel">Username: </label>
-              <input 
-                type="text" 
-                className="form-control" 
-                name="username" 
+              <input
+                type="text"
+                className="form-control"
+                name="username"
                 id="username"
-                placeholder="Enter username" 
-                required 
+                placeholder="Enter username"
+                required
               />
             </div>
             <div className='text-input'>
-              <PasswordInput 
+              <PasswordInput
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
               />
             </div>
-            
+
             <div className="nutrition-goals-option mt-3">
-              <button 
-                type="button" 
+              <button
+                type="button"
                 className="btn btn-secondary"
                 onClick={() => setShowNutritionGoals(!showNutritionGoals)}
               >
                 {showNutritionGoals ? 'Skip Nutrition Goals' : 'Set Initial Nutrition Goals'}
               </button>
-              
+
               {showNutritionGoals && (
                 <div className="nutrition-goals-form mt-3">
                   <h4>Set Your Daily Nutrition Goals</h4>
@@ -118,7 +120,7 @@ function Login() {
                       <input
                         type="number"
                         value={goals.calories}
-                        onChange={(e) => setGoals({...goals, calories: e.target.value})}
+                        onChange={(e) => setGoals({ ...goals, calories: e.target.value })}
                         className="form-control"
                         placeholder="Enter daily calorie goal"
                       />
@@ -129,7 +131,7 @@ function Login() {
                       <input
                         type="number"
                         value={goals.protein}
-                        onChange={(e) => setGoals({...goals, protein: e.target.value})}
+                        onChange={(e) => setGoals({ ...goals, protein: e.target.value })}
                         className="form-control"
                         placeholder="Enter daily protein goal"
                       />
@@ -140,7 +142,7 @@ function Login() {
                       <input
                         type="number"
                         value={goals.carbs}
-                        onChange={(e) => setGoals({...goals, carbs: e.target.value})}
+                        onChange={(e) => setGoals({ ...goals, carbs: e.target.value })}
                         className="form-control"
                         placeholder="Enter daily carbs goal"
                       />
@@ -151,7 +153,7 @@ function Login() {
                       <input
                         type="number"
                         value={goals.fats}
-                        onChange={(e) => setGoals({...goals, fats: e.target.value})}
+                        onChange={(e) => setGoals({ ...goals, fats: e.target.value })}
                         className="form-control"
                         placeholder="Enter daily fats goal"
                       />
@@ -160,7 +162,7 @@ function Login() {
                 </div>
               )}
             </div>
-            
+
             <button className="btn btn-success mt-3" type="submit">Login</button>
           </form>
         </section>

@@ -27,7 +27,7 @@ const Home = () => {
       try {
         const token = localStorage.getItem('token');
         const userStr = localStorage.getItem('user');
-        
+
         if (!token || !userStr) {
           navigate('/login');
           return;
@@ -42,7 +42,8 @@ const Home = () => {
           return;
         }
 
-        const response = await fetch('/api/nutrition/goals', {
+        const PRE_URL = process.env.PROD_SERVER_URL || '';
+        const response = await fetch(`${PRE_URL}/api/nutrition/goals`, {
           headers: {
             'Authorization': `Bearer ${token}`,
             'Content-Type': 'application/json'
@@ -78,7 +79,7 @@ const Home = () => {
             <div className="card-body">
               <h5 className="card-title">Set Nutrition Goals</h5>
               <p className="card-text">Set up your daily nutrition goals to get started</p>
-              <button 
+              <button
                 className="btn btn-primary"
                 onClick={() => navigate('/nutrition')}
               >
@@ -99,7 +100,7 @@ const Home = () => {
   return (
     <div className="Home">
       {!localStorage.getItem('token') && <AuthOptions />}
-      
+
       <header className="Home-header">
         <h1>Welcome to Meal Match</h1>
         {user && <h2>Welcome, {user.username}!</h2>}
@@ -112,7 +113,7 @@ const Home = () => {
               <div className="card-body">
                 <h5 className="card-title">Meal Planning</h5>
                 <p className="card-text">Create and manage your meal plans</p>
-                <button 
+                <button
                   className="btn btn-primary"
                   onClick={() => navigate('/MealPlan')}
                 >
@@ -121,13 +122,13 @@ const Home = () => {
               </div>
             </div>
           </div>
-          
+
           <div className="col-md-4">
             <div className="card">
               <div className="card-body">
                 <h5 className="card-title">Grocery List</h5>
                 <p className="card-text">View and manage your grocery list</p>
-                <button 
+                <button
                   className="btn btn-primary"
                   onClick={() => navigate('/GroceryList')}
                 >
@@ -136,13 +137,13 @@ const Home = () => {
               </div>
             </div>
           </div>
-          
+
           <div className="col-md-4">
             <div className="card">
               <div className="card-body">
                 <h5 className="card-title">Nutrition Tracking</h5>
                 <p className="card-text">Track your daily nutrition</p>
-                <button 
+                <button
                   className="btn btn-primary"
                   onClick={() => navigate('/nutrition')}
                 >
@@ -162,14 +163,14 @@ const Home = () => {
             <ChartPie data={nutritionData?.goals || nutritionData} />
           </div>
         </div>
-        
+
         <div className="row mt-4">
           <div className="col-12">
             <h2>Daily Nutrition Goals</h2>
             <DailyNutrGoals data={nutritionData?.goals || nutritionData} />
           </div>
         </div>
-        
+
         <div className="row mt-4">
           <div className="col-12">
             <h2>Most Recent Nutrition Breakdown</h2>

@@ -29,7 +29,8 @@ const Nutrition = () => {
           return;
         }
 
-        const response = await fetch('/api/nutrition/goals', {
+        const PRE_URL = process.env.PROD_SERVER_URL || '';
+        const response = await fetch(`${PRE_URL}/api/nutrition/goals`, {
           headers: {
             'Authorization': `Bearer ${token}`,
             'Content-Type': 'application/json'
@@ -69,7 +70,8 @@ const Nutrition = () => {
         return;
       }
 
-      const response = await fetch('/api/nutrition/goals', {
+      const PRE_URL = process.env.PROD_SERVER_URL || '';
+      const response = await fetch(`${PRE_URL}/api/nutrition/goals`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -102,7 +104,8 @@ const Nutrition = () => {
         return;
       }
 
-      const response = await fetch(`/api/nutrition/history?days=${historyDays}`, {
+      const PRE_URL = process.env.PROD_SERVER_URL || '';
+      const response = await fetch(`${PRE_URL}/api/nutrition/history?days=${historyDays}`, {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
@@ -149,9 +152,9 @@ const Nutrition = () => {
   return (
     <div className="nutrition-container">
       <h2>Nutrition Tracker</h2>
-      
+
       <div className="toggle-buttons">
-        <button 
+        <button
           onClick={() => {
             setShowGoalsForm(true);
             setShowHistory(false);
@@ -160,7 +163,7 @@ const Nutrition = () => {
         >
           Edit Nutrition Goals
         </button>
-        <button 
+        <button
           onClick={() => {
             setShowGoalsForm(false);
             setShowHistory(true);
@@ -176,9 +179,9 @@ const Nutrition = () => {
           <h3>Nutrition History</h3>
           <div className="history-controls">
             <label>
-              Show last 
-              <select 
-                value={historyDays} 
+              Show last
+              <select
+                value={historyDays}
                 onChange={(e) => {
                   setHistoryDays(e.target.value);
                   fetchNutritionHistory();
@@ -242,7 +245,7 @@ const Nutrition = () => {
                       // Parse the date and adjust for timezone
                       const date = parseISO(day.date);
                       const adjustedDate = addDays(date, 1); // Add one day to account for UTC conversion
-                      
+
                       return (
                         <tr key={day._id}>
                           <td>{format(adjustedDate, 'MMM dd, yyyy')}</td>
@@ -269,7 +272,7 @@ const Nutrition = () => {
               <input
                 type="number"
                 value={goals.calories}
-                onChange={(e) => setGoals({...goals, calories: e.target.value})}
+                onChange={(e) => setGoals({ ...goals, calories: e.target.value })}
                 required
               />
             </label>
@@ -279,7 +282,7 @@ const Nutrition = () => {
               <input
                 type="number"
                 value={goals.protein}
-                onChange={(e) => setGoals({...goals, protein: e.target.value})}
+                onChange={(e) => setGoals({ ...goals, protein: e.target.value })}
                 required
               />
             </label>
@@ -289,7 +292,7 @@ const Nutrition = () => {
               <input
                 type="number"
                 value={goals.carbs}
-                onChange={(e) => setGoals({...goals, carbs: e.target.value})}
+                onChange={(e) => setGoals({ ...goals, carbs: e.target.value })}
                 required
               />
             </label>
@@ -299,7 +302,7 @@ const Nutrition = () => {
               <input
                 type="number"
                 value={goals.fats}
-                onChange={(e) => setGoals({...goals, fats: e.target.value})}
+                onChange={(e) => setGoals({ ...goals, fats: e.target.value })}
                 required
               />
             </label>

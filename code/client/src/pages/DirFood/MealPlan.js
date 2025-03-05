@@ -41,8 +41,8 @@ const MealPlan = () => {
     setError(null);
 
     try {
-      // Use relative URL which will be handled by the proxy
-      const response = await fetch("/api/generate-meal-plan", {
+      const PRE_URL = process.env.PROD_SERVER_URL || '';
+      const response = await fetch(`${PRE_URL}/api/generate-meal-plan`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -132,7 +132,8 @@ const MealPlan = () => {
           return;
         }
 
-        const response = await fetch('/api/users/meal-plans', {  // Use relative URL
+        const PRE_URL = process.env.PROD_SERVER_URL || '';
+        const response = await fetch(`${PRE_URL}/api/users/meal-plans`, {  // Use relative URL
           headers: {
             'Authorization': `Bearer ${token}`,
             'Accept': 'application/json',
@@ -170,12 +171,13 @@ const MealPlan = () => {
       }
 
       // First, test the connection
-      const testResponse = await fetch('/api/users/test');
+      const PRE_URL = process.env.PROD_SERVER_URL || '';
+      const testResponse = await fetch(`${PRE_URL}/api/users/test`);
       console.log('Test response:', await testResponse.json());
 
       // Then try to save the meal plan
       console.log('Saving meal plan with token:', token);
-      const response = await fetch('/api/users/meal-plans', {
+      const response = await fetch(`${PRE_URL}/api/users/meal-plans`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -189,7 +191,7 @@ const MealPlan = () => {
       });
 
       console.log('Response status:', response.status);
-      
+
       if (!response.ok) {
         const errorText = await response.text();
         console.error('Error response:', errorText);
@@ -237,7 +239,8 @@ const MealPlan = () => {
         return;
       }
 
-      const response = await fetch(`/api/users/meal-plans/${planId}`, {
+      const PRE_URL = process.env.PROD_SERVER_URL || '';
+      const response = await fetch(`${PRE_URL}/api/users/meal-plans/${planId}`, {
         method: 'DELETE',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -264,10 +267,10 @@ const MealPlan = () => {
       setLoading(true);
       setMealPlan(plan.plan);
       setFormData(plan.settings);
-      
+
       // Fetch recipe details for the loaded plan
       await fetchRecipeDetailsForAll(plan.plan.selection);
-      
+
       // Scroll to the meal plan display
       const mealPlanDisplay = document.querySelector('.meal-plan-display');
       if (mealPlanDisplay) {
@@ -295,13 +298,13 @@ const MealPlan = () => {
                 <h4>{plan.name}</h4>
                 <p>Created: {new Date(plan.dateCreated).toLocaleDateString()}</p>
                 <div className="d-flex gap-2">
-                  <button 
+                  <button
                     className="btn btn-primary btn-sm"
                     onClick={() => loadMealPlan(plan)}
                   >
                     Load Plan
                   </button>
-                  <button 
+                  <button
                     className="btn btn-danger btn-sm"
                     onClick={() => deleteMealPlan(plan._id)}
                   >
@@ -362,68 +365,68 @@ const MealPlan = () => {
       {error && <p className="text-danger">{error}</p>}
 
       <div className="meal-plan-display">
-  {mealPlan && mealPlan.selection.length > 0 ? (
-    <div>
-      {mealPlan.selection.map((day, index) => (
-        <div key={index} className="mb-5">
-          <h2 className="text-center mb-4">Day {index + 1}</h2>
+        {mealPlan && mealPlan.selection.length > 0 ? (
+          <div>
+            {mealPlan.selection.map((day, index) => (
+              <div key={index} className="mb-5">
+                <h2 className="text-center mb-4">Day {index + 1}</h2>
 
-          {/* Meal Type Headers and Meal Cards in the Same Row */}
-          <div className="row text-center align-items-start">
-            {["Breakfast", "Lunch", "Dinner"].map((mealType) => {
-              const meal = day.sections[mealType];
-              const recipeId = meal ? meal.assigned.split("#recipe_").pop() : null;
-              const details = recipeDetails[recipeId];
+                {/* Meal Type Headers and Meal Cards in the Same Row */}
+                <div className="row text-center align-items-start">
+                  {["Breakfast", "Lunch", "Dinner"].map((mealType) => {
+                    const meal = day.sections[mealType];
+                    const recipeId = meal ? meal.assigned.split("#recipe_").pop() : null;
+                    const details = recipeDetails[recipeId];
 
-              return (
-                <div className="col-md-4 d-flex flex-column align-items-center" key={mealType}>
-                  {/* Meal Header */}
-                  <h3 className="meal-header">{mealType}</h3>
+                    return (
+                      <div className="col-md-4 d-flex flex-column align-items-center" key={mealType}>
+                        {/* Meal Header */}
+                        <h3 className="meal-header">{mealType}</h3>
 
-                  {/* Meal Card */}
-                  {details ? (
-                    <div className="card shadow-sm p-2 mb-3 meal-card">
-                      <img src={details.image} alt={details.name} className="card-img-top meal-image" />
-                      <div className="card-body text-center">
-                        <h5 className="card-title">{details.name}</h5>
-                        <p><strong>{details.servings}</strong> servings</p>
-                        <p><strong>{Math.round(details.calories / details.servings)}</strong> kcal per serving</p>
-                        <p><strong>Protein:</strong> {Math.round(details.protein / details.servings)} g per serving</p>
-                        <p><strong>Fat:</strong> {Math.round(details.fat / details.servings)} g per serving</p>
-                        <p><strong>Carbs:</strong> {Math.round(details.carbs / details.servings)} g per serving</p>
-                        <button className="btn btn-info w-100" onClick={() => window.open(details.url, "_blank")}>
-                          View Recipe
-                        </button>
+                        {/* Meal Card */}
+                        {details ? (
+                          <div className="card shadow-sm p-2 mb-3 meal-card">
+                            <img src={details.image} alt={details.name} className="card-img-top meal-image" />
+                            <div className="card-body text-center">
+                              <h5 className="card-title">{details.name}</h5>
+                              <p><strong>{details.servings}</strong> servings</p>
+                              <p><strong>{Math.round(details.calories / details.servings)}</strong> kcal per serving</p>
+                              <p><strong>Protein:</strong> {Math.round(details.protein / details.servings)} g per serving</p>
+                              <p><strong>Fat:</strong> {Math.round(details.fat / details.servings)} g per serving</p>
+                              <p><strong>Carbs:</strong> {Math.round(details.carbs / details.servings)} g per serving</p>
+                              <button className="btn btn-info w-100" onClick={() => window.open(details.url, "_blank")}>
+                                View Recipe
+                              </button>
+                            </div>
+                          </div>
+                        ) : (
+                          <div className="empty-card">No meal assigned</div>
+                        )}
                       </div>
-                    </div>
-                  ) : (
-                    <div className="empty-card">No meal assigned</div>
-                  )}
+                    );
+                  })}
                 </div>
-              );
-            })}
+              </div>
+            ))}
           </div>
-        </div>
-      ))}
+        ) : (
+          <p>No meal plan available. Please generate one or load a saved plan.</p>
+        )}
+      </div>
+
+      {/* Save Meal Plan Button */}
+      {mealPlan && (
+        <button
+          className="btn btn-success mt-3"
+          onClick={() => setShowSaveDialog(true)}
+        >
+          Save This Meal Plan
+        </button>
+      )}
+
+      {showSaveDialog && renderSaveDialog()}
+      {renderSavedPlans()}
     </div>
-  ) : (
-    <p>No meal plan available. Please generate one or load a saved plan.</p>
-  )}
-</div>
-
-{/* Save Meal Plan Button */}
-{mealPlan && (
-  <button 
-    className="btn btn-success mt-3"
-    onClick={() => setShowSaveDialog(true)}
-  >
-    Save This Meal Plan
-  </button>
-)}
-
-{showSaveDialog && renderSaveDialog()}
-{renderSavedPlans()}
-</div>
   );
 };
 

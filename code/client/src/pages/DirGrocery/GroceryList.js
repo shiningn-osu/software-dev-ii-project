@@ -18,7 +18,8 @@ function GroceryList() {
         return;
       }
 
-      const response = await fetch('/api/users/grocery-list', {
+      const PRE_URL = process.env.PROD_SERVER_URL || '';
+      const response = await fetch(`${PRE_URL}/api/users/grocery-list`, {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
@@ -57,7 +58,8 @@ function GroceryList() {
         return;
       }
 
-      const response = await fetch('/api/users/grocery-list', {
+      const PRE_URL = process.env.PROD_SERVER_URL || '';
+      const response = await fetch(`${PRE_URL}/api/users/grocery-list`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -80,7 +82,7 @@ function GroceryList() {
       setError('Failed to save grocery list');
     }
   };
-  
+
   // Handle location updates
   useEffect(() => {
     if (location.state?.ingredients) {
