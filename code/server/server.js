@@ -26,7 +26,7 @@ connectDB();
 
 // Determine CORS origin based on environment
 const corsOrigin = process.env.NODE_ENV === 'production'
-  ? 'https://meal-match-service.vercel.app/' // Production URL
+  ? 'https://meal-match-service.vercel.app' // Production URL
   : 'http://localhost:3000'; // Development URL
 
 // Middleware
