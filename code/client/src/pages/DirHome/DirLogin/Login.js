@@ -35,6 +35,7 @@ function Login() {
 
     try {
       const PRE_URL = process.env.PROD_SERVER_URL || '';
+      console.log("the pre url - - - " + PRE_URL);
       const response = await fetch(`${PRE_URL}/api/users/login`, {
         method: 'POST',
         headers: {
