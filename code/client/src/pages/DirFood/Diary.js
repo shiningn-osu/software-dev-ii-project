@@ -21,7 +21,7 @@ const Diary = () => {
         const token = localStorage.getItem('token');
         if (!token) return;
 
-        const PRE_URL = process.env.PROD_SERVER_URL || '';
+        const PRE_URL = process.env.REACT_APP_PROD_SERVER_URL || '';
         const response = await axios.get(`${PRE_URL}/api/meals`, {
           headers: { 'Authorization': `Bearer ${token}` }
         });

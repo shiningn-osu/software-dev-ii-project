@@ -41,7 +41,7 @@ const MealPlan = () => {
     setError(null);
 
     try {
-      const PRE_URL = process.env.PROD_SERVER_URL || '';
+      const PRE_URL = process.env.REACT_APP_PROD_SERVER_URL || '';
       const response = await fetch(`${PRE_URL}/api/generate-meal-plan`, {
         method: "POST",
         headers: {
@@ -132,7 +132,7 @@ const MealPlan = () => {
           return;
         }
 
-        const PRE_URL = process.env.PROD_SERVER_URL || '';
+        const PRE_URL = process.env.REACT_APP_PROD_SERVER_URL || '';
         const response = await fetch(`${PRE_URL}/api/users/meal-plans`, {  // Use relative URL
           headers: {
             'Authorization': `Bearer ${token}`,
@@ -171,7 +171,7 @@ const MealPlan = () => {
       }
 
       // First, test the connection
-      const PRE_URL = process.env.PROD_SERVER_URL || '';
+      const PRE_URL = process.env.REACT_APP_PROD_SERVER_URL || '';
       const testResponse = await fetch(`${PRE_URL}/api/users/test`);
       console.log('Test response:', await testResponse.json());
 
@@ -239,7 +239,7 @@ const MealPlan = () => {
         return;
       }
 
-      const PRE_URL = process.env.PROD_SERVER_URL || '';
+      const PRE_URL = process.env.REACT_APP_PROD_SERVER_URL || '';
       const response = await fetch(`${PRE_URL}/api/users/meal-plans/${planId}`, {
         method: 'DELETE',
         headers: {

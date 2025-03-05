@@ -18,7 +18,7 @@ function GroceryList() {
         return;
       }
 
-      const PRE_URL = process.env.PROD_SERVER_URL || '';
+      const PRE_URL = process.env.REACT_APP_PROD_SERVER_URL || '';
       const response = await fetch(`${PRE_URL}/api/users/grocery-list`, {
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -58,7 +58,7 @@ function GroceryList() {
         return;
       }
 
-      const PRE_URL = process.env.PROD_SERVER_URL || '';
+      const PRE_URL = process.env.REACT_APP_PROD_SERVER_URL || '';
       const response = await fetch(`${PRE_URL}/api/users/grocery-list`, {
         method: 'POST',
         headers: {

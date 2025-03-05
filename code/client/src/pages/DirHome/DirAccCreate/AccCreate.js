@@ -19,7 +19,7 @@ const handleSubmit = async (e, setError, setSuccess, navigate) => {
   const password = formData.get('password');
 
   try {
-    const PRE_URL = process.env.PROD_SERVER_URL || '';
+    const PRE_URL = process.env.REACT_APP_PROD_SERVER_URL || '';
     const response = await fetch(`${PRE_URL}/api/users/register`, {
       method: 'POST',
       headers: {
