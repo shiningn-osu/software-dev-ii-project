@@ -109,7 +109,8 @@ const Diary = () => {
   // Save meal to database
   const sendMealToDatabase = async (meal) => {
     try {
-      const response = await axios.post("/api/nutrition/add-meal", meal, {
+      const PRE_URL = process.env.REACT_APP_PROD_SERVER_URL || '';
+      const response = await axios.post(`${PRE_URL}/api/nutrition/add-meal`, meal, {
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('token')}`
         }
@@ -129,7 +130,8 @@ const Diary = () => {
         return;
       }
 
-      await axios.delete(`/api/meals/${mealId}`, {
+      const PRE_URL = process.env.REACT_APP_PROD_SERVER_URL || '';
+      await axios.delete(`${PRE_URL}/api/meals/${mealId}`, {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'

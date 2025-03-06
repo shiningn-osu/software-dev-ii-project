@@ -21,7 +21,8 @@ const DailyNutrGoals = ({ data }) => {
           return;
         }
 
-        const response = await fetch('/api/nutrition/today', {
+        const PRE_URL = process.env.REACT_APP_PROD_SERVER_URL || '';
+        const response = await fetch(`${PRE_URL}/api/nutrition/today`, {
           headers: {
             'Authorization': `Bearer ${token}`,
             'Content-Type': 'application/json'
@@ -51,14 +52,14 @@ const DailyNutrGoals = ({ data }) => {
     };
 
     fetchCurrent();
-    
+
     // Update every minute
     const interval = setInterval(fetchCurrent, 60000);
-    
+
     // Add event listener for nutrition updates
     const handleNutritionUpdate = () => fetchCurrent();
     window.addEventListener('nutritionUpdated', handleNutritionUpdate);
-    
+
     // Cleanup
     return () => {
       clearInterval(interval);
