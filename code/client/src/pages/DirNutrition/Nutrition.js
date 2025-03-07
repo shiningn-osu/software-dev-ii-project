@@ -78,10 +78,10 @@ const Nutrition = () => {
 
       // Ensure all values are non-negative before submitting
       const safeGoals = {
-        calories: Math.max(0, Number(goals.calories) || 0),
-        protein: Math.max(0, Number(goals.protein) || 0),
-        carbs: Math.max(0, Number(goals.carbs) || 0),
-        fats: Math.max(0, Number(goals.fats) || 0)
+        calories: Math.max(0, parseInt(goals.calories, 10) || 0),
+        protein: Math.max(0, parseInt(goals.protein, 10) || 0),
+        carbs: Math.max(0, parseInt(goals.carbs, 10) || 0),
+        fats: Math.max(0, parseInt(goals.fats, 10) || 0)
       };
 
       const PRE_URL = process.env.REACT_APP_PROD_SERVER_URL || '';
@@ -178,18 +178,25 @@ const Nutrition = () => {
     };
   };
 
-  // Validate input to prevent negative values
+  // Validate input to prevent negative values and leading zeros
   const handleInputChange = (e, field) => {
-    const value = e.target.value;
+    const { value } = e.target;
+    
     // Allow empty string for better UX during typing
     if (value === '') {
-      setGoals({ ...goals, [field]: value });
-    } else {
-      const numValue = Number(value);
-      // Only update if the value is non-negative
-      if (numValue >= 0) {
-        setGoals({ ...goals, [field]: value });
-      }
+      setGoals({ ...goals, [field]: '' });
+      return;
+    }
+    
+    // Prevent input if it starts with '0' and has more than one digit
+    if (value.length > 1 && value.startsWith('0')) {
+      return;
+    }
+    
+    // Check if the input is a valid positive number
+    const numValue = parseInt(value, 10);
+    if (!isNaN(numValue) && numValue >= 0) {
+      setGoals({ ...goals, [field]: numValue });
     }
   };
 
@@ -316,8 +323,14 @@ const Nutrition = () => {
               <input
                 type="number"
                 min="0"
+                step="1"
                 value={goals.calories}
                 onChange={(e) => handleInputChange(e, 'calories')}
+                onBlur={(e) => {
+                  if (e.target.value === '0') {
+                    setGoals({ ...goals, calories: '' });
+                  }
+                }}
                 required
               />
             </label>
@@ -327,8 +340,14 @@ const Nutrition = () => {
               <input
                 type="number"
                 min="0"
+                step="1"
                 value={goals.protein}
                 onChange={(e) => handleInputChange(e, 'protein')}
+                onBlur={(e) => {
+                  if (e.target.value === '0') {
+                    setGoals({ ...goals, protein: '' });
+                  }
+                }}
                 required
               />
             </label>
@@ -338,8 +357,14 @@ const Nutrition = () => {
               <input
                 type="number"
                 min="0"
+                step="1"
                 value={goals.carbs}
                 onChange={(e) => handleInputChange(e, 'carbs')}
+                onBlur={(e) => {
+                  if (e.target.value === '0') {
+                    setGoals({ ...goals, carbs: '' });
+                  }
+                }}
                 required
               />
             </label>
@@ -349,8 +374,14 @@ const Nutrition = () => {
               <input
                 type="number"
                 min="0"
+                step="1"
                 value={goals.fats}
                 onChange={(e) => handleInputChange(e, 'fats')}
+                onBlur={(e) => {
+                  if (e.target.value === '0') {
+                    setGoals({ ...goals, fats: '' });
+                  }
+                }}
                 required
               />
             </label>

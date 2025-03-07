@@ -28,6 +28,32 @@ function Login() {
     }
   }, [navigate]);
 
+  const handleNutritionChange = (e) => {
+    const { name, value } = e.target;
+    
+    // Handle empty input
+    if (value === '') {
+      setGoals({ ...goals, [name]: '' });
+      return;
+    }
+    
+    // Prevent input if it starts with '0' and has more than one digit
+    if (value.length > 1 && value.startsWith('0')) {
+      return;
+    }
+    
+    // Convert to number and ensure it's not negative
+    const numValue = Math.max(0, parseInt(value, 10));
+    
+    // Only update if it's a valid number
+    if (!isNaN(numValue)) {
+      setGoals({ 
+        ...goals, 
+        [name]: numValue 
+      });
+    }
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
@@ -53,7 +79,7 @@ function Login() {
         // If nutrition goals were set, submit them
         if (showNutritionGoals && Object.values(goals).some(value => value !== '')) {
           try {
-            const PRE_URL = process.env.PROD_SERVER_URL || '';
+            const PRE_URL = process.env.REACT_APP_PROD_SERVER_URL || '';
             await fetch(`${PRE_URL}/api/nutrition/goals`, {
               method: 'POST',
               headers: {
@@ -120,10 +146,17 @@ function Login() {
                     <label>Calories (kcal):
                       <input
                         type="number"
+                        name="calories"
                         value={goals.calories}
-                        onChange={(e) => setGoals({ ...goals, calories: e.target.value })}
+                        onChange={handleNutritionChange}
                         className="form-control"
                         placeholder="Enter daily calorie goal"
+                        min="0"
+                        step="1"
+                        onBlur={(e) => {
+                          if (e.target.value === '0') e.target.value = '';
+                          handleNutritionChange(e);
+                        }}
                       />
                     </label>
                   </div>
@@ -131,10 +164,17 @@ function Login() {
                     <label>Protein (g):
                       <input
                         type="number"
+                        name="protein"
                         value={goals.protein}
-                        onChange={(e) => setGoals({ ...goals, protein: e.target.value })}
+                        onChange={handleNutritionChange}
                         className="form-control"
                         placeholder="Enter daily protein goal"
+                        min="0"
+                        step="1"
+                        onBlur={(e) => {
+                          if (e.target.value === '0') e.target.value = '';
+                          handleNutritionChange(e);
+                        }}
                       />
                     </label>
                   </div>
@@ -142,10 +182,17 @@ function Login() {
                     <label>Carbs (g):
                       <input
                         type="number"
+                        name="carbs"
                         value={goals.carbs}
-                        onChange={(e) => setGoals({ ...goals, carbs: e.target.value })}
+                        onChange={handleNutritionChange}
                         className="form-control"
                         placeholder="Enter daily carbs goal"
+                        min="0"
+                        step="1"
+                        onBlur={(e) => {
+                          if (e.target.value === '0') e.target.value = '';
+                          handleNutritionChange(e);
+                        }}
                       />
                     </label>
                   </div>
@@ -153,10 +200,17 @@ function Login() {
                     <label>Fats (g):
                       <input
                         type="number"
+                        name="fats"
                         value={goals.fats}
-                        onChange={(e) => setGoals({ ...goals, fats: e.target.value })}
+                        onChange={handleNutritionChange}
                         className="form-control"
                         placeholder="Enter daily fats goal"
+                        min="0"
+                        step="1"
+                        onBlur={(e) => {
+                          if (e.target.value === '0') e.target.value = '';
+                          handleNutritionChange(e);
+                        }}
                       />
                     </label>
                   </div>
