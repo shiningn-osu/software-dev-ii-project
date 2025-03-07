@@ -40,12 +40,14 @@ const DailyNutrGoals = ({ data }) => {
         }
 
         const todayData = await response.json();
-        setCurrent(todayData.totals || {
-          calories: 0,
-          protein: 0,
-          carbs: 0,
-          fats: 0
-        });
+        // Ensure current values are non-negative
+        const safeCurrentData = {
+          calories: Math.max(0, todayData.totals?.calories || 0),
+          protein: Math.max(0, todayData.totals?.protein || 0),
+          carbs: Math.max(0, todayData.totals?.carbs || 0),
+          fats: Math.max(0, todayData.totals?.fats || 0)
+        };
+        setCurrent(safeCurrentData);
       } catch (err) {
         console.error('Error fetching current nutrition:', err);
       }
@@ -68,16 +70,32 @@ const DailyNutrGoals = ({ data }) => {
   }, [navigate]);
 
   // Use default values if no data is provided
-  const goals = data || {
+  const rawGoals = data || {
     calories: 0,
     protein: 0,
     carbs: 0,
     fats: 0
   };
+  
+  // Ensure goals are non-negative
+  const goals = {
+    calories: Math.max(0, rawGoals.calories),
+    protein: Math.max(0, rawGoals.protein),
+    carbs: Math.max(0, rawGoals.carbs),
+    fats: Math.max(0, rawGoals.fats)
+  };
 
   if (!data) {
     return <div className="daily-nutr-goals loading">Loading...</div>;
   }
+
+  // Calculate remaining values, ensuring they don't go below 0
+  const remaining = {
+    calories: Math.max(0, goals.calories - current.calories),
+    protein: Math.max(0, goals.protein - current.protein),
+    carbs: Math.max(0, goals.carbs - current.carbs),
+    fats: Math.max(0, goals.fats - current.fats)
+  };
 
   return (
     <div className="daily-nutr-goals">
@@ -95,25 +113,25 @@ const DailyNutrGoals = ({ data }) => {
             <td>Calories</td>
             <td>{goals.calories} kcal</td>
             <td>{current.calories} kcal</td>
-            <td>{goals.calories - current.calories} kcal</td>
+            <td>{remaining.calories} kcal</td>
           </tr>
           <tr>
             <td>Protein</td>
             <td>{goals.protein}g</td>
             <td>{current.protein}g</td>
-            <td>{goals.protein - current.protein}g</td>
+            <td>{remaining.protein}g</td>
           </tr>
           <tr>
             <td>Carbs</td>
             <td>{goals.carbs}g</td>
             <td>{current.carbs}g</td>
-            <td>{goals.carbs - current.carbs}g</td>
+            <td>{remaining.carbs}g</td>
           </tr>
           <tr>
             <td>Fats</td>
             <td>{goals.fats}g</td>
             <td>{current.fats}g</td>
-            <td>{goals.fats - current.fats}g</td>
+            <td>{remaining.fats}g</td>
           </tr>
         </tbody>
       </table>

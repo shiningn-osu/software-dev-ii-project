@@ -10,8 +10,8 @@ const AuthOptions = () => (
     <h2>Welcome to Meal Match</h2>
     <p>Please login or create an account to continue</p>
     <div className="auth-buttons">
-      <Link to="/login" className="btn btn-primary">Login</Link>
-      <Link to="/account-create" className="btn btn-success">Sign Up</Link>
+      <Link to="/Login" className="btn btn-primary">Login</Link>
+      <Link to="/AccCreate" className="btn btn-success">Sign Up</Link>
     </div>
   </div>
 );
@@ -29,7 +29,7 @@ const Home = () => {
         const userStr = localStorage.getItem('user');
 
         if (!token || !userStr) {
-          navigate('/login');
+          navigate('/Login');
           return;
         }
 
@@ -38,7 +38,7 @@ const Home = () => {
           setUser(userData);
         } catch (error) {
           console.error('Error parsing user data:', error);
-          navigate('/login');
+          navigate('/Login');
           return;
         }
 
@@ -52,7 +52,7 @@ const Home = () => {
 
         if (response.status === 401) {
           localStorage.removeItem('token');
-          navigate('/login');
+          navigate('/Login');
           return;
         }
 
@@ -81,7 +81,7 @@ const Home = () => {
               <p className="card-text">Set up your daily nutrition goals to get started</p>
               <button
                 className="btn btn-primary"
-                onClick={() => navigate('/nutrition')}
+                onClick={() => navigate('/Nutrition')}
               >
                 Set Goals
               </button>
@@ -145,7 +145,7 @@ const Home = () => {
                 <p className="card-text">Track your daily nutrition</p>
                 <button
                   className="btn btn-primary"
-                  onClick={() => navigate('/nutrition')}
+                  onClick={() => navigate('/Nutrition')}
                 >
                   Go to Nutrition
                 </button>

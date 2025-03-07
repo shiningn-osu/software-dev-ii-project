@@ -48,7 +48,13 @@ const Nutrition = () => {
         }
 
         const data = await response.json();
-        setGoals(data);
+        // Ensure all values are non-negative
+        setGoals({
+          calories: Math.max(0, data.calories || 0),
+          protein: Math.max(0, data.protein || 0),
+          carbs: Math.max(0, data.carbs || 0),
+          fats: Math.max(0, data.fats || 0)
+        });
       } catch (err) {
         console.error('Error:', err);
         setError('Error fetching nutrition data');
@@ -70,6 +76,14 @@ const Nutrition = () => {
         return;
       }
 
+      // Ensure all values are non-negative before submitting
+      const safeGoals = {
+        calories: Math.max(0, parseInt(goals.calories, 10) || 0),
+        protein: Math.max(0, parseInt(goals.protein, 10) || 0),
+        carbs: Math.max(0, parseInt(goals.carbs, 10) || 0),
+        fats: Math.max(0, parseInt(goals.fats, 10) || 0)
+      };
+
       const PRE_URL = process.env.REACT_APP_PROD_SERVER_URL || '';
       const response = await fetch(`${PRE_URL}/api/nutrition/goals`, {
         method: 'POST',
@@ -77,7 +91,7 @@ const Nutrition = () => {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
         },
-        body: JSON.stringify(goals)
+        body: JSON.stringify(safeGoals)
       });
 
       if (!response.ok) {
@@ -85,7 +99,12 @@ const Nutrition = () => {
       }
 
       const data = await response.json();
-      setGoals(data);
+      setGoals({
+        calories: Math.max(0, data.calories || 0),
+        protein: Math.max(0, data.protein || 0),
+        carbs: Math.max(0, data.carbs || 0),
+        fats: Math.max(0, data.fats || 0)
+      });
       window.dispatchEvent(new CustomEvent('nutritionUpdated'));
       alert('Goals updated successfully!');
     } catch (err) {
@@ -117,7 +136,17 @@ const Nutrition = () => {
       }
 
       const data = await response.json();
-      setNutritionHistory(data);
+      // Ensure all history values are non-negative
+      const safeData = data.map(day => ({
+        ...day,
+        totals: {
+          calories: Math.max(0, day.totals?.calories || 0),
+          protein: Math.max(0, day.totals?.protein || 0),
+          carbs: Math.max(0, day.totals?.carbs || 0),
+          fats: Math.max(0, day.totals?.fats || 0)
+        }
+      }));
+      setNutritionHistory(safeData);
     } catch (err) {
       console.error('Error:', err);
       setError('Error fetching nutrition history');
@@ -147,6 +176,28 @@ const Nutrition = () => {
       carbs: Math.round(totals.carbs / history.length),
       fats: Math.round(totals.fats / history.length)
     };
+  };
+
+  // Validate input to prevent negative values and leading zeros
+  const handleInputChange = (e, field) => {
+    const { value } = e.target;
+    
+    // Allow empty string for better UX during typing
+    if (value === '') {
+      setGoals({ ...goals, [field]: '' });
+      return;
+    }
+    
+    // Prevent input if it starts with '0' and has more than one digit
+    if (value.length > 1 && value.startsWith('0')) {
+      return;
+    }
+    
+    // Check if the input is a valid positive number
+    const numValue = parseInt(value, 10);
+    if (!isNaN(numValue) && numValue >= 0) {
+      setGoals({ ...goals, [field]: numValue });
+    }
   };
 
   return (
@@ -271,8 +322,15 @@ const Nutrition = () => {
             <label>Calories (kcal):
               <input
                 type="number"
+                min="0"
+                step="1"
                 value={goals.calories}
-                onChange={(e) => setGoals({ ...goals, calories: e.target.value })}
+                onChange={(e) => handleInputChange(e, 'calories')}
+                onBlur={(e) => {
+                  if (e.target.value === '0') {
+                    setGoals({ ...goals, calories: '' });
+                  }
+                }}
                 required
               />
             </label>
@@ -281,8 +339,15 @@ const Nutrition = () => {
             <label>Protein (g):
               <input
                 type="number"
+                min="0"
+                step="1"
                 value={goals.protein}
-                onChange={(e) => setGoals({ ...goals, protein: e.target.value })}
+                onChange={(e) => handleInputChange(e, 'protein')}
+                onBlur={(e) => {
+                  if (e.target.value === '0') {
+                    setGoals({ ...goals, protein: '' });
+                  }
+                }}
                 required
               />
             </label>
@@ -291,8 +356,15 @@ const Nutrition = () => {
             <label>Carbs (g):
               <input
                 type="number"
+                min="0"
+                step="1"
                 value={goals.carbs}
-                onChange={(e) => setGoals({ ...goals, carbs: e.target.value })}
+                onChange={(e) => handleInputChange(e, 'carbs')}
+                onBlur={(e) => {
+                  if (e.target.value === '0') {
+                    setGoals({ ...goals, carbs: '' });
+                  }
+                }}
                 required
               />
             </label>
@@ -301,8 +373,15 @@ const Nutrition = () => {
             <label>Fats (g):
               <input
                 type="number"
+                min="0"
+                step="1"
                 value={goals.fats}
-                onChange={(e) => setGoals({ ...goals, fats: e.target.value })}
+                onChange={(e) => handleInputChange(e, 'fats')}
+                onBlur={(e) => {
+                  if (e.target.value === '0') {
+                    setGoals({ ...goals, fats: '' });
+                  }
+                }}
                 required
               />
             </label>
