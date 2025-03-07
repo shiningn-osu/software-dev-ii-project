@@ -115,22 +115,19 @@ function GroceryList() {
   useEffect(() => {
     if (location.state?.ingredients) {
       const newIngredients = location.state.ingredients.filter(
-        (ingredient) => !groceryList.some(item => item.name === ingredient)
+        (ingredient) => !groceryList.some(item => item.name === ingredient.name)
       );
       
       if (newIngredients.length > 0) {
-        const formattedIngredients = newIngredients.map(name => ({
-          name,
-          quantity: 1,
-          id: Date.now() + Math.random()
-        }));
-        
-        const newList = [...groceryList, ...formattedIngredients];
+        const newList = [...groceryList, ...newIngredients];
         setGroceryList(newList);
         saveGroceryList(newList);
       }
+
+      // Clear the location state to prevent re-adding ingredients
+      navigate(location.pathname, { replace: true });
     }
-  }, [location.state, groceryList]);
+  }, [location.state, navigate]);
 
   const addItem = async () => {
     if (newItem.trim()) {

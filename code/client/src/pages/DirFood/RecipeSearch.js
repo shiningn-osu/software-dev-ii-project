@@ -11,8 +11,14 @@ function RecipeSearch() {
   const navigate = useNavigate(); // Hook for navigation
 
   const handleAddToGroceryList = () => {
-    // Pass selected ingredients to the grocery list page
-    navigate("/GroceryList", { state: { ingredients: selectedIngredients } });
+    // Add IDs to the ingredients before passing them
+    const ingredientsWithIds = selectedIngredients.map(ingredient => ({
+      name: ingredient,
+      quantity: 1,
+      id: Date.now() + Math.random()
+    }));
+    
+    navigate("/GroceryList", { state: { ingredients: ingredientsWithIds } });
   };
 
   const APP_ID = "91241cae";
