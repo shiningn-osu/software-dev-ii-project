@@ -3,6 +3,7 @@ import React, { useState, useEffect } from 'react';
 function GrocerySearch() {
 
   const [query, setQuery] = useState('');
+  const [zipQuery, setZipQuery] = useState('');
   const [groceries, setGroceries] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -12,11 +13,18 @@ function GrocerySearch() {
   //const APP_KEY = "d938c99d056d72a1cb7267e86c60ff53";
 
   const fetchKrogerLocations = async () => {
+    if(!zipQuery || zipQuery.length === 0){
+      setError("Please Enter a Zip Code To Find Nearby Stores.")
+      return;
+    }
+
     if (!query) return;
     if (query.length <= 2) {
       setError("Please input 3 or more letters."); //kroger doesnt like TERM being less than 2 char- throws error
       return;
     }
+
+    
     setLoading(true);
     setError(null);
     //const LOCATION_ID = "01400943";
@@ -26,7 +34,7 @@ function GrocerySearch() {
 
     try {
       const PRE_URL = process.env.REACT_APP_PROD_SERVER_URL || '';
-      const response = await fetch(`${PRE_URL}api/krogerLocations`);
+      const response = await fetch(`${PRE_URL}api/krogerLocations?zipcode=${zipQuery}`);
       const data = await response.json();
       console.log("Locations1:", data);
 
@@ -62,6 +70,13 @@ function GrocerySearch() {
         const response = await fetch(`${PRE_URL}api/krogerProducts?query=${query}&locationId=${locData.locationId}`);
         const data = await response.json();
         console.log("Products:", data);
+        
+        const errorMessage = data.error;
+        if(errorMessage){
+          if(errorMessage === "Failed to fetch products"){
+            setError("Kroger API has failed to find the products at this location. Please Try again later, or try another store.");
+          }
+        }
 
         setGroceries(data.data || []);
       } catch (error) {
@@ -74,25 +89,71 @@ function GrocerySearch() {
     };
 
     fetchKrogerProducts();
-  }, [locData, query]);
+  }, [locData]);
 
 
   // Handle form submission
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    console.log("Form submitted:", query);
-    fetchKrogerLocations();
+    if(query.length !== 0 && confirmZipisNumbers(zipQuery) === true && zipQuery.length === 5){
+      console.log("Form submitted:", query);
+      fetchKrogerLocations();
+    }
   };
   const handleChange = (e) => { //prevents submit from being called whenever change is called
     console.log("Input changed:", e.target.value);
     setQuery(e.target.value);
   };
 
+  const confirmZipisNumbers = (input) => /^\d+$/.test(input);
+
+
+  const assignZipcode = (f) =>{
+    f.preventDefault();
+    console.log(confirmZipisNumbers(zipQuery))
+    if(confirmZipisNumbers(zipQuery) === false){
+      setError("A zip code needs to be 5 valid integer numbers. (0 - 9)");
+      return;
+    }
+    else{
+      setError("");
+      if(zipQuery.length === 5){
+        setError("Zip Code Succesfully Stored."); 
+        console.log("Zip code assigned: ", zipQuery);
+      }
+      else{
+        setError("Zip code Needs to be 5 characters long");
+        return;
+      }
+      
+    }
+  }
+  const handleZipChange = (f) => { //prevents submit from being called whenever change is called
+    console.log("Input changed:", f.target.value);
+    setZipQuery(f.target.value);
+  };
 
   return (
     <div className="GrocerySearch">
+      <h1 style={{ marginTop: '20px' }}>Search for Groceries</h1>
       <div className="container mt-4" style={{ marginBottom: '20px' }}>
+
+      <form className="d-flex mt-4" onSubmit={assignZipcode}>
+          <input
+            className="form-control me-2"
+            type="search"
+            value={zipQuery}
+            onChange={handleZipChange}
+            placeholder="Enter a Zipcode..."
+            aria-label="Search"
+          />
+          <button className="btn btn-dark" type="submit">
+            Enter
+          </button>
+        </form>
+
+
         <form className="d-flex mt-4" onSubmit={handleSubmit}>
           <input
             className="form-control me-2"
@@ -152,12 +213,12 @@ function GrocerySearch() {
           </div>
         </div>
       ) : (
-        <p>No groceries found. Try searching for something else.</p>
+        query.length === 0
+        ? <p> </p>
+        :<p>No groceries found. Try searching for something else.</p>
+        
       )}
-
-      <p>
-        Refresh <a href="/GrocerySearch">Search</a>
-      </p>
+      
     </div>
   );
 }
