@@ -16,32 +16,42 @@ const RecentNutrBreak = () => {
           return;
         }
 
-        const response = await fetch('/api/nutrition/today', {
+        const PRE_URL = process.env.REACT_APP_PROD_SERVER_URL || '';
+        const response = await fetch(`${PRE_URL}/api/nutrition/today`, {
           headers: {
             'Authorization': `Bearer ${token}`,
             'Content-Type': 'application/json'
           }
         });
-        
+
         if (response.status === 401) {
           localStorage.removeItem('token');
           navigate('/login');
           return;
         }
-        
+
         if (!response.ok) {
           throw new Error('Network response was not ok');
         }
-        
+
         const data = await response.json();
         // Get the most recent meal from today's meals
         const meals = data.meals || [];
-        const latest = meals.length > 0 ? 
+        const latest = meals.length > 0 ?
           meals.reduce((latest, current) => {
             return new Date(current.timeEaten) > new Date(latest.timeEaten) ? current : latest;
-          }, meals[0]) 
+          }, meals[0])
           : null;
-        
+
+        // Extract nutritional information
+        if (latest) {
+          const { nutrition } = latest;
+          latest.calories = nutrition.calories || 0;
+          latest.protein = nutrition.protein || 0;
+          latest.carbs = nutrition.carbs || 0;
+          latest.fats = nutrition.fats || 0;
+        }
+
         setLatestMeal(latest);
       } catch (err) {
         setError('Failed to fetch latest meal data');
@@ -50,14 +60,14 @@ const RecentNutrBreak = () => {
     };
 
     fetchLatestMeal();
-    
+
     // Fetch data every minute to keep it updated
     const interval = setInterval(fetchLatestMeal, 60000);
-    
+
     // Add event listener for nutrition updates
     const handleNutritionUpdate = () => fetchLatestMeal();
     window.addEventListener('nutritionUpdated', handleNutritionUpdate);
-    
+
     // Cleanup interval and event listener on unmount
     return () => {
       clearInterval(interval);
@@ -109,4 +119,4 @@ const RecentNutrBreak = () => {
   );
 };
 
-export default RecentNutrBreak; 
+export default RecentNutrBreak;
