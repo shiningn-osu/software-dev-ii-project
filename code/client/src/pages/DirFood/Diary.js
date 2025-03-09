@@ -13,6 +13,8 @@ const Diary = () => {
   const [meals, setMeals] = useState([]);
   const [mealName, setMealName] = useState("");
   const [error, setError] = useState("");
+  const [editingIndex, setEditingIndex] = useState(null);
+  const [editingIngredient, setEditingIngredient] = useState(null);
 
   // Fetch existing meals
   useEffect(() => {
@@ -33,7 +35,7 @@ const Diary = () => {
           totalCalories: meal.nutrition?.calories || 0,
           ingredients: meal.ingredients.map(ing => ({
             name: ing.name,
-            weight: ing.weight,
+            weight: ing.amount,
             nutrition: {
               calories: ing.nutrition?.calories || 0,
               protein: ing.nutrition?.protein || 0,
@@ -92,7 +94,7 @@ const Diary = () => {
     const newIngredient = {
       name: ingredient.trim(),
       weight: parseInt(weight),
-      ...nutrition
+      nutrition: nutrition
     };
 
     setIngredients([...ingredients, newIngredient]);
@@ -106,11 +108,54 @@ const Diary = () => {
     setIngredients(newIngredients);
   };
 
+  // Edit ingredient
+  const editIngredient = (index) => {
+    setEditingIndex(index);
+    setEditingIngredient(ingredients[index]);
+  };
+
+  // Handle input change for editing
+  const handleEditChange = (e) => {
+    const { name, value } = e.target;
+    setEditingIngredient({
+      ...editingIngredient,
+      [name]: name === "weight" ? parseInt(value) : value
+    });
+  };
+
+  // Save edited ingredient
+  const saveEdit = async () => {
+    if (!editingIngredient.name || !editingIngredient.weight) {
+      setError("Please fill in both fields");
+      return;
+    }
+    setError("");
+
+    const nutrition = await fetchNutrition(editingIngredient.name, editingIngredient.weight);
+    const newIngredients = [...ingredients];
+    newIngredients[editingIndex] = {
+      ...editingIngredient,
+      nutrition: {
+        ...editingIngredient.nutrition,
+        ...nutrition
+      }
+    };
+    setIngredients(newIngredients);
+    setEditingIndex(null);
+    setEditingIngredient(null);
+  };
+
+  // Cancel edit
+  const cancelEdit = () => {
+    setEditingIndex(null);
+    setEditingIngredient(null);
+  };
+
   // Save meal to database
   const sendMealToDatabase = async (meal) => {
     try {
       const PRE_URL = process.env.REACT_APP_PROD_SERVER_URL || '';
-      const response = await axios.post(`${PRE_URL}/api/nutrition/add-meal`, meal, {
+      const response = await axios.post(`${PRE_URL}/api/meals/add`, meal, {
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('token')}`
         }
@@ -164,10 +209,10 @@ const Diary = () => {
     }
 
     const totalNutrition = ingredients.reduce((acc, ing) => ({
-      calories: acc.calories + ing.calories,
-      protein: acc.protein + ing.protein,
-      carbs: acc.carbs + ing.carbs,
-      fats: acc.fats + ing.fats
+      calories: acc.calories + ing.nutrition.calories,
+      protein: acc.protein + ing.nutrition.protein,
+      carbs: acc.carbs + ing.nutrition.carbs,
+      fats: acc.fats + ing.nutrition.fats
     }), { calories: 0, protein: 0, carbs: 0, fats: 0 });
 
     const newMeal = {
@@ -179,12 +224,8 @@ const Diary = () => {
         name: ing.name,
         weight: ing.weight,
         unit: 'g',
-        nutrition: {
-          calories: ing.calories,
-          protein: ing.protein,
-          carbs: ing.carbs,
-          fats: ing.fats
-        }
+        nutrition: ing.nutrition
+
       })),
       nutrition: totalNutrition
     };
@@ -247,20 +288,85 @@ const Diary = () => {
             <tbody>
               {ingredients.map((ing, index) => (
                 <tr key={index}>
-                  <td>{ing.name}</td>
-                  <td>{ing.weight}g</td>
-                  <td>{ing.calories}kcal</td>
-                  <td>{ing.protein}g</td>
-                  <td>{ing.carbs}g</td>
-                  <td>{ing.fats}g</td>
-                  <td>
-                    <button
-                      onClick={() => deleteIngredient(index)}
-                      className="delete-button"
-                    >
-                      Delete
-                    </button>
-                  </td>
+                  {editingIndex === index ? (
+                    <>
+                      <td>
+                        <input
+                          type="text"
+                          name="name"
+                          value={editingIngredient.name}
+                          onChange={handleEditChange}
+                        />
+                      </td>
+                      <td>
+                        <input
+                          type="number"
+                          name="weight"
+                          value={editingIngredient.weight}
+                          onChange={handleEditChange}
+                        />
+                      </td>
+                      <td>
+                        <input
+                          type="number"
+                          name="calories"
+                          value={editingIngredient.nutrition.calories}
+                          onChange={handleEditChange}
+                        />
+                      </td>
+                      <td>
+                        <input
+                          type="number"
+                          name="protein"
+                          value={editingIngredient.nutrition.protein}
+                          onChange={handleEditChange}
+                        />
+                      </td>
+                      <td>
+                        <input
+                          type="number"
+                          name="carbs"
+                          value={editingIngredient.nutrition.carbs}
+                          onChange={handleEditChange}
+                        />
+                      </td>
+                      <td>
+                        <input
+                          type="number"
+                          name="fats"
+                          value={editingIngredient.nutrition.fats}
+                          onChange={handleEditChange}
+                        />
+                      </td>
+                      <td>
+                        <button onClick={saveEdit}>Save</button>
+                        <button onClick={cancelEdit}>Cancel</button>
+                      </td>
+                    </>
+                  ) : (
+                    <>
+                      <td>{ing.name}</td>
+                      <td>{ing.weight}g</td>
+                      <td>{ing.nutrition.calories}kcal</td>
+                      <td>{ing.nutrition.protein}g</td>
+                      <td>{ing.nutrition.carbs}g</td>
+                      <td>{ing.nutrition.fats}g</td>
+                      <td>
+                        <button
+                          onClick={() => editIngredient(index)}
+                          className="edit-button"
+                        >
+                          Edit
+                        </button>
+                        <button
+                          onClick={() => deleteIngredient(index)}
+                          className="delete-button"
+                        >
+                          Delete
+                        </button>
+                      </td>
+                    </>
+                  )}
                 </tr>
               ))}
             </tbody>
