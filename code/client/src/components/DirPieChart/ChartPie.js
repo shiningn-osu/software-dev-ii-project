@@ -28,7 +28,8 @@ const ChartPie = ({ data: goals }) => {
           return;
         }
 
-        const response = await fetch('/api/nutrition/today', {
+        const PRE_URL = process.env.REACT_APP_PROD_SERVER_URL || '';
+        const response = await fetch(`${PRE_URL}/api/nutrition/today`, {
           headers: {
             'Authorization': `Bearer ${token}`,
             'Content-Type': 'application/json'
@@ -58,14 +59,14 @@ const ChartPie = ({ data: goals }) => {
     };
 
     fetchCurrent();
-    
+
     // Update every minute
     const interval = setInterval(fetchCurrent, 60000);
-    
+
     // Add event listener for nutrition updates
     const handleNutritionUpdate = () => fetchCurrent();
     window.addEventListener('nutritionUpdated', handleNutritionUpdate);
-    
+
     // Cleanup
     return () => {
       clearInterval(interval);
@@ -74,18 +75,18 @@ const ChartPie = ({ data: goals }) => {
   }, [navigate]);
 
   // Show current nutrition if available, otherwise show goals
-  const chartData = currentNutrition && (currentNutrition.calories > 0 || currentNutrition.protein > 0 || currentNutrition.carbs > 0 || currentNutrition.fats > 0) 
+  const chartData = currentNutrition && (currentNutrition.calories > 0 || currentNutrition.protein > 0 || currentNutrition.carbs > 0 || currentNutrition.fats > 0)
     ? [
-        { name: 'Protein', value: Number(currentNutrition.protein) || 0 },
-        { name: 'Carbs', value: Number(currentNutrition.carbs) || 0 },
-        { name: 'Fats', value: Number(currentNutrition.fats) || 0 }
-      ]
-    : goals 
+      { name: 'Protein', value: Number(currentNutrition.protein) || 0 },
+      { name: 'Carbs', value: Number(currentNutrition.carbs) || 0 },
+      { name: 'Fats', value: Number(currentNutrition.fats) || 0 }
+    ]
+    : goals
       ? [
-          { name: 'Protein Goal', value: Number(goals.protein) || 0 },
-          { name: 'Carbs Goal', value: Number(goals.carbs) || 0 },
-          { name: 'Fats Goal', value: Number(goals.fats) || 0 }
-        ]
+        { name: 'Protein Goal', value: Number(goals.protein) || 0 },
+        { name: 'Carbs Goal', value: Number(goals.carbs) || 0 },
+        { name: 'Fats Goal', value: Number(goals.fats) || 0 }
+      ]
       : [];
 
   const renderCustomizedLabel = ({ cx, cy, midAngle, innerRadius, outerRadius, percent, index, name, value }) => {
@@ -142,16 +143,16 @@ const ChartPie = ({ data: goals }) => {
           label={renderCustomizedLabel}
         >
           {chartData.map((entry, index) => (
-            <Cell 
-              key={`cell-${index}`} 
+            <Cell
+              key={`cell-${index}`}
               fill={COLORS[index % COLORS.length]}
               opacity={entry.name.includes('Goal') ? 0.6 : 1} // Make goals slightly transparent
             />
           ))}
         </Pie>
         <Tooltip />
-        <Legend 
-          verticalAlign="bottom" 
+        <Legend
+          verticalAlign="bottom"
           height={36}
           wrapperStyle={{ paddingTop: "20px" }}
         />

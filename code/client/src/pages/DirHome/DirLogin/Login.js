@@ -28,13 +28,41 @@ function Login() {
     }
   }, [navigate]);
 
+  const handleNutritionChange = (e) => {
+    const { name, value } = e.target;
+    
+    // Handle empty input
+    if (value === '') {
+      setGoals({ ...goals, [name]: '' });
+      return;
+    }
+    
+    // Prevent input if it starts with '0' and has more than one digit
+    if (value.length > 1 && value.startsWith('0')) {
+      return;
+    }
+    
+    // Convert to number and ensure it's not negative
+    const numValue = Math.max(0, parseInt(value, 10));
+    
+    // Only update if it's a valid number
+    if (!isNaN(numValue)) {
+      setGoals({ 
+        ...goals, 
+        [name]: numValue 
+      });
+    }
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
     const username = e.target.username.value;
 
     try {
-      const response = await fetch('/api/users/login', {
+      const PRE_URL = process.env.REACT_APP_PROD_SERVER_URL || '';
+      console.log("the pre url - - - " + PRE_URL);
+      const response = await fetch(`${PRE_URL}/api/users/login`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -47,11 +75,12 @@ function Login() {
       if (response.ok) {
         localStorage.setItem('token', data.token);
         localStorage.setItem('user', JSON.stringify(data.user));
-        
+
         // If nutrition goals were set, submit them
         if (showNutritionGoals && Object.values(goals).some(value => value !== '')) {
           try {
-            await fetch('/api/nutrition/goals', {
+            const PRE_URL = process.env.REACT_APP_PROD_SERVER_URL || '';
+            await fetch(`${PRE_URL}/api/nutrition/goals`, {
               method: 'POST',
               headers: {
                 'Authorization': `Bearer ${data.token}`,
@@ -63,7 +92,7 @@ function Login() {
             console.error('Error saving nutrition goals:', err);
           }
         }
-        
+
         navigate('/', { replace: true });
       } else {
         setError(data.message || 'Login failed. Please check your credentials.');
@@ -85,31 +114,31 @@ function Login() {
             <div className='text-input d-flex align-items-center'>
               <label htmlFor="username" className="d-flex align-items-center justify-content-center"
                 id="searchLabel">Username: </label>
-              <input 
-                type="text" 
-                className="form-control" 
-                name="username" 
+              <input
+                type="text"
+                className="form-control"
+                name="username"
                 id="username"
-                placeholder="Enter username" 
-                required 
+                placeholder="Enter username"
+                required
               />
             </div>
             <div className='text-input'>
-              <PasswordInput 
+              <PasswordInput
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
               />
             </div>
-            
+
             <div className="nutrition-goals-option mt-3">
-              <button 
-                type="button" 
+              <button
+                type="button"
                 className="btn btn-secondary"
                 onClick={() => setShowNutritionGoals(!showNutritionGoals)}
               >
                 {showNutritionGoals ? 'Skip Nutrition Goals' : 'Set Initial Nutrition Goals'}
               </button>
-              
+
               {showNutritionGoals && (
                 <div className="nutrition-goals-form mt-3">
                   <h4>Set Your Daily Nutrition Goals</h4>
@@ -117,10 +146,17 @@ function Login() {
                     <label>Calories (kcal):
                       <input
                         type="number"
+                        name="calories"
                         value={goals.calories}
-                        onChange={(e) => setGoals({...goals, calories: e.target.value})}
+                        onChange={handleNutritionChange}
                         className="form-control"
                         placeholder="Enter daily calorie goal"
+                        min="0"
+                        step="1"
+                        onBlur={(e) => {
+                          if (e.target.value === '0') e.target.value = '';
+                          handleNutritionChange(e);
+                        }}
                       />
                     </label>
                   </div>
@@ -128,10 +164,17 @@ function Login() {
                     <label>Protein (g):
                       <input
                         type="number"
+                        name="protein"
                         value={goals.protein}
-                        onChange={(e) => setGoals({...goals, protein: e.target.value})}
+                        onChange={handleNutritionChange}
                         className="form-control"
                         placeholder="Enter daily protein goal"
+                        min="0"
+                        step="1"
+                        onBlur={(e) => {
+                          if (e.target.value === '0') e.target.value = '';
+                          handleNutritionChange(e);
+                        }}
                       />
                     </label>
                   </div>
@@ -139,10 +182,17 @@ function Login() {
                     <label>Carbs (g):
                       <input
                         type="number"
+                        name="carbs"
                         value={goals.carbs}
-                        onChange={(e) => setGoals({...goals, carbs: e.target.value})}
+                        onChange={handleNutritionChange}
                         className="form-control"
                         placeholder="Enter daily carbs goal"
+                        min="0"
+                        step="1"
+                        onBlur={(e) => {
+                          if (e.target.value === '0') e.target.value = '';
+                          handleNutritionChange(e);
+                        }}
                       />
                     </label>
                   </div>
@@ -150,17 +200,24 @@ function Login() {
                     <label>Fats (g):
                       <input
                         type="number"
+                        name="fats"
                         value={goals.fats}
-                        onChange={(e) => setGoals({...goals, fats: e.target.value})}
+                        onChange={handleNutritionChange}
                         className="form-control"
                         placeholder="Enter daily fats goal"
+                        min="0"
+                        step="1"
+                        onBlur={(e) => {
+                          if (e.target.value === '0') e.target.value = '';
+                          handleNutritionChange(e);
+                        }}
                       />
                     </label>
                   </div>
                 </div>
               )}
             </div>
-            
+
             <button className="btn btn-success mt-3" type="submit">Login</button>
           </form>
         </section>

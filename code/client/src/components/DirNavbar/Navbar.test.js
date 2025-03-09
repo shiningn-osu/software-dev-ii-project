@@ -75,7 +75,7 @@ describe('Navbar', () => {
       expect(screen.getByText(/meal plan/i)).toHaveAttribute('href', '/MealPlan');
       expect(screen.getByText(/grocery list/i)).toHaveAttribute('href', '/GroceryList');
       expect(screen.getByText(/grocery search/i)).toHaveAttribute('href', '/GrocerySearch');
-      expect(screen.getByText(/nutrition/i)).toHaveAttribute('href', '/NutritionDay');
+      expect(screen.getByText(/nutrition/i)).toHaveAttribute('href', '/Nutrition');
     });
 
     test('shows help link in authenticated state', () => {

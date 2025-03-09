@@ -26,8 +26,8 @@ connectDB();
 
 // Determine CORS origin based on environment
 const corsOrigin = process.env.NODE_ENV === 'production'
-  ? 'https://meal-match-9nx72i8vk-duncan-eversons-projects.vercel.app/' // Production URL
-  : 'http://localhost:3000'; // Development URL (specific, not wildcard)
+  ? 'https://meal-match-service.vercel.app' // Production URL
+  : 'http://localhost:3000'; // Development URL
 
 // Middleware
 app.use(express.json());
@@ -317,7 +317,7 @@ app.post('/api/nutrition/add-meal', verifyToken, async (req, res) => {
         carbs: nutrition.carbs,
         fats: nutrition.fats
       },
-      recipe: "" 
+      recipe: ""
     });
 
     const savedMeal = await newMeal.save();
@@ -325,7 +325,7 @@ app.post('/api/nutrition/add-meal', verifyToken, async (req, res) => {
     // Update daily nutrition
     const today = new Date();
     today.setHours(0, 0, 0, 0);
-    
+
     await DailyNutrition.findOneAndUpdate(
       { userId: req.userId, date: { $gte: today } },
       {
@@ -432,11 +432,9 @@ app.get('/api/test', (req, res) => {
 // Modify the server start section
 if (process.env.NODE_ENV !== 'test') {
   const PORT = process.env.PORT || 6000;
-  if (process.env.NODE_ENV !== 'production') {
-    app.listen(PORT, () => {
-      console.log(`Server is running on port ${PORT}`);
-    });
-  }
+  app.listen(PORT, () => {
+    console.log(`Server is running on port ${PORT}`);
+  });
 }
 
 export default app;

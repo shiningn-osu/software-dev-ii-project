@@ -43,7 +43,7 @@ describe('GroceryList Component', () => {
 
     expect(screen.getByText('Your Grocery List')).toBeInTheDocument();
     expect(screen.getByPlaceholderText('Add a new item')).toBeInTheDocument();
-    expect(screen.getByText('Add Item')).toBeInTheDocument();
+    expect(screen.getByText('Add')).toBeInTheDocument();
   });
 
   test('shows empty list message', async () => {

@@ -19,7 +19,8 @@ const handleSubmit = async (e, setError, setSuccess, navigate) => {
   const password = formData.get('password');
 
   try {
-    const response = await fetch('/api/users/register', {
+    const PRE_URL = process.env.REACT_APP_PROD_SERVER_URL || '';
+    const response = await fetch(`${PRE_URL}/api/users/register`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -37,12 +38,12 @@ const handleSubmit = async (e, setError, setSuccess, navigate) => {
 
     setError('');
     setSuccess('Account created successfully! Redirecting to login...');
-    
+
     // Wait for 2 seconds before redirecting to show the success message
     setTimeout(() => {
       navigate('/login', { replace: true });
     }, 2000);
-    
+
   } catch (err) {
     setError('Failed to create account');
     setSuccess('');
@@ -77,9 +78,10 @@ const AccCreate = () => {
           <h2 className="centered">Create An Account</h2>
           {error && <div className="alert alert-danger">{error}</div>}
           {success && <div className="alert alert-success">{success}</div>}
-          <form 
-            className="centered" 
-            id="accountCreateForm" 
+          <form
+            role = "form" //this is necessary, as in the test looking by role fails to find this. something had overwritten the role
+            className="centered"
+            id="accountCreateForm"
             onSubmit={onSubmit}
           >
             <div className="text-input d-flex align-items-center">
@@ -108,8 +110,8 @@ const AccCreate = () => {
                   placeholder="Enter password"
                   required
                 />
-                <button 
-                  type="button" 
+                <button
+                  type="button"
                   className="btn btn-info"
                   onClick={togglePasswordVisibility}
                 >

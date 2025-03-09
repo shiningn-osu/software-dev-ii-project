@@ -1,5 +1,7 @@
 # Welcome to Meal Match
 
+For installation steps, see the UserDocumentation.md
+
 ## Documentation Guide
 Here you will find a navigation guide to find the documentation that you are looking for.
 

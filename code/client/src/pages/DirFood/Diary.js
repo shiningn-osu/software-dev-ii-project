@@ -225,6 +225,7 @@ const Diary = () => {
         weight: ing.weight,
         unit: 'g',
         nutrition: ing.nutrition
+
       })),
       nutrition: totalNutrition
     };
