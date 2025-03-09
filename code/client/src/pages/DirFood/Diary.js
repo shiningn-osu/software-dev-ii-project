@@ -35,7 +35,7 @@ const Diary = () => {
           totalCalories: meal.nutrition?.calories || 0,
           ingredients: meal.ingredients.map(ing => ({
             name: ing.name,
-            weight: ing.weight,
+            weight: ing.amount,
             nutrition: {
               calories: ing.nutrition?.calories || 0,
               protein: ing.nutrition?.protein || 0,
@@ -94,7 +94,7 @@ const Diary = () => {
     const newIngredient = {
       name: ingredient.trim(),
       weight: parseInt(weight),
-      ...nutrition
+      nutrition: nutrition
     };
 
     setIngredients([...ingredients, newIngredient]);
@@ -124,9 +124,22 @@ const Diary = () => {
   };
 
   // Save edited ingredient
-  const saveEdit = () => {
+  const saveEdit = async () => {
+    if (!editingIngredient.name || !editingIngredient.weight) {
+      setError("Please fill in both fields");
+      return;
+    }
+    setError("");
+
+    const nutrition = await fetchNutrition(editingIngredient.name, editingIngredient.weight);
     const newIngredients = [...ingredients];
-    newIngredients[editingIndex] = editingIngredient;
+    newIngredients[editingIndex] = {
+      ...editingIngredient,
+      nutrition: {
+        ...editingIngredient.nutrition,
+        ...nutrition
+      }
+    };
     setIngredients(newIngredients);
     setEditingIndex(null);
     setEditingIngredient(null);
@@ -142,7 +155,7 @@ const Diary = () => {
   const sendMealToDatabase = async (meal) => {
     try {
       const PRE_URL = process.env.REACT_APP_PROD_SERVER_URL || '';
-      const response = await axios.post(`${PRE_URL}/api/nutrition/add-meal`, meal, {
+      const response = await axios.post(`${PRE_URL}/api/meals/add`, meal, {
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('token')}`
         }
@@ -196,10 +209,10 @@ const Diary = () => {
     }
 
     const totalNutrition = ingredients.reduce((acc, ing) => ({
-      calories: acc.calories + ing.calories,
-      protein: acc.protein + ing.protein,
-      carbs: acc.carbs + ing.carbs,
-      fats: acc.fats + ing.fats
+      calories: acc.calories + ing.nutrition.calories,
+      protein: acc.protein + ing.nutrition.protein,
+      carbs: acc.carbs + ing.nutrition.carbs,
+      fats: acc.fats + ing.nutrition.fats
     }), { calories: 0, protein: 0, carbs: 0, fats: 0 });
 
     const newMeal = {
@@ -211,12 +224,7 @@ const Diary = () => {
         name: ing.name,
         weight: ing.weight,
         unit: 'g',
-        nutrition: {
-          calories: ing.calories,
-          protein: ing.protein,
-          carbs: ing.carbs,
-          fats: ing.fats
-        }
+        nutrition: ing.nutrition
       })),
       nutrition: totalNutrition
     };
@@ -301,7 +309,7 @@ const Diary = () => {
                         <input
                           type="number"
                           name="calories"
-                          value={editingIngredient.calories}
+                          value={editingIngredient.nutrition.calories}
                           onChange={handleEditChange}
                         />
                       </td>
@@ -309,7 +317,7 @@ const Diary = () => {
                         <input
                           type="number"
                           name="protein"
-                          value={editingIngredient.protein}
+                          value={editingIngredient.nutrition.protein}
                           onChange={handleEditChange}
                         />
                       </td>
@@ -317,7 +325,7 @@ const Diary = () => {
                         <input
                           type="number"
                           name="carbs"
-                          value={editingIngredient.carbs}
+                          value={editingIngredient.nutrition.carbs}
                           onChange={handleEditChange}
                         />
                       </td>
@@ -325,7 +333,7 @@ const Diary = () => {
                         <input
                           type="number"
                           name="fats"
-                          value={editingIngredient.fats}
+                          value={editingIngredient.nutrition.fats}
                           onChange={handleEditChange}
                         />
                       </td>
@@ -338,10 +346,10 @@ const Diary = () => {
                     <>
                       <td>{ing.name}</td>
                       <td>{ing.weight}g</td>
-                      <td>{ing.calories}kcal</td>
-                      <td>{ing.protein}g</td>
-                      <td>{ing.carbs}g</td>
-                      <td>{ing.fats}g</td>
+                      <td>{ing.nutrition.calories}kcal</td>
+                      <td>{ing.nutrition.protein}g</td>
+                      <td>{ing.nutrition.carbs}g</td>
+                      <td>{ing.nutrition.fats}g</td>
                       <td>
                         <button
                           onClick={() => editIngredient(index)}
