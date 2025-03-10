@@ -116,7 +116,7 @@ describe('Server Tests', () => {
       const response = await request(app)
         .get('/api/nutrition/current')
         .set('Authorization', `Bearer ${testToken}`);
-      
+
       expect(response.status).toBe(200);
       // The response should have calories, protein, carbs, fats
       expect(response.body).toHaveProperty('calories');
@@ -125,7 +125,7 @@ describe('Server Tests', () => {
       expect(response.body).toHaveProperty('fats');
     });
 
-    test.skip('POST /api/nutrition/add-custom should add custom food', async () => {
+    test('POST /api/nutrition/add-custom should add custom food', async () => {
       const foodData = {
         name: 'Test Food',
         servingSize: '100g',
@@ -217,7 +217,7 @@ describe('Server Tests', () => {
       const response = await request(app)
         .get('/api/nutrition/search')
         .query({ query: 'apple' });
-      
+
       expect(response.status).toBe(500);
       expect(response.body).toHaveProperty('message');
     });
@@ -250,7 +250,7 @@ describe('Server Tests', () => {
         .get('/api/krogerProducts')
         .query({ query: 'apple', locationId: '123' });
       expect(response.status).toBe(500);
-      
+
       // Add small delay after the test
       await new Promise(resolve => setTimeout(resolve, 100));
     });
@@ -261,8 +261,8 @@ describe('Server Tests', () => {
         .set('Authorization', `Bearer ${testToken}`)
         .send({
           userId: testUser._id.toString(),
-          allergies: ['peanut'],
-          diet: 'balanced',
+          allergies: ['peanut-free'],
+          diet: 'high-protein',
           minCalories: 1500,
           maxCalories: 2500
         });
@@ -278,7 +278,7 @@ describe('Server Tests', () => {
           minCalories: 'invalid',
           maxCalories: 'invalid'
         });
-      expect(response.status).toBe(200);
+      expect(response.status).toBe(400);
     });
 
     test('POST /api/generate-meal-plan should handle missing parameters', async () => {
@@ -286,7 +286,7 @@ describe('Server Tests', () => {
         .post('/api/generate-meal-plan')
         .set('Authorization', `Bearer ${testToken}`)
         .send({});
-      expect(response.status).toBe(200);
+      expect(response.status).toBe(400);
     });
   });
 
@@ -331,7 +331,7 @@ describe('Server Tests', () => {
           minCalories: 'invalid',
           maxCalories: 'invalid'
         });
-      expect(response.status).toBe(200);
+      expect(response.status).toBe(400);
     });
 
     test('POST /api/generate-meal-plan should handle missing parameters', async () => {
@@ -339,7 +339,7 @@ describe('Server Tests', () => {
         .post('/api/generate-meal-plan')
         .set('Authorization', `Bearer ${testToken}`)
         .send({});
-      expect(response.status).toBe(200);
+      expect(response.status).toBe(400);
     });
   });
 });
@@ -348,7 +348,7 @@ describe('Server Tests', () => {
 afterAll(async () => {
   // Close mongoose connection
   await mongoose.disconnect();
-  
+
   // Add a small delay to allow connections to close
   await new Promise(resolve => setTimeout(resolve, 500));
 
