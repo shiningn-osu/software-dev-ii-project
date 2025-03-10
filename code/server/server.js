@@ -16,18 +16,13 @@ import NutritionGoals from './models/nutritionGoals.js';
 import jwt from 'jsonwebtoken';
 import DailyNutrition from './models/dailyNutrition.js';
 import fetch from 'node-fetch';
-import { verifyToken } from './middlewares/authMiddleware.js';
-
-// Create Express app
-const app = express();
 
 // Load environment variables
 dotenv.config();
+const app = express();
 
-// Only connect to DB if not in test environment
-if (process.env.NODE_ENV !== 'test') {
-  connectDB();
-}
+// Connect to MongoDB
+connectDB();
 
 // Determine CORS origin based on environment
 const corsOrigin = process.env.NODE_ENV === 'production'
@@ -91,8 +86,14 @@ async function ensureValidToken(req, res, next) {
 }
 //kroger
 app.get("/api/krogerLocations", ensureValidToken, async (req, res) => {
+  const zipCode = req.query.zipcode;
+  if (!zipCode) {
+    return res.status(400).json({ error: "zip code is missing" });
+  }
+
+
   try {
-    const locResponse = await fetch("https://api.kroger.com/v1/locations?filter.zipCode.near=97333", {
+    const locResponse = await fetch(`https://api.kroger.com/v1/locations?filter.zipCode.near=${zipCode}`, {
       headers: { "Authorization": `Bearer ${accessToken}` }
     });
 
@@ -139,6 +140,28 @@ const EDAMAM_APP_ID = process.env.EDAMAM_APP_ID || "16138714";
 const EDAMAM_APP_KEY = process.env.EDAMAM_APP_KEY || "2598c0e6de2179e988541e49d26f91d3";
 const EDAMAM_ACCOUNT_USER = process.env.EDAMAM_ACCOUNT_USER || "aidenmm22";
 const EDAMAM_API_URL = `https://api.edamam.com/api/meal-planner/v1/${EDAMAM_APP_ID}/select?type=public&app_id=${EDAMAM_APP_ID}&app_key=${EDAMAM_APP_KEY}`;
+
+// Middleware to verify JWT token
+const verifyToken = (req, res, next) => {
+  try {
+    const authHeader = req.headers.authorization;
+    if (!authHeader) {
+      return res.status(401).json({ message: 'No token provided' });
+    }
+
+    const token = authHeader.split(' ')[1];
+    if (!token) {
+      return res.status(401).json({ message: 'Invalid token format' });
+    }
+
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    req.userId = decoded.userId;
+    next();
+  } catch (error) {
+    console.error('Token verification error:', error);
+    return res.status(401).json({ message: 'Invalid token' });
+  }
+};
 
 // Routes
 app.use('/api/users', userRoutes);
@@ -329,36 +352,87 @@ app.post('/api/nutrition/add-meal', verifyToken, async (req, res) => {
   }
 });
 
-// Ensure this endpoint is protected with verifyToken middleware
-app.post("/api/generate-meal-plan", verifyToken, async (req, res) => {
+// Meal Plan Generation endpoint
+app.post("/api/generate-meal-plan", async (req, res) => {
+  const { allergies, diet, minCalories, maxCalories } = req.body;
+
+  const requestBody = {
+    size: 7,
+    plan: {
+      accept: {
+        all: [
+          { health: Array.isArray(allergies) ? allergies : [allergies] },
+          { diet: diet ? [diet] : [] },
+        ],
+      },
+      fit: {
+        ENERC_KCAL: { min: Number(minCalories), max: Number(maxCalories) },
+        "SUGAR.added": { max: 20 },
+      },
+      sections: {
+        Breakfast: {
+          accept: {
+            all: [
+              { dish: ["drinks", "egg", "biscuits and cookies", "bread", "pancake", "cereals"] },
+              { meal: ["breakfast"] },
+            ],
+          },
+          fit: { ENERC_KCAL: { min: 100, max: 600 } },
+        },
+        Lunch: {
+          accept: {
+            all: [
+              { dish: ["main course", "pasta", "egg", "salad", "soup", "sandwiches", "pizza", "seafood"] },
+              { meal: ["lunch/dinner"] },
+            ],
+          },
+          fit: { ENERC_KCAL: { min: 300, max: 900 } },
+        },
+        Dinner: {
+          accept: {
+            all: [
+              { dish: ["seafood", "egg", "salad", "pizza", "pasta", "main course"] },
+              { meal: ["lunch/dinner"] },
+            ],
+          },
+          fit: { ENERC_KCAL: { min: 200, max: 900 } },
+        },
+      },
+    },
+  };
+
   try {
-    const { userId, allergies, diet, minCalories, maxCalories } = req.body;
-    
-    // Your existing meal plan generation code...
-    
-    // Mock response for testing
-    res.json({
-      meals: [],
-      nutrients: {
-        calories: 2000,
-        protein: 100,
-        fat: 70,
-        carbs: 250
-      }
+    const response = await fetch(EDAMAM_API_URL, {
+      method: "POST",
+      headers: {
+        "accept": "application/json",
+        "Content-Type": "application/json",
+        "Edamam-Account-User": EDAMAM_ACCOUNT_USER,
+      },
+      body: JSON.stringify(requestBody),
     });
+
+    if (!response.ok) {
+      console.error("Edamam API Error:", response.statusText);
+      return res.status(response.status).json({ error: await response.text() });
+    }
+
+    const data = await response.json();
+    res.json(data);
   } catch (error) {
-    console.error("Error generating meal plan:", error);
-    res.status(500).json({ error: "Failed to generate meal plan" });
+    console.error("Internal Server Error:", error);
+    res.status(500).json({ error: "Internal server error" });
   }
 });
 
-// Basic test endpoints
+// Test route to verify server is working
 app.get('/test', (req, res) => {
-  res.status(200).json({ message: 'Server is working' });
+  res.json({ message: 'Server is working' });
 });
 
+// Add a test endpoint
 app.get('/api/test', (req, res) => {
-  res.status(200).json({ message: 'Server is working' });
+  res.json({ message: 'Server is working' });
 });
 
 // Modify the server start section
