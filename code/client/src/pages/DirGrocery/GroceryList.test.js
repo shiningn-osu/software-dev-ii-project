@@ -1,70 +1,85 @@
 import React from 'react';
-import { render, screen } from '@testing-library/react';
-import { BrowserRouter } from 'react-router-dom';
+import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { MemoryRouter } from 'react-router-dom';
 import GroceryList from './GroceryList';
-import '@testing-library/jest-dom';
 
-// Mock useNavigate
-const mockNavigate = jest.fn();
 jest.mock('react-router-dom', () => ({
   ...jest.requireActual('react-router-dom'),
-  useNavigate: () => mockNavigate,
-  useLocation: () => ({ state: null })
+  useNavigate: jest.fn(),
 }));
-
-// Mock fetch
-global.fetch = jest.fn(() =>
-  Promise.resolve({
-    ok: true,
-    json: () => Promise.resolve([])
-  })
-);
-
-// Mock localStorage
-const mockLocalStorage = {
-  getItem: jest.fn(() => 'fake-token'),
-  removeItem: jest.fn()
-};
-Object.defineProperty(window, 'localStorage', { value: mockLocalStorage });
 
 describe('GroceryList Component', () => {
   beforeEach(() => {
-    fetch.mockClear();
-    mockNavigate.mockClear();
-    mockLocalStorage.getItem.mockClear();
+    localStorage.clear();
+    jest.restoreAllMocks();
   });
 
-  test('renders grocery list elements', async () => {
+  test('renders the component correctly', () => {
     render(
-      <BrowserRouter>
+      <MemoryRouter>
         <GroceryList />
-      </BrowserRouter>
+      </MemoryRouter>
     );
-
-    expect(screen.getByText('Your Grocery List')).toBeInTheDocument();
-    expect(screen.getByPlaceholderText('Add a new item')).toBeInTheDocument();
-    expect(screen.getByText('Add')).toBeInTheDocument();
+    expect(screen.getByText(/Your Grocery List/i)).toBeInTheDocument();
   });
 
-  test('shows empty list message', async () => {
+  test('adds an item to the grocery list', async () => {
     render(
-      <BrowserRouter>
+      <MemoryRouter>
         <GroceryList />
-      </BrowserRouter>
+      </MemoryRouter>
     );
 
-    expect(screen.getByText('No items in the grocery list.')).toBeInTheDocument();
+    const input = screen.getByPlaceholderText('Add a new item');
+    const addButton = screen.getByText('Add');
+
+    fireEvent.change(input, { target: { value: 'Milk' } });
+    fireEvent.click(addButton);
+
+    await waitFor(() => expect(screen.getByText('Milk')).toBeInTheDocument());
   });
 
-  test('redirects to login when no token', () => {
-    mockLocalStorage.getItem.mockReturnValueOnce(null);
-
+  test('removes an item from the grocery list', async () => {
     render(
-      <BrowserRouter>
+      <MemoryRouter>
         <GroceryList />
-      </BrowserRouter>
+      </MemoryRouter>
     );
 
-    expect(mockNavigate).toHaveBeenCalledWith('/login');
+    const input = screen.getByPlaceholderText('Add a new item');
+    const addButton = screen.getByText('Add');
+
+    fireEvent.change(input, { target: { value: 'Eggs' } });
+    fireEvent.click(addButton);
+
+    await waitFor(() => expect(screen.getByText('Eggs')).toBeInTheDocument());
+
+    const removeButton = screen.getByText('Remove');
+    fireEvent.click(removeButton);
+
+    await waitFor(() => expect(screen.queryByText('Eggs')).not.toBeInTheDocument());
+  });
+
+  test('updates the quantity of an item', async () => {
+    render(
+      <MemoryRouter>
+        <GroceryList />
+      </MemoryRouter>
+    );
+
+    const input = screen.getByPlaceholderText('Add a new item');
+    const addButton = screen.getByText('Add');
+
+    fireEvent.change(input, { target: { value: 'Bread' } });
+    fireEvent.click(addButton);
+
+    await waitFor(() => expect(screen.getByText('Bread')).toBeInTheDocument());
+
+    const quantityInputs = screen.getAllByDisplayValue('1');
+    const quantityInput = quantityInputs[quantityInputs.length - 1]; // Select the last added item
+
+    fireEvent.change(quantityInput, { target: { value: '3' } });
+
+    await waitFor(() => expect(screen.getByDisplayValue('3')).toBeInTheDocument());
   });
 });
