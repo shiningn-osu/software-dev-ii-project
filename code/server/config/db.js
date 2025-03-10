@@ -5,36 +5,29 @@ dotenv.config();
 
 const connectDB = async () => {
   try {
-    mongoose.set('debug', true)
+    // Don't connect if we're already connected
+    if (mongoose.connection.readyState === 1) {
+      return mongoose.connection;
+    }
 
-    // Listen for connection events
-    mongoose.connection.on('connected', () => {
-      console.log('Mongoose connected to DB');
-    });
+    // Don't connect if we're in test mode (connection handled by tests)
+    if (process.env.NODE_ENV === 'test') {
+      return;
+    }
 
-    mongoose.connection.on('error', (err) => {
-      console.error(`Mongoose connection error: ${err}`);
-    });
+    const conn = await mongoose.connect(process.env.MONGODB_URI);
 
-    mongoose.connection.on('disconnected', () => {
-      console.log('Mongoose disconnected');
-    });
+    if (process.env.NODE_ENV !== 'test') {
+      console.log(`MongoDB Connected: ${conn.connection.host}`);
+    }
 
-    const options = {
-      connectTimeoutMS: 10000,       // Timeout for establishing the connection (10 seconds)
-      serverSelectionTimeoutMS: 5000, // Timeout for selecting a server (5 seconds)
-      family: 4
-    };
-
-    const conn = await mongoose.connect(process.env.MONGODB_URI, options);
-    console.log(`MongoDB Connected: ${conn.connection.host}`);
     return conn;
   } catch (error) {
     console.error(`Error: ${error.message}`);
     if (process.env.NODE_ENV !== 'test') {
       process.exit(1);
     }
-    throw error; // Re-throw the error for testing environments
+    throw error; // Re-throw the error in test environment
   }
 };
 

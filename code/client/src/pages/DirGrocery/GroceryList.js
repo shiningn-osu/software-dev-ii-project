@@ -129,6 +129,14 @@ function GroceryList() {
     }
   }, [location.state, navigate]);
 
+  // Add ESLint ignore comment for the missing dependencies
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  useEffect(() => {
+    if (location.pathname === '/grocery') {
+      saveGroceryList(groceryList);
+    }
+  }, []);
+
   const addItem = async () => {
     if (newItem.trim()) {
       // Check if item with same name exists

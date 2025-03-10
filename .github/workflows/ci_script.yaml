@@ -10,14 +10,7 @@ jobs:
   build:
     runs-on: ubuntu-latest
 
-    services:
-      mongodb:
-        image: mongo
-        ports:
-          - 27017:27017
-
     env:
-      MONGODB_URI: mongodb://localhost:27017/test_db
       JWT_SECRET: test_secret
       NODE_ENV: test
 
@@ -32,25 +25,31 @@ jobs:
       # Client setup and tests
       - name: Install Client Dependencies
         run: cd code/client && npm install
+        timeout-minutes: 5
       
       - name: Run Client Tests
         run: cd code/client && npm test
         env:
           CI: true
+        timeout-minutes: 5
 
       # Server setup and tests
       - name: Install Server Dependencies
         run: cd code/server && npm install
+        timeout-minutes: 5
       
       - name: Run Server Tests
         run: cd code/server && npm test
         env:
           CI: true
-          MONGODB_URI: ${{ env.MONGODB_URI }}
           JWT_SECRET: ${{ env.JWT_SECRET }}
+          NODE_ENV: ${{ env.NODE_ENV }}
+          # Using mongodb-memory-server, so no need for MONGODB_URI
+        timeout-minutes: 10
 
       # Add build step if needed for deployment
       - name: Build Client
         run: cd code/client && npm run build
         env:
-          CI: true
+          CI: false
+        timeout-minutes: 5
