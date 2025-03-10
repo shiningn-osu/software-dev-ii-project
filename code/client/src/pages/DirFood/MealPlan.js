@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import "./mealPlan.css";
 
 const MealPlan = () => {
+  // Form state for allergies, diet, and calories
   const [formData, setFormData] = useState({
     allergies: [],
     diet: [],
@@ -9,25 +10,31 @@ const MealPlan = () => {
     maxCalories: 2000,
   });
 
-  const [mealPlan, setMealPlan] = useState(null);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
-  const [recipeDetails, setRecipeDetails] = useState({});
-  const [savedPlans, setSavedPlans] = useState([]);
-  const [planName, setPlanName] = useState('');
+  // Meal plan state 
+  const [mealPlan, setMealPlan] = useState(null); // Stores generated meal plan
+  const [loading, setLoading] = useState(false); // Loading state during API call
+  const [error, setError] = useState(null); // Stores error message when/if API call fails
+  const [recipeDetails, setRecipeDetails] = useState({}); // Stores recipe details
+  const [savedPlans, setSavedPlans] = useState([]); // Stores saved meal plans
+  const [planName, setPlanName] = useState(''); // Stores user input for saving a plan
   const [showSaveDialog, setShowSaveDialog] = useState(false);
   // eslint-disable-next-line no-unused-vars
   const [isSaving, setIsSaving] = useState(false);
-  // eslint-disable-next-line no-unused-vars
-  const [isLoading, setIsLoading] = useState(false);
 
+  // Edamam API credentials
   const EDAMAM_APP_ID = "16138714";
   const EDAMAM_APP_KEY = "2598c0e6de2179e988541e49d26f91d3";
 
+  /**
+   * Handles form input changes and updates state accordingly.
+   * Supports both text inputs and multi-select fields.
+   * @param {Event} e - The change event from form inputs.
+   */
   const handleChange = (e) => {
     const { name, value, type, selectedOptions } = e.target;
 
     if (type === "select-multiple") {
+      // Extract values from selected options
       const values = Array.from(selectedOptions, (option) => option.value);
       setFormData({ ...formData, [name]: values });
     } else {
@@ -35,12 +42,18 @@ const MealPlan = () => {
     }
   };
 
+  /**
+   * Handles form submission to generate a meal plan.
+   * Sends user input data to the backend API for processing.
+   * @param {Event} e - The form submit event.
+   */
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
     setError(null);
 
     try {
+      // Determine API URL from environment variable or default
       const PRE_URL = process.env.REACT_APP_PROD_SERVER_URL || '';
       const response = await fetch(`${PRE_URL}/api/generate-meal-plan`, {
         method: "POST",
@@ -58,6 +71,7 @@ const MealPlan = () => {
         throw new Error(errorText || "Failed to fetch meal plan");
       }
 
+      // Parse and store meal plan data
       const data = await response.json();
       console.log("Received Meal Plan Data from Server:", data);
 
@@ -71,6 +85,11 @@ const MealPlan = () => {
     }
   };
 
+  /**
+   * Fetches detailed information about a recipe from Edamam API.
+   * @param {string} recipeId - The unique recipe ID from the meal plan.
+   * @returns {Object|null} Recipe details or null if an error occurs.
+   */
   const fetchRecipeDetails = async (recipeId) => {
     try {
       const response = await fetch(
@@ -86,6 +105,7 @@ const MealPlan = () => {
 
       if (!response.ok) throw new Error("Failed to fetch recipe details");
 
+      // Parse and return relevant recipe data
       const data = await response.json();
       return {
         name: data.recipe.label,
@@ -103,6 +123,10 @@ const MealPlan = () => {
     }
   };
 
+  /**
+   * Fetches recipe details for all meals in the generated meal plan.
+   * @param {Array} selection - List of meals included in the meal plan.
+   */
   const fetchRecipeDetailsForAll = async (selection) => {
     const details = {};
 
@@ -133,12 +157,12 @@ const MealPlan = () => {
         }
 
         const PRE_URL = process.env.REACT_APP_PROD_SERVER_URL || '';
-        const response = await fetch(`${PRE_URL}/api/users/meal-plans`, {  // Use relative URL
+        const response = await fetch(`${PRE_URL}/api/users/meal-plans`, { 
           headers: {
             'Authorization': `Bearer ${token}`,
             'Accept': 'application/json',
           },
-          credentials: 'include',  // Include credentials
+          credentials: 'include',  // Include credentials if needed 
         });
 
         if (!response.ok) {
@@ -212,7 +236,6 @@ const MealPlan = () => {
     }
   };
 
-  // Add this near your existing JSX, perhaps after the meal plan display
   const renderSaveDialog = () => (
     <div className="save-dialog">
       <input

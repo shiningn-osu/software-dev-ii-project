@@ -1,16 +1,15 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import './Grocery.css';
 
 function GroceryList() {
-  const [groceryList, setGroceryList] = useState([]);
-  const [newItem, setNewItem] = useState('');
-  const [newQuantity, setNewQuantity] = useState(1);
-  const [error, setError] = useState(null);
-  const location = useLocation();
-  const navigate = useNavigate();
+  const [groceryList, setGroceryList] = useState([]); // Stores grocery items
+  const [newItem, setNewItem] = useState(''); // Stores new item input from user
+  const [newQuantity, setNewQuantity] = useState(1); // Stores quantity for new item
+  const [error, setError] = useState(null); // Stores error messages
+  const navigate = useNavigate(); // Hook for navigation
 
-  // Move fetchGroceryList inside useCallback to prevent infinite loop
+  // Fetch grocery list from server and merge with localStorage data
   const fetchGroceryList = useCallback(async () => {
     try {
       const token = localStorage.getItem('token');
@@ -18,7 +17,8 @@ function GroceryList() {
         navigate('/login');
         return;
       }
-
+      
+      // Fetch grocery list from server
       const PRE_URL = process.env.REACT_APP_PROD_SERVER_URL || '';
       const response = await fetch(`${PRE_URL}/api/users/grocery-list`, {
         headers: {
@@ -26,66 +26,82 @@ function GroceryList() {
           'Content-Type': 'application/json'
         }
       });
-
+  
       if (response.status === 401) {
         localStorage.removeItem('token');
         navigate('/login');
         return;
       }
-
+  
       if (!response.ok) {
         throw new Error('Failed to fetch grocery list');
       }
-
-      const data = await response.json();
-      
-      // Parse items to extract name and quantity
-      const parsedItems = data.map(item => {
-        // Check if the item contains quantity information
+  
+      const serverData = await response.json();
+  
+      // Convert server data to proper format
+      const parsedServerItems = serverData.map(item => {
         if (item.includes(' (x')) {
           const match = item.match(/(.*) \(x(\d+)\)/);
           if (match) {
             return {
-              name: match[1],
-              quantity: parseInt(match[2], 10),
+              name: match[1].trim(),
+              quantity: parseInt(match[2], 10), 
               id: Date.now() + Math.random()
             };
           }
         }
-        // Default to quantity 1 if no quantity info
-        return {
-          name: item,
-          quantity: 1,
-          id: Date.now() + Math.random()
-        };
+        return { name: item.trim(), quantity: 1, id: Date.now() + Math.random() };
       });
-      
-      setGroceryList(parsedItems);
+  
+      // Get stored list from localStorage
+      const storedList = JSON.parse(localStorage.getItem("groceryList")) || [];
+  
+      // Merge lists, preserving existing item quantity
+      const mergedList = [...storedList];
+  
+      parsedServerItems.forEach(serverItem => {
+        const existingItem = mergedList.find(i => i.name === serverItem.name);
+        if (!existingItem) {
+          mergedList.push(serverItem);
+        }
+      });
+  
+      // Update state and save merged list in localStorage
+      setGroceryList(mergedList);
+      localStorage.setItem("groceryList", JSON.stringify(mergedList));
     } catch (err) {
       console.error('Error:', err);
       setError('Failed to load grocery list');
     }
   }, [navigate]);
+  
 
   // Initial fetch
   useEffect(() => {
     fetchGroceryList();
   }, [fetchGroceryList]);
 
-  // Save grocery list to server
+  /**
+   * Saves the grocery list to localStorage and updates the server.
+   * @param {Array} items - The updated grocery list.
+   */
   const saveGroceryList = async (items) => {
+    // Save to localStorage
+    localStorage.setItem("groceryList", JSON.stringify(items));
+  
     try {
       const token = localStorage.getItem('token');
       if (!token) {
         navigate('/login');
         return;
       }
-
-      // Convert items to strings with quantity information
+      
+      // Convert items to a list of strings with quanitity info
       const stringItems = items.map(item => 
         item.quantity > 1 ? `${item.name} (x${item.quantity})` : item.name
       );
-
+  
       const PRE_URL = process.env.REACT_APP_PROD_SERVER_URL || '';
       const response = await fetch(`${PRE_URL}/api/users/grocery-list`, {
         method: 'POST',
@@ -95,13 +111,13 @@ function GroceryList() {
         },
         body: JSON.stringify({ items: stringItems })
       });
-
+  
       if (response.status === 401) {
         localStorage.removeItem('token');
         navigate('/login');
         return;
       }
-
+  
       if (!response.ok) {
         throw new Error('Failed to save grocery list');
       }
@@ -110,25 +126,30 @@ function GroceryList() {
       setError('Failed to save grocery list');
     }
   };
-
-  // Handle location updates
+  
+  // Load grocery list from localStorage whenever the component updates
   useEffect(() => {
-    if (location.state?.ingredients) {
-      const newIngredients = location.state.ingredients.filter(
-        (ingredient) => !groceryList.some(item => item.name === ingredient.name)
-      );
-      
-      if (newIngredients.length > 0) {
-        const newList = [...groceryList, ...newIngredients];
-        setGroceryList(newList);
-        saveGroceryList(newList);
-      }
-
-      // Clear the location state to prevent re-adding ingredients
-      navigate(location.pathname, { replace: true });
-    }
-  }, [location.state, navigate]);
-
+    const fetchStoredGroceryList = () => {
+      const storedList = JSON.parse(localStorage.getItem("groceryList")) || [];
+      setGroceryList(storedList);
+    };
+  
+    fetchStoredGroceryList();
+  
+    // Listen for navigation to update list when coming from Recipe Search
+    const handleStorageUpdate = () => {
+      fetchStoredGroceryList();
+    };
+  
+    window.addEventListener("storage", handleStorageUpdate);
+  
+    return () => {
+      window.removeEventListener("storage", handleStorageUpdate);
+    };
+  }, []);
+  
+  
+  // Add a new item to grocery list
   const addItem = async () => {
     if (newItem.trim()) {
       // Check if item with same name exists
@@ -162,15 +183,22 @@ function GroceryList() {
     }
   };
 
+  // Handle input changes
   const handleInputChange = (e) => {
     setNewItem(e.target.value);
   };
 
+  // Handle quantity changes
   const handleQuantityChange = (e) => {
     const value = parseInt(e.target.value, 10);
     setNewQuantity(isNaN(value) ? 1 : Math.max(1, value));
   };
 
+    /**
+   * Updates the quantity of an existing grocery list item.
+   * @param {string} id - The ID of the item to update.
+   * @param {number} newQuantity - The new quantity value.
+   */
   const updateItemQuantity = async (id, newQuantity) => {
     const updatedList = groceryList.map(item => 
       item.id === id ? { ...item, quantity: Math.max(1, newQuantity) } : item
@@ -179,6 +207,10 @@ function GroceryList() {
     await saveGroceryList(updatedList);
   };
 
+    /**
+   * Removes an item from the grocery list.
+   * @param {string} id - The ID of the item to remove.
+   */
   const removeItem = async (id) => {
     const updatedList = groceryList.filter(item => item.id !== id);
     setGroceryList(updatedList);
