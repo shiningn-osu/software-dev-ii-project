@@ -57,7 +57,7 @@ function GrocerySearch() {
   };
 
 
-
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {  //triggered when locData updates
     if (!locData || !query) return;
     console.log("LOC DATA UPDATED:", locData);

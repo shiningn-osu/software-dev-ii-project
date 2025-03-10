@@ -87,4 +87,47 @@ describe('ProtectedRoute', () => {
       {}
     );
   });
+
+  test('handles empty or invalid token', () => {
+    // Test with empty token
+    localStorage.setItem('token', '');
+    
+    render(
+      <MemoryRouter>
+        <ProtectedRoute>
+          <div>Protected Content</div>
+        </ProtectedRoute>
+      </MemoryRouter>
+    );
+
+    expect(Navigate).toHaveBeenCalledWith(
+      {
+        to: '/login',
+        state: { from: expect.any(Object) },
+        replace: true
+      },
+      {}
+    );
+
+    // Clear and test with null token
+    localStorage.clear();
+    localStorage.setItem('token', null);
+    
+    render(
+      <MemoryRouter>
+        <ProtectedRoute>
+          <div>Protected Content</div>
+        </ProtectedRoute>
+      </MemoryRouter>
+    );
+
+    expect(Navigate).toHaveBeenCalledWith(
+      {
+        to: '/login',
+        state: { from: expect.any(Object) },
+        replace: true
+      },
+      {}
+    );
+  });
 }); 

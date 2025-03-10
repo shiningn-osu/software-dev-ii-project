@@ -86,8 +86,14 @@ async function ensureValidToken(req, res, next) {
 }
 //kroger
 app.get("/api/krogerLocations", ensureValidToken, async (req, res) => {
+  const zipCode = req.query.zipcode;
+  if (!zipCode) {
+    return res.status(400).json({ error: "zip code is missing" });
+  }
+
+
   try {
-    const locResponse = await fetch("https://api.kroger.com/v1/locations?filter.zipCode.near=97333", {
+    const locResponse = await fetch(`https://api.kroger.com/v1/locations?filter.zipCode.near=${zipCode}`, {
       headers: { "Authorization": `Bearer ${accessToken}` }
     });
 

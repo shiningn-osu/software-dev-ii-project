@@ -57,7 +57,9 @@ function Login() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
-    const username = e.target.username.value;
+    const formData = new FormData(e.currentTarget);
+    const username = formData.get('username');
+    const submittedPassword = formData.get('password');
 
     try {
       const PRE_URL = process.env.REACT_APP_PROD_SERVER_URL || '';
@@ -67,7 +69,10 @@ function Login() {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ username, password }),
+        body: JSON.stringify({ 
+          username, 
+          password: submittedPassword 
+        }),
       });
 
       const data = await response.json();
@@ -110,7 +115,12 @@ function Login() {
         <section className='account-box'>
           <h2 className='centered'>Login to Your Account</h2>
           {error && <div className="alert alert-danger">{error}</div>}
-          <form onSubmit={handleSubmit} className='centered' id="accountLoginForm">
+          <form 
+            onSubmit={handleSubmit} 
+            className='centered' 
+            id="accountLoginForm"
+            data-testid="accountLoginForm"
+          >
             <div className='text-input d-flex align-items-center'>
               <label htmlFor="username" className="d-flex align-items-center justify-content-center"
                 id="searchLabel">Username: </label>

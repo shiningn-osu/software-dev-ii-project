@@ -79,6 +79,7 @@ const AccCreate = () => {
           {error && <div className="alert alert-danger">{error}</div>}
           {success && <div className="alert alert-success">{success}</div>}
           <form
+            // eslint-disable-next-line jsx-a11y/no-redundant-roles
             role = "form" //this is necessary, as in the test looking by role fails to find this. something had overwritten the role
             className="centered"
             id="accountCreateForm"
