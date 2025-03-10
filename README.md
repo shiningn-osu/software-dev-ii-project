@@ -11,6 +11,8 @@ Here you will find a navigation guide to find the documentation that you are loo
 - An outline of the main functionalities that the Meal Match project supports
 - A bug section describing currently known bugs and how to submit bug reports
 
+[UserDocumentation.md] (./UserDocumentation.md)
+
 ### DeveloperDocumentation.md Entails:
 - Information about how to acquire the source code of meal match
 - The directory structure of the code folder
@@ -19,7 +21,11 @@ Here you will find a navigation guide to find the documentation that you are loo
 - How to add custom tests for the project's code
 - How to build a release of the project's code
 
+[DeveloperDocumentation.md] (./DeveloperDocumentation.md)
+
 ### team-resources.md Entails: 
 - Team members and roles
 - Project artifacts
 - Team member communication policies
+
+[team-resources.md] (./team-resources.md)
