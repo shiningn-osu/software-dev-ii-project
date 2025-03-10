@@ -34,7 +34,7 @@ function GrocerySearch() {
 
     try {
       const PRE_URL = process.env.REACT_APP_PROD_SERVER_URL || '';
-      const response = await fetch(`${PRE_URL}api/krogerLocations?zipcode=${zipQuery}`);
+      const response = await fetch(`${PRE_URL}/api/krogerLocations?zipcode=${zipQuery}`);
       const data = await response.json();
       console.log("Locations1:", data);
 
@@ -67,7 +67,7 @@ function GrocerySearch() {
         console.log("LOC DATA:", locData);
         console.log("LOC NAME: ", locData.name)
         const PRE_URL = process.env.REACT_APP_PROD_SERVER_URL || '';
-        const response = await fetch(`${PRE_URL}api/krogerProducts?query=${query}&locationId=${locData.locationId}`);
+        const response = await fetch(`${PRE_URL}/api/krogerProducts?query=${query}&locationId=${locData.locationId}`);
         const data = await response.json();
         console.log("Products:", data);
         
