@@ -136,6 +136,7 @@ const Nutrition = () => {
       }
 
       const data = await response.json();
+
       // Ensure all history values are non-negative
       const safeData = data.map(day => ({
         ...day,
@@ -162,14 +163,14 @@ const Nutrition = () => {
   // Add this helper function to calculate averages
   const calculateAverage = (history) => {
     if (!history || history.length === 0) return null;
-
+  
     const totals = history.reduce((acc, day) => ({
       calories: acc.calories + (day.totals?.calories || 0),
       protein: acc.protein + (day.totals?.protein || 0),
       carbs: acc.carbs + (day.totals?.carbs || 0),
       fats: acc.fats + (day.totals?.fats || 0)
     }), { calories: 0, protein: 0, carbs: 0, fats: 0 });
-
+  
     return {
       calories: Math.round(totals.calories / history.length),
       protein: Math.round(totals.protein / history.length),

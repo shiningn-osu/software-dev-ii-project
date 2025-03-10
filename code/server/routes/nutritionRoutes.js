@@ -124,6 +124,7 @@ router.get('/today', verifyToken, async (req, res) => {
   }
 });
 
+
 // Get nutrition history
 router.get('/history', verifyToken, async (req, res) => {
   try {
@@ -135,15 +136,49 @@ router.get('/history', verifyToken, async (req, res) => {
     startDate.setUTCDate(startDate.getUTCDate() - parseInt(days));
     startDate.setUTCHours(0, 0, 0, 0);
 
-    const history = await DailyNutrition.find({
-      userId: req.userId,
-      date: { $gte: startDate, $lte: endDate }
-    }).sort({ date: -1 }); // Sort by most recent first
+    // Get data from both collections
+    const [dailyLogs, meals] = await Promise.all([
+      DailyNutrition.find({
+        userId: req.userId,
+        date: { $gte: startDate, $lte: endDate }
+      }),
+      Meal.find({
+        creator: req.userId,
+        createdAt: { $gte: startDate, $lte: endDate }
+      })
+    ]);
 
-    res.json(history);
+    // Combine and format data
+    const combinedData = dailyLogs.map(log => ({
+      date: log.date,
+      totals: log.totals
+    }));
+
+    meals.forEach(meal => {
+      const mealDate = new Date(meal.createdAt);
+      mealDate.setUTCHours(0, 0, 0, 0);
+      
+      const existing = combinedData.find(d => 
+        d.date.getTime() === mealDate.getTime()
+      );
+      
+      if (existing) {
+        existing.totals.calories += meal.nutrition.calories;
+        existing.totals.protein += meal.nutrition.protein;
+        existing.totals.carbs += meal.nutrition.carbs;
+        existing.totals.fats += meal.nutrition.fats;
+      } else {
+        combinedData.push({
+          date: mealDate,
+          totals: { ...meal.nutrition }
+        });
+      }
+    });
+
+    res.json(combinedData.sort((a, b) => b.date - a.date));
   } catch (error) {
     console.error('Error fetching nutrition history:', error);
-    res.status(500).json({ message: 'Failed to fetch nutrition history' });
+    res.status(500).json({ message: 'Failed to fetch history' });
   }
 });
 
