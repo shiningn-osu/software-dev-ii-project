@@ -129,7 +129,6 @@ function GroceryList() {
   
   // Load grocery list from localStorage whenever the component updates
   useEffect(() => {
-<<<<<<< HEAD
     const fetchStoredGroceryList = () => {
       const storedList = JSON.parse(localStorage.getItem("groceryList")) || [];
       setGroceryList(storedList);
@@ -151,32 +150,6 @@ function GroceryList() {
   
   
   // Add a new item to grocery list
-=======
-    if (location.state?.ingredients) {
-      const newIngredients = location.state.ingredients.filter(
-        (ingredient) => !groceryList.some(item => item.name === ingredient.name)
-      );
-      
-      if (newIngredients.length > 0) {
-        const newList = [...groceryList, ...newIngredients];
-        setGroceryList(newList);
-        saveGroceryList(newList);
-      }
-
-      // Clear the location state to prevent re-adding ingredients
-      navigate(location.pathname, { replace: true });
-    }
-  }, [location.state, navigate]);
-
-  // Add ESLint ignore comment for the missing dependencies
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  useEffect(() => {
-    if (location.pathname === '/grocery') {
-      saveGroceryList(groceryList);
-    }
-  }, []);
-
->>>>>>> 161f341dd75e383b3fe8037d0597f0688cb2ed0b
   const addItem = async () => {
     if (newItem.trim()) {
       // Check if item with same name exists

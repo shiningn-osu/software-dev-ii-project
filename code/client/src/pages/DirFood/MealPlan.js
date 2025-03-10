@@ -373,7 +373,7 @@ const MealPlan = () => {
 
           <div className="col-md-3">
             <label>Calories:</label>
-            <input type="number" name="minCalories" placeholder="Min" onChange={handleChange} className="form-control" min = "500" />
+            <input type="number" name="minCalories" placeholder="Min" onChange={handleChange} className="form-control" max = "1750" />
           </div>
 
           <div className="col-md-3">
