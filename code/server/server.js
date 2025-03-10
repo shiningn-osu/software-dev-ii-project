@@ -35,7 +35,7 @@ app.use(cors({
   origin: corsOrigin,          // Use the dynamically determined origin
   credentials: true,           // Allow cookies or auth headers
   methods: ['GET', 'POST', 'PUT', 'DELETE'], // Allowed HTTP methods
-  allowedHeaders: ['Content-Type', 'Authorization', 'Accept'] // Allowed headers
+  allowedHeaders: ['Content-Type', 'Authorization', 'Accept', 'edamam-account-user'] // Allowed headers
 }));
 
 //api keys and access tokens:
