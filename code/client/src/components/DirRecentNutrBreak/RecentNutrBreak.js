@@ -43,15 +43,6 @@ const RecentNutrBreak = () => {
           }, meals[0])
           : null;
 
-        // Extract nutritional information
-        if (latest) {
-          const { nutrition } = latest;
-          latest.calories = nutrition.calories || 0;
-          latest.protein = nutrition.protein || 0;
-          latest.carbs = nutrition.carbs || 0;
-          latest.fats = nutrition.fats || 0;
-        }
-
         setLatestMeal(latest);
       } catch (err) {
         setError('Failed to fetch latest meal data');
@@ -119,4 +110,4 @@ const RecentNutrBreak = () => {
   );
 };
 
-export default RecentNutrBreak;
+export default RecentNutrBreak; 
