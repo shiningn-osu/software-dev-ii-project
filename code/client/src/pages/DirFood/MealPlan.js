@@ -338,7 +338,7 @@ const MealPlan = () => {
 
           <div className="col-md-3">
             <label>Diet:</label>
-            <select name="diet" onChange={handleChange} className="form-control">
+            <select name="diet" multple onChange={handleChange} className="form-control">
               <option value="">Select Diet</option>
               <option value="high-protein">High-Protein</option>
               <option value="low-carb">Low-Carb</option>
@@ -350,11 +350,11 @@ const MealPlan = () => {
 
           <div className="col-md-3">
             <label>Calories:</label>
-            <input type="number" name="minCalories" placeholder="Min" onChange={handleChange} className="form-control" />
+            <input type="number" name="minCalories" placeholder="Min" onChange={handleChange} className="form-control" min = "500" />
           </div>
 
           <div className="col-md-3">
-            <input type="number" name="maxCalories" placeholder="Max" onChange={handleChange} className="form-control mt-4" />
+            <input type="number" name="maxCalories" placeholder="Max" onChange={handleChange} className="form-control mt-4" max ="3000" />
           </div>
         </div>
 
