@@ -6,14 +6,22 @@ Here you will find a guide to understanding the contents of the directories of t
 ### .github Entails: 
 a workflows directory, which contains a .yaml script file that makes GitHub Actions run and automatically test the code/client and code/server directories' unit tests. This file makes GitHub Actions run whenever a push to any branch occurs, or whenever a pull request to main occurs.
 
+[.github](./.github)
+
 ### code Entails: 
 all of the code for the Meal Match application. This code is split up into the client directory code (which houses all the code required to run the client), and the server directory code (which hourses all the code required to run the server).
 
-### Documents Entails: 
+[code](./code)
+
+### documents Entails: 
 All of the project related artifacts. One artifact is the 'Front-end Design.pdf' file, which contains the work for the frontend design done by Benjamin Kono and Aiden McCoy. Another is the Poster-Slide.pdf, which contains the poster developed for the Meal Match presentation at OSU in Week 10 of Winter term, 2025.
 
-### Reports Entails: 
+[documents](./documents)
+
+### reports Entails: 
 All of the project weekly status reports outlining contributions, project goals, and qualititative data about each week of development.
+
+[reports](./reports)
 
 ## Top-Level Documentation Guide
 Here you will find a navigation guide to find the documentation that you are looking for.
@@ -62,4 +70,4 @@ Here you will find a guide to understanding the top-level files of the project
 - code to make any build of server.js run in a vercel serverless environment.
 - code to match all routes and send them to server.js
 
-[team-resources.md](./team-resources.md)
+[vercel.json](./vercel.json)
