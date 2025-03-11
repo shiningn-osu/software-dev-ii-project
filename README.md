@@ -62,12 +62,3 @@ Here you will find a navigation guide to find the documentation that you are loo
 - Team member communication policies
 
 [team-resources.md](./team-resources.md)
-
-## File Information 
-Here you will find a guide to understanding the top-level files of the project
-
-### vercel.json Entails: 
-- code to make any build of server.js run in a vercel serverless environment.
-- code to match all routes and send them to server.js
-
-[vercel.json](./vercel.json)
