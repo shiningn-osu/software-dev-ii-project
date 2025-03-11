@@ -1,8 +1,21 @@
 # Welcome to Meal Match
 
-For installation steps, see the UserDocumentation.md
+## Directory Guide
+Here you will find a guide to understanding the contents of the directories of the project
 
-## Documentation Guide
+### .github Entails: 
+a workflows directory, which contains a .yaml script file that makes GitHub Actions run and automatically test the code/client and code/server directories' unit tests. This file makes GitHub Actions run whenever a push to any branch occurs, or whenever a pull request to main occurs.
+
+### code Entails: 
+all of the code for the Meal Match application. This code is split up into the client directory code (which houses all the code required to run the client), and the server directory code (which hourses all the code required to run the server).
+
+### Documents Entails: 
+All of the project related artifacts. One artifact is the 'Front-end Design.pdf' file, which contains the work for the frontend design done by Benjamin Kono and Aiden McCoy. Another is the Poster-Slide.pdf, which contains the poster developed for the Meal Match presentation at OSU in Week 10 of Winter term, 2025.
+
+### Reports Entails: 
+All of the project weekly status reports outlining contributions, project goals, and qualititative data about each week of development.
+
+## Top-Level Documentation Guide
 Here you will find a navigation guide to find the documentation that you are looking for.
 
 ### UserDocumentation.md Entails: 
@@ -16,6 +29,7 @@ Here you will find a navigation guide to find the documentation that you are loo
 ### DeveloperDocumentation.md Entails:
 - Information about how to acquire the source code of meal match
 - The directory structure of the code folder
+- Information about what coding guidelines the project code utilizes
 - The necessary technology required for running Meal Match locally
 - How to run tests on the project's code
 - How to add custom tests for the project's code
@@ -27,12 +41,25 @@ Here you will find a navigation guide to find the documentation that you are loo
 - The URL of a live version of the project
 - Installation steps for getting the project and the npm dependencies on a local machine
 
+[INSTALL.md](./INSTALL.md)
+
 ### SETUP.md Entails: 
 - Setup steps for getting the project to be able to run locally on your machine after installation.
+
+[SETUP.md](./SETUP.md)
 
 ### team-resources.md Entails: 
 - Team members and roles
 - Project artifacts
 - Team member communication policies
+
+[team-resources.md](./team-resources.md)
+
+## File Information 
+Here you will find a guide to understanding the top-level files of the project
+
+### vercel.json Entails: 
+- code to make any build of server.js run in a vercel serverless environment.
+- code to match all routes and send them to server.js
 
 [team-resources.md](./team-resources.md)
