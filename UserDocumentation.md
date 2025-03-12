@@ -41,7 +41,6 @@ The code for Meal Match is within the top-level directory named "code". Within t
     cd ../..
     ```
 3. **Set up a MongoDB Server Connection**
-   OPTION 1
     3.0. Go to the server directory and add a .env file. This file will simply have the name of '.env', where no text is in front of the '.' part. This will be set up in the server directory, which is inside the top-level code directory of the project.
       3.0.1 Make sure to create two variables named MONGODB_URI and JWT_SECRET 
       3.0.2 For the MONGODB_URI variable, just leave it blank for now.
