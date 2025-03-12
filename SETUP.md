@@ -2,7 +2,6 @@
 
 This document provides the instructions for setting up and deploying the web application on a remote server. The app is a React client-server application that requires a backend API (Express.js) and a database (MongoDB or PostgreSQL, depending on your app’s design). This guide will walk through installing the dependencies, configuring the server, and starting the application, both locally and remotely.
 
-
 ## Local Version Setup 
 
 The following is a guide for setting up the Meal Match project locally.
@@ -75,43 +74,3 @@ The code for Meal Match is within the top-level directory named "code". Within t
     6.1 Open up a browser tab
     6.2 Navigate to http://localhost:3000
       6.2.1 It may be necessary to navigate to http://127.0.0.1:3000 if the localhost address does not work.
-
-## Live Version Setup (Deployment)
-
-The following is a guide for setting up a live deployment of Meal Match. This process requires you to have set up the project locally first, which can be done by following the previous steps.
-
-### Client Setup
-
-A good, free service that can be used to deploy the client directory is [netlify.com](https://www.netlify.com/). Below are the steps to deploy the client directory using vercel.
-
-1. **Create an Account**
-    1.1 Click the "Sign Up" button and create an account.
-    1.2 Verify your email
-    1.3 Login and continue answering their questions.
-    1.4 Click on the "Continue to Deploy" button and then proceed to step 2.
-2. **Create a Build**
-    2.1 In the client directory of the code directory in the software-dev-ii-project repository that was downloaded from github, run the following command:
-    ```Bash
-    npm run build
-    ```
-    2.2 Note the new presence of a directory titled "build: in your client directory, and continue to step 3.
-3. **Deploy a New Project**
-    3.1 Click the "Try Netlify Drop" text.
-    3.2 Upload the build folder that you created in step 2 to the site by either dragging and dropping, or by clicking the "browse to upload" link and finding the build folder.
-    3.3 You should now be congratulated. Click on the "Get Started" button to continue.
-4. **Change the Site Name**
-    4.1 From the "Sites" left navigation bar tab, click on your site name to enter into the site specific menu.
-    4.2 Click on the "Site Configuration" button
-    4.3 Scroll down to view the "Site information" section, and click on the "Change site name" button, and enter in a name of your choice.
-5. **Create an Environment Variable**
-    5.1 From the "Site configuration" left navigation bar tab underneath the text "Sites / (whatever you put for the site name in step 4)", you should see another navigation bar to the left, where it has headers like "General", "Build and Deploy", and "Environment Variables". Click on the header that says "Environment Variables".
-    5.2 Click on the blue button that says "Add a variable"
-    5.3 Click on the button that says "Add a single varibale".
-    5.4 For the key field, fill it out with the following text: REACT_APP_PROD_SERVER_URL
-    5.5 For the Scopes, select the "Specific scopes" option.
-    5.6 For the values, under the Production field, enter the url of the server that we set up previously.
-    5.7 Click the blue "Create Variable" button at the bottom of the page.
-6. **Create an Environment Variable**
-    6.1 From the "Site configuration" left navigation bar tab underneath the text "Sites / (whatever you put for the site name in step 4)", you should see another navigation bar to the left, where it has headers like "General", "Build and Deploy", and "Environment Variables". Click on the header that says "Environment Variables".
-    6.2 Click on the blue button that says "Add a variable"
-    6.3 Click on the button that says "Add a single varibale".
