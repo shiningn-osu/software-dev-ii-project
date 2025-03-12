@@ -45,10 +45,9 @@ Here you will find a guide to understanding the files of the client directory
 
 [vercel.json](./vercel.json)
 
-
 ## Available Scripts
 
-In the project directory, you can run:
+In the client directory, you can run:
 
 ### `npm start`
 
