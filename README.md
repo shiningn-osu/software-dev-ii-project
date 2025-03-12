@@ -24,12 +24,12 @@ Here you will find a navigation guide to find the documentation that you are loo
 
 ### INSTALL.md Entails: 
 - The URL of a live version of the project
-- Installation steps for getting the project and the npm dependencies on a local machine
+- Installation steps for getting the project installed on your local machine.
 
 [INSTALL.md](./INSTALL.md)
 
 ### SETUP.md Entails: 
-- Setup steps for getting the project to be able to run locally on your machine after installation.
+- Setup steps for getting the project to be able to run locally on your machine.
 
 [SETUP.md](./SETUP.md)
 
