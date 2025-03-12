@@ -2,7 +2,7 @@
 
 This document provides the instructions for setting up and deploying the web application on a remote server. The app is a React client-server application that requires a backend API (Express.js) and a database (MongoDB or PostgreSQL, depending on your app’s design). This guide will walk through installing the dependencies, configuring the server, and starting the application, both locally and remotely.
 
-## Local Version Setup 
+## Local Project Setup to Run
 
 The following is a guide for setting up the Meal Match project locally.
 
