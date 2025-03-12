@@ -16,7 +16,9 @@ const Diary = () => {
   const [editingIndex, setEditingIndex] = useState(null);
   const [editingIngredient, setEditingIngredient] = useState(null);
 
-  // Fetch existing meals
+  /**
+   * Fetches existing meals from the database when the component mounts.
+   */
   useEffect(() => {
     const fetchMeals = async () => {
       try {
@@ -53,7 +55,12 @@ const Diary = () => {
     fetchMeals();
   }, []);
 
-  // Fetch nutrition data
+  /**
+   * Fetches nutrition data for a given ingredient and weight.
+   * @param {string} name - The ingredient name.
+   * @param {number} weight - The weight of the ingredient in grams.
+   * @returns {object} Nutrition information including calories, protein, carbs, and fats.
+   */
   const fetchNutrition = async (name, weight) => {
     try {
       const response = await axios.get("https://api.edamam.com/api/nutrition-data", {
@@ -82,7 +89,9 @@ const Diary = () => {
     }
   };
 
-  // Add ingredient
+  /**
+   * Adds an ingredient to the list with its nutritional information.
+   */
   const addIngredient = async () => {
     if (!ingredient || !weight) {
       setError("Please fill in both fields");
@@ -102,19 +111,28 @@ const Diary = () => {
     setWeight("");
   };
 
-  // Delete ingredient
+  /**
+   * Deletes an ingredient from the list.
+   * @param {number} index - The index of the ingredient to remove.
+   */
   const deleteIngredient = (index) => {
     const newIngredients = ingredients.filter((_, i) => i !== index);
     setIngredients(newIngredients);
   };
 
-  // Edit ingredient
+  /**
+   * Edits an existing ingredient.
+   * @param {number} index - The index of the ingredient to edit.
+   */
   const editIngredient = (index) => {
     setEditingIndex(index);
     setEditingIngredient(ingredients[index]);
   };
 
-  // Handle input change for editing
+  /**
+   * Handles changes to the ingredient being edited.
+   * @param {Event} e - The input change event.
+   */
   const handleEditChange = (e) => {
     const { name, value } = e.target;
     setEditingIngredient({
@@ -123,7 +141,9 @@ const Diary = () => {
     });
   };
 
-  // Save edited ingredient
+  /**
+   * Saves the edited ingredient back into the list.
+   */
   const saveEdit = async () => {
     if (!editingIngredient.name || !editingIngredient.weight) {
       setError("Please fill in both fields");
@@ -145,13 +165,19 @@ const Diary = () => {
     setEditingIngredient(null);
   };
 
-  // Cancel edit
+  /**
+   * Cancels the ingredient editing process.
+   */
   const cancelEdit = () => {
     setEditingIndex(null);
     setEditingIngredient(null);
   };
 
-  // Save meal to database
+  /**
+   * Sends the meal to the database.
+   * @param {object} meal - The meal object to be saved.
+   * @returns {object} The saved meal from the database.
+   */
   const sendMealToDatabase = async (meal) => {
     try {
       const PRE_URL = process.env.REACT_APP_PROD_SERVER_URL || '';
@@ -166,7 +192,10 @@ const Diary = () => {
     }
   };
 
-  // Delete meal
+  /**
+   * Deletes a meal from the database.
+   * @param {string} mealId - The ID of the meal to delete.
+   */
   const deleteMeal = async (mealId) => {
     try {
       const token = localStorage.getItem('token');
@@ -190,7 +219,9 @@ const Diary = () => {
     }
   };
 
-  // Create new meal
+  /**
+   * Creates a new meal with selected ingredients and saves it.
+   */
   const addMeal = async () => {
     if (!mealName) {
       setError("Please enter a meal name");
