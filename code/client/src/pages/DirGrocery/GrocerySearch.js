@@ -12,6 +12,10 @@ function GrocerySearch() {
   //const APP_ID = "14fa0a37";
   //const APP_KEY = "d938c99d056d72a1cb7267e86c60ff53";
 
+  /* 
+  Calls for kroger locations near the zipCode stored as zipQuery
+  */
+  
   const fetchKrogerLocations = async () => {
     if(!zipQuery || zipQuery.length === 0){
       setError("Please Enter a Zip Code To Find Nearby Stores.")
@@ -57,6 +61,10 @@ function GrocerySearch() {
   };
 
 
+  /* 
+    Fetches the list of groceries at the current location (taken from fetchKrogerLocations) and saves them as groceries
+  */
+  
   // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {  //triggered when locData updates
     if (!locData || !query) return;
@@ -109,6 +117,10 @@ function GrocerySearch() {
   const confirmZipisNumbers = (input) => /^\d+$/.test(input);
 
 
+  /*
+    Checks validity of zipQuery, and returns if invalid- otherwise, shows to the user that the zipcode given was accepted
+  */
+  
   const assignZipcode = (f) =>{
     f.preventDefault();
     console.log(confirmZipisNumbers(zipQuery))
@@ -134,6 +146,8 @@ function GrocerySearch() {
     setZipQuery(f.target.value);
   };
 
+  //output html
+  
   return (
     <div className="GrocerySearch">
       <h1 style={{ marginTop: '20px' }}>Search for Groceries</h1>
